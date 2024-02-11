@@ -150,14 +150,14 @@ func (c *Character) attack(target *Character) {
 			damage := rollDice(attack.DamageDice)
 			if !target.CritImmune && diceRoll >= attack.CritRange {
 				damage = damage * attack.CritBonus
-				logger.Log(DEBUG, "(%d) Critical Hit! %s takes %d damage from %s.\n", diceRoll, target.Name, damage, attack.Name)
+				logger.Log(NOTICE, "(%d) Critical Hit! %s takes %d damage from %s.\n", diceRoll, target.Name, damage, attack.Name)
 				target.takeDamage(damage)
 			} else {
-				logger.Log(DEBUG, "(%d) Hit! %s takes %d damage from %s.\n", diceRoll, target.Name, damage, attack.Name)
+				logger.Log(NOTICE, "(%d) Hit! %s takes %d damage from %s.\n", diceRoll, target.Name, damage, attack.Name)
 				target.takeDamage(damage)
 			}
 		} else {
-			logger.Log(DEBUG, "%s misses (%d) %s with %s.\n", c.Name, diceRoll, target.Name, attack.Name)
+			logger.Log(NOTICE, "(%d) %s misses %s with %s.\n", diceRoll, c.Name, target.Name, attack.Name)
 		}
 	}
 }
@@ -233,7 +233,7 @@ func monsterFactory(monsterType int) *Character {
 }
 
 func main() {
-	logger = Logger{INFO}
+	logger = Logger{NOTICE}
 
 	battlefield := Battlefield{arena}
 

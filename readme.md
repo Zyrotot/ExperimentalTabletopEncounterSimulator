@@ -1,4 +1,4 @@
-# Experimental TableTop Simulator
+# Experimental TableTop Encounter Simulator
 
 Made by a bored programmer to help with his tabletop powergaming, this simulator is made to test the power level of character in the TormentaRPG system, fighting against the favourite monsters of his GM. This system can be easely altered to work with any simple minded meele creature in a d20 based system.
 
@@ -21,5 +21,6 @@ Functionts planned to be done:
     Great cleave
     Support for large creatures
     Alightment
+    Diferent sided dice in the same attack
 
 

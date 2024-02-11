@@ -25,7 +25,7 @@ var HP int = 195
 var AC int = 42
 
 // Is the Character immune to crits? true or false
-var CritImmune bool = false
+var CritImmune bool = true
 
 // Does the Character has Cleave? true or false  // TODO(rafael.moresco): enum para poder ter great cleave
 var Cleave bool = false
@@ -37,6 +37,9 @@ var FlankImmune bool = false
 // where: x is the number of dice, y the dice type, z the damage modifier
 // more than one value can be added
 var attacks = []string{"SwordAttack1 5d6+34 19 20 2", "SwordAttack2 5d6+34 19 20 2"}
+
+// Select enemy difficulty
+var difficulty int = 2
 
 type Attack struct {
 	Name        string
@@ -61,6 +64,12 @@ type Character struct {
 type PrintLog struct {
 	level int
 }
+
+const (
+	Uktril    int = 0
+	Geraktril int = 1
+	Reishid   int = 2
+)
 
 func attackParser() []Attack {
 	AttacksList := []Attack{}
@@ -150,6 +159,57 @@ func numberOfAliveEnemies(enemies []*Character) int {
 	return count
 }
 
+func monsterFactory(monsterType int) *Character { // TODO(Zyrotot): Create logic for monsters bigger than medium
+	switch monsterType {
+	case Uktril:
+		return &Character{
+			Name:       "Uktril",
+			CurrentHP:  60,
+			AC:         22,
+			CritImmune: true,
+			Attacks: []Attack{
+				{"Pinça", "1d8+8", 20, 13, 2},
+				{"Garra", "1d4+8", 20, 12, 2},
+			},
+		}
+	case Geraktril:
+		return &Character{
+			Name:       "Geraktril",
+			CurrentHP:  99,
+			AC:         25,
+			CritImmune: true,
+			Attacks: []Attack{
+				{"Pinça", "1d8+10", 20, 17, 2},
+				{"Pinça", "1d8+10", 20, 17, 2},
+				{"Garra", "1d4+10", 20, 16, 2},
+			},
+		}
+	case Reishid: // TODO(Zyrotot): Add alignment to characters, so that anti-alignment weapons can work
+		return &Character{
+			Name:       "Reishid",
+			CurrentHP:  143,
+			AC:         30,
+			CritImmune: true,
+			Attacks: []Attack{
+				{"Adaga", "1d4+14", 19, 26, 2},
+				{"Mordida", "1d4+10", 20, 22, 2},
+				{"Garra", "1d4+10", 20, 22, 2},
+			},
+		}
+	default:
+		return &Character{
+			Name:       "Uktril",
+			CurrentHP:  60,
+			AC:         22,
+			CritImmune: true,
+			Attacks: []Attack{
+				{"Pinça", "1d8+8", 20, 13, 2},
+				{"Garra", "1d4+8", 20, 12, 2},
+			},
+		}
+	}
+}
+
 func main() {
 	var printer PrintLog
 
@@ -178,17 +238,7 @@ func main() {
 
 		for i := 0; i < encounter; i++ {
 			fmt.Printf("Criando monstro %d\n", i)
-			enemy := &Character{
-				Name:       "Geraktril",
-				CurrentHP:  99,
-				AC:         25,
-				CritImmune: true,
-				Attacks: []Attack{
-					{"Pinça", "1d8+10", 20, 17, 2},
-					{"Pinça", "1d8+10", 20, 17, 2},
-					{"Garra", "1d4+10", 20, 16, 2},
-				},
-			}
+			enemy := monsterFactory(difficulty)
 			enemies = append(enemies, enemy)
 			fmt.Println(enemies[i])
 		}

@@ -146,7 +146,7 @@ func (c *Character) attack(target *Character) {
 		logger.Log(DEBUG, "%v\n", attack)
 		diceRoll := rollDice("1d20")
 		attackRoll := diceRoll + attack.AttackBonus
-		if attackRoll >= target.AC || diceRoll == 20 {
+		if diceRoll != 1 && (attackRoll >= target.AC || diceRoll == 20) {
 			damage := rollDice(attack.DamageDice)
 			if !target.CritImmune && diceRoll >= attack.CritRange {
 				damage = damage * attack.CritBonus

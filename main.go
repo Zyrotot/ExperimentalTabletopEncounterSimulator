@@ -6,7 +6,37 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 )
+
+///////////////////////////////////////////////
+// EXPERIMENTAL TABLETOP ENCOUNTER SIMULATOR //
+///////////////////////////////////////////////
+
+// INPUTS:
+
+// Character Name
+var Name string = "Bob"
+
+// Character HP
+var HP int = 195
+
+// Character Armor Class
+var AC int = 42
+
+// Is the Character immune to crits? true or false
+var CritImmune bool = false
+
+// Does the Character has Cleave? true or false  // TODO(rafael.moresco): enum para poder ter great cleave
+var Cleave bool = false
+
+// Is the Character immune to flanking? true or false
+var FlankImmune bool = false
+
+// Character attacks and damage, following the template "attack_name xdy+z #critrange #attack_bonus #crit_multyplier"
+// where: x is the number of dice, y the dice type, z the damage modifier
+// more than one value can be added
+var attacks = []string{"SwordAttack1 5d6+34 19 20 2", "SwordAttack2 5d6+34 19 20 2"}
 
 type Attack struct {
 	Name        string
@@ -30,6 +60,19 @@ type Character struct {
 
 type PrintLog struct {
 	level int
+}
+
+func attackParser() []Attack {
+	AttacksList := []Attack{}
+	for _, attack := range attacks {
+		split := strings.Split(attack, " ")
+		AttackBonus, _ := strconv.Atoi(split[2])
+		CritRange, _ := strconv.Atoi(split[3])
+		CritBonus, _ := strconv.Atoi(split[4])
+		NewAttack := Attack{split[0], split[1], AttackBonus, CritRange, CritBonus}
+		AttacksList = append(AttacksList, NewAttack)
+	}
+	return AttacksList
 }
 
 func (c *Character) takeDamage(damage int) {
@@ -69,6 +112,7 @@ func rollDice(dice string) int {
 func (c *Character) attack(target *Character) {
 	fmt.Printf("%s attacks %s...\n", c.Name, target.Name)
 	for _, attack := range c.Attacks {
+		fmt.Println(attack)
 		diceRoll := rollDice("1d20")
 		attackRoll := diceRoll + attack.AttackBonus
 		if attackRoll >= target.AC || diceRoll == 20 {
@@ -82,7 +126,7 @@ func (c *Character) attack(target *Character) {
 				target.takeDamage(damage)
 			}
 		} else {
-			fmt.Printf("%s misses %s with %s.\n", c.Name, target.Name, attack.Name)
+			fmt.Printf("%s misses (%d) %s with %s.\n", c.Name, diceRoll, target.Name, attack.Name)
 		}
 	}
 }
@@ -116,15 +160,13 @@ func main() {
 	}
 
 	player := Character{
-		Name:        "Paladino Sedutor Meio-Dragão",
-		MaxHP:       195,
-		AC:          42,
-		CritImmune:  true,
-		Cleave:      false,
-		FlankImmune: false,
-		Attacks: []Attack{
-			{"Espada grande", "5d6+34", 19, 25, 2},
-		},
+		Name:        Name,
+		MaxHP:       HP,
+		AC:          AC,
+		CritImmune:  CritImmune,
+		Cleave:      Cleave,
+		FlankImmune: FlankImmune,
+		Attacks:     attackParser(),
 	}
 	var enemies []*Character
 
@@ -174,7 +216,7 @@ func main() {
 				if enemy.isAlive() {
 					count++
 					if count <= 8 {
-						if numberOfAliveEnemies(enemies)%2 == 1 && len(enemies)-1 == i {
+						if numberOfAliveEnemies(enemies)%2 == 1 && len(enemies)-1 == i && numberOfAliveEnemies(enemies) < 8 {
 							player.IsFlanked = false
 						}
 						enemy.attack(&player)

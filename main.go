@@ -26,7 +26,7 @@ var AC int = 42
 // Is the Character immune to crits? true or false
 var CritImmune bool = true
 
-// Does the Character has Cleave? true or false  // TODO(rafael.moresco): enum para poder ter great cleave
+// Does the Character has Cleave? true or false
 var Cleave bool = false
 
 // Is the Character immune to flanking? true or false
@@ -181,7 +181,7 @@ func numberOfAliveEnemies(enemies []*Character) int {
 	return count
 }
 
-func monsterFactory(monsterType int) *Character { // TODO(Zyrotot): Create logic for monsters bigger than medium
+func monsterFactory(monsterType int) *Character {
 	switch monsterType {
 	case Uktril:
 		return &Character{
@@ -206,7 +206,7 @@ func monsterFactory(monsterType int) *Character { // TODO(Zyrotot): Create logic
 				{"Garra", "1d4+10", 20, 16, 2},
 			},
 		}
-	case Reishid: // TODO(Zyrotot): Add alignment to characters, so that anti-alignment weapons can work
+	case Reishid:
 		return &Character{
 			Name:       "Reishid",
 			CurrentHP:  143,

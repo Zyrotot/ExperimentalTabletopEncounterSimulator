@@ -38,8 +38,15 @@ var FlankImmune bool = false
 // more than one value can be added
 var attacks = []string{"SwordAttack1 5d6+34 19 20 2", "SwordAttack2 5d6+34 19 20 2"}
 
-// Select enemy difficulty
-var difficulty int = 2
+// Select enemy difficulty, ranging from 1 to 3
+var difficulty int = 1
+
+// Select arena type, where 1 is an open field, 2 is the Character in front of a wall, 3 is the Character in a corner between two walls
+var arena int = 3
+
+type Battlefield struct {
+	ArenaType int
+}
 
 type Attack struct {
 	Name        string
@@ -66,9 +73,9 @@ type PrintLog struct {
 }
 
 const (
-	Uktril    int = 0
-	Geraktril int = 1
-	Reishid   int = 2
+	Uktril    int = 1
+	Geraktril int = 2
+	Reishid   int = 3
 )
 
 func attackParser() []Attack {
@@ -219,6 +226,21 @@ func main() {
 		printer.level = 0
 	}
 
+	battlefield := Battlefield{arena}
+
+	var countLimit int
+
+	switch battlefield.ArenaType {
+	case 1:
+		countLimit = 8
+	case 2:
+		countLimit = 5
+	case 3:
+		countLimit = 3
+	default:
+		countLimit = 8
+	}
+
 	player := Character{
 		Name:        Name,
 		MaxHP:       HP,
@@ -256,7 +278,7 @@ func main() {
 			}
 			count := 0
 
-			if numberOfAliveEnemies(enemies) > 2 {
+			if numberOfAliveEnemies(enemies) > 2 && battlefield.ArenaType != 3 {
 				if !player.FlankImmune {
 					player.IsFlanked = true
 				}
@@ -265,10 +287,17 @@ func main() {
 			for i, enemy := range enemies {
 				if enemy.isAlive() {
 					count++
-					if count <= 8 {
-						if numberOfAliveEnemies(enemies)%2 == 1 && len(enemies)-1 == i && numberOfAliveEnemies(enemies) < 8 {
-							player.IsFlanked = false
+					if count <= countLimit {
+						if battlefield.ArenaType == 1 {
+							if numberOfAliveEnemies(enemies)%2 == 1 && len(enemies)-1 == i && numberOfAliveEnemies(enemies) < 8 {
+								player.IsFlanked = false
+							}
+						} else if battlefield.ArenaType == 2 {
+							if numberOfAliveEnemies(enemies) < 2 || count > 2 {
+								player.IsFlanked = false
+							}
 						}
+
 						enemy.attack(&player)
 					}
 				} else {

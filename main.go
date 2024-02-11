@@ -3,35 +3,47 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"os"
 	"regexp"
 	"strconv"
-	"time"
 )
 
 type Attack struct {
 	Name        string
 	DamageDice  string
 	AttackBonus int
+	CritRange   int
 	CritBonus   int
 }
 
 type Character struct {
-	Name       string
-	HP         int
-	AC         int
-	CritImmune bool
-	Attacks    []Attack
+	Name        string
+	CurrentHP   int
+	MaxHP       int
+	AC          int
+	CritImmune  bool
+	Cleave      bool
+	FlankImmune bool
+	IsFlanked   bool
+	Attacks     []Attack
+}
+
+type PrintLog struct {
+	level int
 }
 
 func (c *Character) takeDamage(damage int) {
-	c.HP -= damage
-	if c.HP < 0 {
-		c.HP = 0
+	if damage < 1 {
+		damage = 1
+	}
+	c.CurrentHP -= damage
+	if c.CurrentHP < 0 {
+		c.CurrentHP = 0
 	}
 }
 
 func (c *Character) isAlive() bool {
-	return c.HP > 0
+	return c.CurrentHP > 0
 }
 
 func rollDice(dice string) int {
@@ -61,16 +73,12 @@ func (c *Character) attack(target *Character) {
 		attackRoll := diceRoll + attack.AttackBonus
 		if attackRoll >= target.AC || diceRoll == 20 {
 			damage := rollDice(attack.DamageDice)
-			if !target.CritImmune && diceRoll == 20 {
+			if !target.CritImmune && diceRoll >= attack.CritRange {
 				damage = damage * attack.CritBonus
-				fmt.Printf("Critical Hit! %s takes %d damage from %s.\n", target.Name, damage, attack.Name)
+				fmt.Printf("(%d) Critical Hit! %s takes %d damage from %s.\n", diceRoll, target.Name, damage, attack.Name)
 				target.takeDamage(damage)
 			} else {
-				if diceRoll == 20 {
-					fmt.Printf("Critical Hit! %s takes %d damage from %s.\n", target.Name, damage, attack.Name)
-				} else {
-					fmt.Printf("Hit! %s takes %d damage from %s.\n", target.Name, damage, attack.Name)
-				}
+				fmt.Printf("(%d) Hit! %s takes %d damage from %s.\n", diceRoll, target.Name, damage, attack.Name)
 				target.takeDamage(damage)
 			}
 		} else {
@@ -88,40 +96,55 @@ func indexOfFirstAliveEnemy(enemies []*Character) int {
 	return -1
 }
 
+func numberOfAliveEnemies(enemies []*Character) int {
+	count := 0
+	for _, enemy := range enemies {
+		if enemy.isAlive() {
+			count++
+		}
+	}
+	return count
+}
+
 func main() {
-	rand.Seed(time.Now().UnixNano()) // Trocar aqui para mudar o resultado
+	var printer PrintLog
 
-	HPtotal := 195
-
-	player := Character{
-		Name:       "Player",
-		HP:         HPtotal,
-		AC:         42,
-		CritImmune: true,
-		Attacks: []Attack{
-			{"Sword", "3d6+34", 25, 2},
-		},
+	if len(os.Args) > 0 {
+		printer.level, _ = strconv.Atoi(os.Args[0])
+	} else {
+		printer.level = 0
 	}
 
-	enemies := []*Character{}
+	player := Character{
+		Name:        "Paladino Sedutor Meio-Dragão",
+		MaxHP:       195,
+		AC:          42,
+		CritImmune:  true,
+		Cleave:      false,
+		FlankImmune: false,
+		Attacks: []Attack{
+			{"Espada grande", "5d6+34", 19, 25, 2},
+		},
+	}
+	var enemies []*Character
 
 	encounter := 1
-	for player.isAlive() {
+	for {
 		fmt.Printf("Encounter %d begins!\n", encounter)
-		player.HP = HPtotal
-
+		player.CurrentHP = player.MaxHP
 		enemies = nil
 
 		for i := 0; i < encounter; i++ {
-			fmt.Printf("Criando monsntro %d\n", i)
+			fmt.Printf("Criando monstro %d\n", i)
 			enemy := &Character{
-				Name:       "Enemy",
-				HP:         99,
+				Name:       "Geraktril",
+				CurrentHP:  99,
 				AC:         25,
 				CritImmune: true,
 				Attacks: []Attack{
-					{"Pinça", "1d8+10", 17, 2},
-					{"Garra", "1d4+10", 16, 2},
+					{"Pinça", "1d8+10", 20, 17, 2},
+					{"Pinça", "1d8+10", 20, 17, 2},
+					{"Garra", "1d4+10", 20, 16, 2},
 				},
 			}
 			enemies = append(enemies, enemy)
@@ -134,13 +157,30 @@ func main() {
 				break
 			}
 			player.attack(enemies[index])
+			if player.Cleave && !enemies[index].isAlive() {
+				if index+1 < len(enemies) && numberOfAliveEnemies(enemies) > 4 {
+					player.attack(enemies[index+1])
+				}
+			}
 			count := 0
-			for _, enemy := range enemies {
-				count++
-				if !enemy.isAlive() {
-					fmt.Printf("%s defeated!\n", enemy.Name)
-				} else if count <= 8 {
-					enemy.attack(&player)
+
+			if numberOfAliveEnemies(enemies) > 2 {
+				if !player.FlankImmune {
+					player.IsFlanked = true
+				}
+			}
+
+			for i, enemy := range enemies {
+				if enemy.isAlive() {
+					count++
+					if count <= 8 {
+						if numberOfAliveEnemies(enemies)%2 == 1 && len(enemies)-1 == i {
+							player.IsFlanked = false
+						}
+						enemy.attack(&player)
+					}
+				} else {
+					fmt.Println("Enemy is defeated!")
 				}
 				if !player.isAlive() {
 					break
@@ -152,7 +192,7 @@ func main() {
 			}
 		}
 
-		fmt.Printf("Player HP: %d\n", player.HP)
+		fmt.Printf("Player HP: %d\n", player.CurrentHP)
 		if player.isAlive() {
 			fmt.Println("Proceeding to next encounter with more enemies...")
 			encounter++

@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -39,14 +38,12 @@ var FlankImmune bool = false
 var attacks = []string{"SwordAttack1 5d6+34 19 20 2", "SwordAttack2 5d6+34 19 20 2"}
 
 // Select enemy difficulty, ranging from 1 to 3
-var difficulty int = 1
+var difficulty int = 2
 
 // Select arena type, where 1 is an open field, 2 is the Character in front of a wall, 3 is the Character in a corner between two walls
-var arena int = 3
+var arena int = 1
 
-type Battlefield struct {
-	ArenaType int
-}
+// ---------------------------------   CODE  ---------------------------------------------------
 
 type Attack struct {
 	Name        string
@@ -68,15 +65,33 @@ type Character struct {
 	Attacks     []Attack
 }
 
-type PrintLog struct {
+type Battlefield struct {
+	ArenaType int
+}
+
+type Logger struct {
 	level int
 }
+
+var logger Logger
+
+const (
+	INFO   int = 5
+	NOTICE int = 6
+	DEBUG  int = 7
+)
 
 const (
 	Uktril    int = 1
 	Geraktril int = 2
 	Reishid   int = 3
 )
+
+func (log *Logger) Log(level int, format string, a ...any) {
+	if level <= log.level {
+		fmt.Printf(format, a...)
+	}
+}
 
 func attackParser() []Attack {
 	AttacksList := []Attack{}
@@ -126,23 +141,23 @@ func rollDice(dice string) int {
 }
 
 func (c *Character) attack(target *Character) {
-	fmt.Printf("%s attacks %s...\n", c.Name, target.Name)
+	logger.Log(NOTICE, "%s attacks %s...\n", c.Name, target.Name)
 	for _, attack := range c.Attacks {
-		fmt.Println(attack)
+		logger.Log(DEBUG, "%v\n", attack)
 		diceRoll := rollDice("1d20")
 		attackRoll := diceRoll + attack.AttackBonus
 		if attackRoll >= target.AC || diceRoll == 20 {
 			damage := rollDice(attack.DamageDice)
 			if !target.CritImmune && diceRoll >= attack.CritRange {
 				damage = damage * attack.CritBonus
-				fmt.Printf("(%d) Critical Hit! %s takes %d damage from %s.\n", diceRoll, target.Name, damage, attack.Name)
+				logger.Log(DEBUG, "(%d) Critical Hit! %s takes %d damage from %s.\n", diceRoll, target.Name, damage, attack.Name)
 				target.takeDamage(damage)
 			} else {
-				fmt.Printf("(%d) Hit! %s takes %d damage from %s.\n", diceRoll, target.Name, damage, attack.Name)
+				logger.Log(DEBUG, "(%d) Hit! %s takes %d damage from %s.\n", diceRoll, target.Name, damage, attack.Name)
 				target.takeDamage(damage)
 			}
 		} else {
-			fmt.Printf("%s misses (%d) %s with %s.\n", c.Name, diceRoll, target.Name, attack.Name)
+			logger.Log(DEBUG, "%s misses (%d) %s with %s.\n", c.Name, diceRoll, target.Name, attack.Name)
 		}
 	}
 }
@@ -218,13 +233,7 @@ func monsterFactory(monsterType int) *Character { // TODO(Zyrotot): Create logic
 }
 
 func main() {
-	var printer PrintLog
-
-	if len(os.Args) > 0 {
-		printer.level, _ = strconv.Atoi(os.Args[0])
-	} else {
-		printer.level = 0
-	}
+	logger = Logger{INFO}
 
 	battlefield := Battlefield{arena}
 
@@ -254,20 +263,20 @@ func main() {
 
 	encounter := 1
 	for {
-		fmt.Printf("Encounter %d begins!\n", encounter)
+		logger.Log(INFO, "Encounter %d begins!\n", encounter)
 		player.CurrentHP = player.MaxHP
 		enemies = nil
 
 		for i := 0; i < encounter; i++ {
-			fmt.Printf("Criando monstro %d\n", i)
+			logger.Log(DEBUG, "Criando monstro %d\n", i)
 			enemy := monsterFactory(difficulty)
 			enemies = append(enemies, enemy)
-			fmt.Println(enemies[i])
+			logger.Log(DEBUG, "%v\n", enemies[i])
 		}
 		for {
 			index := indexOfFirstAliveEnemy(enemies)
 			if index == -1 {
-				fmt.Printf("Encounter %d finished \n", encounter)
+				logger.Log(INFO, "Encounter %d finished \n", encounter)
 				break
 			}
 			player.attack(enemies[index])
@@ -301,24 +310,24 @@ func main() {
 						enemy.attack(&player)
 					}
 				} else {
-					fmt.Println("Enemy is defeated!")
+					logger.Log(DEBUG, "Enemy is defeated! \n")
 				}
 				if !player.isAlive() {
 					break
 				}
 			}
 			if !player.isAlive() {
-				fmt.Println("Player has been defeated!")
+				logger.Log(INFO, "%v\n", "Player has been defeated!")
 				break
 			}
 		}
 
-		fmt.Printf("Player HP: %d\n", player.CurrentHP)
+		logger.Log(INFO, "Player HP: %d\n", player.CurrentHP)
 		if player.isAlive() {
-			fmt.Println("Proceeding to next encounter with more enemies...")
+			logger.Log(INFO, "%v\n", "Proceeding to next encounter with more enemies...")
 			encounter++
 		} else {
-			fmt.Printf("You managed to defeat %d enemies!", encounter-1)
+			logger.Log(INFO, "You managed to defeat %d enemies!", encounter-1)
 			break
 		}
 	}

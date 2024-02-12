@@ -35,10 +35,13 @@ var Cleave bool = false
 // Is the Character immune to flanking? true or false
 var FlankImmune bool = false
 
+// Does the Character have Rigidez Raivosa? true or false
+var RigidezRaivosa bool = false
+
 // Character attacks and damage, following the template "attack_name #attack_bonus xdy+z #critrange #crit_multyplier"
 // where: x is the number of dice, y the dice type, z the damage modifier
 // more than one value can be added
-var attacks = []string{"SwordAttack1 5d6+34 19 20 2", "SwordAttack2 5d6+34 19 20 2"}
+var attacks = []string{"SwordAttack1 20 5d6+34 19 2", "SwordAttack2 20 5d6+34 19 2"}
 
 // Select enemy difficulty, ranging from 1 to 3
 var difficulty int = 2
@@ -57,17 +60,18 @@ type Attack struct {
 }
 
 type Character struct {
-	Name        string
-	CurrentHP   int
-	MaxHP       int
-	AC          int
-	DR          int
-	CritImmune  bool
-	Cleave      bool
-	FlankImmune bool
-	IsFlanked   bool
-	IsNPC       bool
-	Attacks     []Attack
+	Name           string
+	CurrentHP      int
+	MaxHP          int
+	AC             int
+	DR             int
+	CritImmune     bool
+	Cleave         bool
+	FlankImmune    bool
+	RigidezRaivosa bool
+	IsFlanked      bool
+	IsNPC          bool
+	Attacks        []Attack
 }
 
 type Battlefield struct {
@@ -115,11 +119,20 @@ func (c *Character) takeDamage(damage int) {
 	if damage < 1 {
 		damage = 1
 	}
-	damage -= c.DR
-	if damage < 1 {
-		damage = 0
+	if c.DR > 0 {
+		damage -= c.DR
+		if damage < 1 {
+			damage = 0
+		}
+		logger.Log(NOTICE, "%d damage taken due to %d DR.\n", damage, c.DR)
 	}
+
+	if c.RigidezRaivosa && damage > 0 {
+		c.DR += 1
+	}
+	logger.Log(DEBUG, "Current DR %d.\n", c.DR)
 	c.CurrentHP -= damage
+	logger.Log(DEBUG, "Current HP %d.\n", c.CurrentHP)
 	if c.CurrentHP < 0 {
 		c.CurrentHP = 0
 		if c.IsNPC {
@@ -168,10 +181,10 @@ func (c *Character) attack(target *Character) {
 			damage := rollDice(attack.DamageDice)
 			if !target.CritImmune && diceRoll >= attack.CritRange {
 				damage = damage * attack.CritBonus
-				logger.Log(NOTICE, "(%d) Critical Hit! %s takes %d damage from %s.\n", diceRoll, target.Name, damage, attack.Name)
+				logger.Log(NOTICE, "(%d) Critical Hit! %s deals %d damage to %s.\n", diceRoll, attack.Name, damage, target.Name)
 				target.takeDamage(damage)
 			} else {
-				logger.Log(NOTICE, "(%d) Hit! %s takes %d damage from %s.\n", diceRoll, target.Name, damage, attack.Name)
+				logger.Log(NOTICE, "(%d) Hit! %s deals %d damage to %s.\n", diceRoll, attack.Name, damage, target.Name)
 				target.takeDamage(damage)
 			}
 		} else {
@@ -255,7 +268,7 @@ func monsterFactory(monsterType int) *Character {
 }
 
 func main() {
-	logger = Logger{NOTICE}
+	logger = Logger{INFO}
 
 	battlefield := Battlefield{arena}
 
@@ -273,14 +286,15 @@ func main() {
 	}
 
 	player := Character{
-		Name:        Name,
-		MaxHP:       HP,
-		AC:          AC,
-		DR:          DR,
-		CritImmune:  CritImmune,
-		Cleave:      Cleave,
-		FlankImmune: FlankImmune,
-		Attacks:     attackParser(),
+		Name:           Name,
+		MaxHP:          HP,
+		AC:             AC,
+		DR:             DR,
+		CritImmune:     CritImmune,
+		Cleave:         Cleave,
+		FlankImmune:    FlankImmune,
+		RigidezRaivosa: RigidezRaivosa,
+		Attacks:        attackParser(),
 	}
 	var enemies []*Character
 
@@ -288,6 +302,7 @@ func main() {
 	for {
 		logger.Log(INFO, "Encounter %d begins!\n", encounter)
 		player.CurrentHP = player.MaxHP
+		player.DR = DR
 		enemies = nil
 
 		for i := 0; i < encounter; i++ {
@@ -350,7 +365,11 @@ func main() {
 			logger.Log(INFO, "%v\n", "Proceeding to next encounter with more enemies...")
 			encounter++
 		} else {
-			logger.Log(INFO, "You managed to defeat %d enemies!", encounter-1)
+			if player.RigidezRaivosa {
+				logger.Log(INFO, "You managed to defeat %d enemies! (You had %d DR)", encounter-1, player.DR)
+			} else {
+				logger.Log(INFO, "You managed to defeat %d enemies!", encounter-1)
+			}
 			break
 		}
 	}

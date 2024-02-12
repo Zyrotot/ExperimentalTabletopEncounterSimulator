@@ -62,6 +62,7 @@ type Character struct {
 	Cleave      bool
 	FlankImmune bool
 	IsFlanked   bool
+	IsNPC       bool
 	Attacks     []Attack
 }
 
@@ -113,6 +114,9 @@ func (c *Character) takeDamage(damage int) {
 	c.CurrentHP -= damage
 	if c.CurrentHP < 0 {
 		c.CurrentHP = 0
+		if c.IsNPC {
+			logger.Log(NOTICE, "Enemy defeated\n")
+		}
 	}
 }
 
@@ -143,6 +147,9 @@ func rollDice(dice string) int {
 func (c *Character) attack(target *Character) {
 	logger.Log(NOTICE, "%s attacks %s...\n", c.Name, target.Name)
 	for _, attack := range c.Attacks {
+		if !target.isAlive() {
+			break
+		}
 		logger.Log(DEBUG, "%v\n", attack)
 		diceRoll := rollDice("1d20")
 		attackRoll := diceRoll + attack.AttackBonus
@@ -196,6 +203,7 @@ func monsterFactory(monsterType int) *Character {
 				{"Pinça", "1d8+8", 20, 13, 2},
 				{"Garra", "1d4+8", 20, 12, 2},
 			},
+			IsNPC: true,
 		}
 	case Geraktril:
 		return &Character{
@@ -208,6 +216,7 @@ func monsterFactory(monsterType int) *Character {
 				{"Pinça", "1d8+10", 20, 17, 2},
 				{"Garra", "1d4+10", 20, 16, 2},
 			},
+			IsNPC: true,
 		}
 	case Reishid:
 		return &Character{
@@ -220,6 +229,7 @@ func monsterFactory(monsterType int) *Character {
 				{"Mordida", "1d4+10", 20, 22, 2},
 				{"Garra", "1d4+10", 20, 22, 2},
 			},
+			IsNPC: true,
 		}
 	default:
 		return &Character{
@@ -231,6 +241,7 @@ func monsterFactory(monsterType int) *Character {
 				{"Pinça", "1d8+8", 20, 13, 2},
 				{"Garra", "1d4+8", 20, 12, 2},
 			},
+			IsNPC: true,
 		}
 	}
 }

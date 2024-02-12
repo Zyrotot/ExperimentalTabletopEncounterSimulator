@@ -4,14 +4,14 @@ Made by a bored programmer to help with his tabletop powergaming, this simulator
 
 
 ## Files
-The main.go file has all necessary to run the program. it can be either be executed by the basic Bash command:
+The main.go file has all the code, and is the only necessary to run the program. it can be executed by the basic Bash command:
 ```bash
 go run .
 ```
 
 ## How to use
 
-You can run this code by copying the code in main.go to the go [playground page](https://go.dev/play/), and press RUN.
+You can run this program by copying the code in main.go to the go [playground page](https://go.dev/play/), and press RUN.
 
 ## TODO
 
@@ -26,4 +26,3 @@ Functionts planned to be done:
     Alightment
     Diferent sided dice in the same attack
     Crit enchantments
-    DR

@@ -26,8 +26,9 @@ var AC int = 42
 // Damage Resistance
 var DR int = 0
 
-// Is the Character immune to crits? true or false
-var CritImmune bool = true
+// Fortification (chance to ignore critical hits). Must be placed as whole number, 25% = 25
+// If immune, to critical hits, put 100
+var Fort int = 0
 
 // Does the Character has Cleave? true or false
 var Cleave bool = false
@@ -49,6 +50,9 @@ var difficulty int = 2
 // Select arena type, where 1 is an open field, 2 is the Character in front of a wall, 3 is the Character in a corner between two walls
 var arena int = 1
 
+// Run mode: 1 = Info - Just the results; 2 = Notice - Shows the fight; 3 = Debug - For debbuging purposes
+var runmode int = 2
+
 // ---------------------------------   CODE  ---------------------------------------------------
 
 type Attack struct {
@@ -65,7 +69,7 @@ type Character struct {
 	MaxHP          int
 	AC             int
 	DR             int
-	CritImmune     bool
+	Fort           int
 	Cleave         bool
 	FlankImmune    bool
 	RigidezRaivosa bool
@@ -85,9 +89,9 @@ type Logger struct {
 var logger Logger
 
 const (
-	INFO   int = 5
-	NOTICE int = 6
-	DEBUG  int = 7
+	INFO   int = 1
+	NOTICE int = 2
+	DEBUG  int = 3
 )
 
 const (
@@ -179,9 +183,18 @@ func (c *Character) attack(target *Character) {
 		}
 		if diceRoll != 1 && (attackRoll >= target.AC || diceRoll == 20) {
 			damage := rollDice(attack.DamageDice)
-			if !target.CritImmune && diceRoll >= attack.CritRange {
-				damage = damage * attack.CritBonus
-				logger.Log(NOTICE, "(%d) Critical Hit! %s deals %d damage to %s.\n", diceRoll, attack.Name, damage, target.Name)
+			if diceRoll >= attack.CritRange {
+				if target.Fort == 0 {
+					damage = damage * attack.CritBonus
+					logger.Log(NOTICE, "(%d) Critical Hit! %s deals %d damage to %s.\n", diceRoll, attack.Name, damage, target.Name)
+				} else {
+					if rand.Intn(100) > target.Fort {
+						damage = damage * attack.CritBonus
+						logger.Log(NOTICE, "(%d) Critical Hit! %s deals %d damage to %s.\n", diceRoll, attack.Name, damage, target.Name)
+					} else {
+						logger.Log(NOTICE, "(%d) Hit! %s deals %d damage to %s.\n", diceRoll, attack.Name, damage, target.Name)
+					}
+				}
 				target.takeDamage(damage)
 			} else {
 				logger.Log(NOTICE, "(%d) Hit! %s deals %d damage to %s.\n", diceRoll, attack.Name, damage, target.Name)
@@ -216,10 +229,10 @@ func monsterFactory(monsterType int) *Character {
 	switch monsterType {
 	case Uktril:
 		return &Character{
-			Name:       "Uktril",
-			CurrentHP:  60,
-			AC:         22,
-			CritImmune: true,
+			Name:      "Uktril",
+			CurrentHP: 60,
+			AC:        22,
+			Fort:      100,
 			Attacks: []Attack{
 				{"Pinça", "1d8+8", 13, 20, 2},
 				{"Garra", "1d4+8", 12, 20, 2},
@@ -228,10 +241,10 @@ func monsterFactory(monsterType int) *Character {
 		}
 	case Geraktril:
 		return &Character{
-			Name:       "Geraktril",
-			CurrentHP:  99,
-			AC:         25,
-			CritImmune: true,
+			Name:      "Geraktril",
+			CurrentHP: 99,
+			AC:        25,
+			Fort:      100,
 			Attacks: []Attack{
 				{"Pinça", "1d8+10", 17, 20, 2},
 				{"Pinça", "1d8+10", 17, 20, 2},
@@ -241,10 +254,10 @@ func monsterFactory(monsterType int) *Character {
 		}
 	case Reishid:
 		return &Character{
-			Name:       "Reishid",
-			CurrentHP:  143,
-			AC:         30,
-			CritImmune: true,
+			Name:      "Reishid",
+			CurrentHP: 143,
+			AC:        30,
+			Fort:      100,
 			Attacks: []Attack{
 				{"Adaga", "1d4+14", 26, 19, 2},
 				{"Mordida", "1d4+10", 22, 20, 2},
@@ -254,10 +267,10 @@ func monsterFactory(monsterType int) *Character {
 		}
 	default:
 		return &Character{
-			Name:       "Uktril",
-			CurrentHP:  60,
-			AC:         22,
-			CritImmune: true,
+			Name:      "Uktril",
+			CurrentHP: 60,
+			AC:        22,
+			Fort:      100,
 			Attacks: []Attack{
 				{"Pinça", "1d8+8", 13, 20, 2},
 				{"Garra", "1d4+8", 12, 20, 2},
@@ -268,7 +281,7 @@ func monsterFactory(monsterType int) *Character {
 }
 
 func main() {
-	logger = Logger{INFO}
+	logger = Logger{runmode}
 
 	battlefield := Battlefield{arena}
 
@@ -290,7 +303,7 @@ func main() {
 		MaxHP:          HP,
 		AC:             AC,
 		DR:             DR,
-		CritImmune:     CritImmune,
+		Fort:           Fort,
 		Cleave:         Cleave,
 		FlankImmune:    FlankImmune,
 		RigidezRaivosa: RigidezRaivosa,

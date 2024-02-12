@@ -32,10 +32,10 @@ var Cleave bool = false
 // Is the Character immune to flanking? true or false
 var FlankImmune bool = false
 
-// Character attacks and damage, following the template "attack_name xdy+z #critrange #attack_bonus #crit_multyplier"
+// Character attacks and damage, following the template "attack_name #attack_bonus xdy+z #critrange #crit_multyplier"
 // where: x is the number of dice, y the dice type, z the damage modifier
 // more than one value can be added
-var attacks = []string{"SwordAttack1 5d6+34 19 20 2", "SwordAttack2 5d6+34 19 20 2"}
+var attacks = []string{"SwordAttack1 20 5d6+34 19 2", "SwordAttack2 20 5d6+34 19 2"}
 
 // Select enemy difficulty, ranging from 1 to 3
 var difficulty int = 2
@@ -98,10 +98,10 @@ func attackParser() []Attack {
 	AttacksList := []Attack{}
 	for _, attack := range attacks {
 		split := strings.Split(attack, " ")
-		AttackBonus, _ := strconv.Atoi(split[2])
+		AttackBonus, _ := strconv.Atoi(split[1])
 		CritRange, _ := strconv.Atoi(split[3])
 		CritBonus, _ := strconv.Atoi(split[4])
-		NewAttack := Attack{split[0], split[1], AttackBonus, CritRange, CritBonus}
+		NewAttack := Attack{split[0], split[2], AttackBonus, CritRange, CritBonus}
 		AttacksList = append(AttacksList, NewAttack)
 	}
 	return AttacksList
@@ -247,7 +247,7 @@ func monsterFactory(monsterType int) *Character {
 }
 
 func main() {
-	logger = Logger{NOTICE}
+	logger = Logger{INFO}
 
 	battlefield := Battlefield{arena}
 

@@ -23,6 +23,9 @@ var HP int = 195
 // Character Armor Class
 var AC int = 42
 
+// Damage Resistance
+var DR int = 0
+
 // Is the Character immune to crits? true or false
 var CritImmune bool = true
 
@@ -35,7 +38,7 @@ var FlankImmune bool = false
 // Character attacks and damage, following the template "attack_name #attack_bonus xdy+z #critrange #crit_multyplier"
 // where: x is the number of dice, y the dice type, z the damage modifier
 // more than one value can be added
-var attacks = []string{"SwordAttack1 20 5d6+34 19 2", "SwordAttack2 20 5d6+34 19 2"}
+var attacks = []string{"SwordAttack1 5d6+34 19 20 2", "SwordAttack2 5d6+34 19 20 2"}
 
 // Select enemy difficulty, ranging from 1 to 3
 var difficulty int = 2
@@ -58,6 +61,7 @@ type Character struct {
 	CurrentHP   int
 	MaxHP       int
 	AC          int
+	DR          int
 	CritImmune  bool
 	Cleave      bool
 	FlankImmune bool
@@ -110,6 +114,10 @@ func attackParser() []Attack {
 func (c *Character) takeDamage(damage int) {
 	if damage < 1 {
 		damage = 1
+	}
+	damage -= c.DR
+	if damage < 1 {
+		damage = 0
 	}
 	c.CurrentHP -= damage
 	if c.CurrentHP < 0 {
@@ -200,8 +208,8 @@ func monsterFactory(monsterType int) *Character {
 			AC:         22,
 			CritImmune: true,
 			Attacks: []Attack{
-				{"Pinça", "1d8+8", 20, 13, 2},
-				{"Garra", "1d4+8", 20, 12, 2},
+				{"Pinça", "1d8+8", 13, 20, 2},
+				{"Garra", "1d4+8", 12, 20, 2},
 			},
 			IsNPC: true,
 		}
@@ -212,9 +220,9 @@ func monsterFactory(monsterType int) *Character {
 			AC:         25,
 			CritImmune: true,
 			Attacks: []Attack{
-				{"Pinça", "1d8+10", 20, 17, 2},
-				{"Pinça", "1d8+10", 20, 17, 2},
-				{"Garra", "1d4+10", 20, 16, 2},
+				{"Pinça", "1d8+10", 17, 20, 2},
+				{"Pinça", "1d8+10", 17, 20, 2},
+				{"Garra", "1d4+10", 16, 20, 2},
 			},
 			IsNPC: true,
 		}
@@ -225,9 +233,9 @@ func monsterFactory(monsterType int) *Character {
 			AC:         30,
 			CritImmune: true,
 			Attacks: []Attack{
-				{"Adaga", "1d4+14", 19, 26, 2},
-				{"Mordida", "1d4+10", 20, 22, 2},
-				{"Garra", "1d4+10", 20, 22, 2},
+				{"Adaga", "1d4+14", 26, 19, 2},
+				{"Mordida", "1d4+10", 22, 20, 2},
+				{"Garra", "1d4+10", 22, 20, 2},
 			},
 			IsNPC: true,
 		}
@@ -238,8 +246,8 @@ func monsterFactory(monsterType int) *Character {
 			AC:         22,
 			CritImmune: true,
 			Attacks: []Attack{
-				{"Pinça", "1d8+8", 20, 13, 2},
-				{"Garra", "1d4+8", 20, 12, 2},
+				{"Pinça", "1d8+8", 13, 20, 2},
+				{"Garra", "1d4+8", 12, 20, 2},
 			},
 			IsNPC: true,
 		}
@@ -247,7 +255,7 @@ func monsterFactory(monsterType int) *Character {
 }
 
 func main() {
-	logger = Logger{INFO}
+	logger = Logger{NOTICE}
 
 	battlefield := Battlefield{arena}
 
@@ -268,6 +276,7 @@ func main() {
 		Name:        Name,
 		MaxHP:       HP,
 		AC:          AC,
+		DR:          DR,
 		CritImmune:  CritImmune,
 		Cleave:      Cleave,
 		FlankImmune: FlankImmune,

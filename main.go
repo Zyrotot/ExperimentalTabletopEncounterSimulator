@@ -18,10 +18,10 @@ import (
 var Name string = "Bob"
 
 // Character HP
-var HP int = 195
+var HP int = 205
 
 // Character Armor Class
-var AC int = 42
+var AC int = 43
 
 // Damage Resistance
 var DR int = 0
@@ -29,6 +29,9 @@ var DR int = 0
 // Fortification (chance to ignore critical hits). Must be placed as whole number, 25% = 25
 // If immune, to critical hits, put 100
 var Fort int = 0
+
+// Does the creatura has Cura Acelerada? Whole number
+var CuraAcelerada int = 0
 
 // Does the Character has Cleave? true or false
 var Cleave bool = false
@@ -39,10 +42,13 @@ var FlankImmune bool = false
 // Does the Character have Rigidez Raivosa? true or false
 var RigidezRaivosa bool = false
 
+// Does the character have Perfect Mobility? true or false
+var PerfectMobility bool = false
+
 // Character attacks and damage, following the template "attack_name #attack_bonus xdy+z #critrange #crit_multyplier"
 // where: x is the number of dice, y the dice type, z the damage modifier
 // more than one value can be added
-var attacks = []string{"SwordAttack1 20 5d6+34 19 2", "SwordAttack2 20 5d6+34 19 2"}
+var attacks = []string{"SwordAttack1 21 5d6+36 19 2", "SwordAttack2 21 5d6+36 19 2"}
 
 // Select enemy difficulty, ranging from 1 to 3
 var difficulty int = 2
@@ -63,19 +69,27 @@ type Attack struct {
 	CritBonus   int
 }
 
+type TempBonus struct {
+	AC int
+	DR int
+}
+
 type Character struct {
-	Name           string
-	CurrentHP      int
-	MaxHP          int
-	AC             int
-	DR             int
-	Fort           int
-	Cleave         bool
-	FlankImmune    bool
-	RigidezRaivosa bool
-	IsFlanked      bool
-	IsNPC          bool
-	Attacks        []Attack
+	Name            string
+	CurrentHP       int
+	MaxHP           int
+	AC              int
+	DR              int
+	Fort            int
+	CuraAcelerada   int
+	Cleave          bool
+	FlankImmune     bool
+	RigidezRaivosa  bool
+	PerfectMobility bool
+	IsFlanked       bool
+	IsNPC           bool
+	Attacks         []Attack
+	TemporaryBonus  TempBonus
 }
 
 type Battlefield struct {
@@ -123,8 +137,8 @@ func (c *Character) takeDamage(damage int) {
 	if damage < 1 {
 		damage = 1
 	}
-	if c.DR > 0 {
-		damage -= c.DR
+	if c.DR+c.TemporaryBonus.DR > 0 {
+		damage -= c.DR + c.TemporaryBonus.DR
 		if damage < 1 {
 			damage = 0
 		}
@@ -132,9 +146,9 @@ func (c *Character) takeDamage(damage int) {
 	}
 
 	if c.RigidezRaivosa && damage > 0 {
-		c.DR += 1
+		c.TemporaryBonus.DR += 1
 	}
-	logger.Log(DEBUG, "Current DR %d.\n", c.DR)
+	logger.Log(DEBUG, "Current DR %d.\n", c.DR+c.TemporaryBonus.DR)
 	c.CurrentHP -= damage
 	logger.Log(DEBUG, "Current HP %d.\n", c.CurrentHP)
 	if c.CurrentHP < 0 {
@@ -181,7 +195,8 @@ func (c *Character) attack(target *Character) {
 		if target.IsFlanked {
 			attackRoll = attackRoll + 2
 		}
-		if diceRoll != 1 && (attackRoll >= target.AC || diceRoll == 20) {
+		logger.Log(DEBUG, "Total AC: %v\n", target.AC+target.TemporaryBonus.AC)
+		if diceRoll != 1 && (attackRoll >= target.AC+target.TemporaryBonus.AC || diceRoll == 20) {
 			damage := rollDice(attack.DamageDice)
 			if diceRoll >= attack.CritRange {
 				if target.Fort == 0 {
@@ -299,15 +314,17 @@ func main() {
 	}
 
 	player := Character{
-		Name:           Name,
-		MaxHP:          HP,
-		AC:             AC,
-		DR:             DR,
-		Fort:           Fort,
-		Cleave:         Cleave,
-		FlankImmune:    FlankImmune,
-		RigidezRaivosa: RigidezRaivosa,
-		Attacks:        attackParser(),
+		Name:            Name,
+		MaxHP:           HP,
+		AC:              AC,
+		DR:              DR,
+		Fort:            Fort,
+		CuraAcelerada:   CuraAcelerada,
+		Cleave:          Cleave,
+		FlankImmune:     FlankImmune,
+		RigidezRaivosa:  RigidezRaivosa,
+		PerfectMobility: PerfectMobility,
+		Attacks:         attackParser(),
 	}
 	var enemies []*Character
 
@@ -338,10 +355,28 @@ func main() {
 			}
 			count := 0
 
+			if player.CuraAcelerada > 0 && player.CurrentHP < player.MaxHP {
+				logger.Log(DEBUG, "Healing %d, current HP %d, current DR %d\n", player.CuraAcelerada, player.CurrentHP, player.DR+player.TemporaryBonus.DR)
+				player.CurrentHP += player.CuraAcelerada
+				if player.RigidezRaivosa {
+					player.TemporaryBonus.DR = 0
+				}
+				if player.CurrentHP > player.MaxHP {
+					player.CurrentHP = player.MaxHP
+				}
+				logger.Log(DEBUG, "Current HP %d and DR %d after healing\n", player.CurrentHP, player.DR+player.TemporaryBonus.DR)
+			}
+
 			if numberOfAliveEnemies(enemies) > 2 && battlefield.ArenaType != 3 {
 				if !player.FlankImmune {
 					player.IsFlanked = true
 				}
+			}
+
+			if numberOfAliveEnemies(enemies) < 4 && player.PerfectMobility {
+				player.TemporaryBonus.AC = 2
+			} else {
+				player.TemporaryBonus.AC = 0
 			}
 
 			for i, enemy := range enemies {

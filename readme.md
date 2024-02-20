@@ -18,8 +18,6 @@ You can run this program by copying the code in main.go to the go [playground pa
 Functionts planned to be done:
     
     Add iterations to get mean power level
-    Duro de matar
-    Duro de ferir
     Great cleave
     Support for large creatures
     Alightment

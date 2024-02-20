@@ -33,6 +33,12 @@ var Fort int = 0
 // Does the creatura has Cura Acelerada? Whole number
 var CuraAcelerada int = 0
 
+// How many stacks of duro de matar does the character have? Whole number
+var DuroDeMatar int = 0
+
+// How many stacks of duro de ferir does the character have? Whole number
+var DuroDeFerir int = 0
+
 // Does the Character has Cleave? true or false
 var Cleave bool = false
 
@@ -82,6 +88,8 @@ type Character struct {
 	DR              int
 	Fort            int
 	CuraAcelerada   int
+	DuroDeMatar     int
+	DuroDeFerir     int
 	Cleave          bool
 	FlankImmune     bool
 	RigidezRaivosa  bool
@@ -142,13 +150,28 @@ func (c *Character) takeDamage(damage int) {
 		if damage < 1 {
 			damage = 0
 		}
-		logger.Log(NOTICE, "%d damage taken due to %d DR.\n", damage, c.DR)
+		if c.DuroDeFerir > 0 && damage > 0 {
+			logger.Log(NOTICE, "%d damage negated due to Duro de ferir, remaining stacks %d.\n", damage, c.DuroDeFerir-1)
+			damage = 0
+			c.DuroDeFerir--
+		} else {
+			logger.Log(NOTICE, "%d damage taken due to %d DR.\n", damage, c.DR)
+		}
+	} else if c.DuroDeFerir > 0 && damage > 0 {
+		logger.Log(NOTICE, "%d damage negated due to Duro de ferir, remaining stacks %d.\n", damage, c.DuroDeFerir-1)
+		damage = 0
+		c.DuroDeFerir--
 	}
 
 	if c.RigidezRaivosa && damage > 0 {
 		c.TemporaryBonus.DR += 1
 	}
 	logger.Log(DEBUG, "Current DR %d.\n", c.DR+c.TemporaryBonus.DR)
+	if c.CurrentHP-damage < 0 && c.DuroDeMatar > 0 {
+		logger.Log(NOTICE, "Death avoided, %d damage negated due to Duro de matar, remaining stacks %d.\n", damage, c.DuroDeMatar-1)
+		damage = 0
+		c.DuroDeMatar--
+	}
 	c.CurrentHP -= damage
 	logger.Log(DEBUG, "Current HP %d.\n", c.CurrentHP)
 	if c.CurrentHP < 0 {
@@ -320,6 +343,8 @@ func main() {
 		DR:              DR,
 		Fort:            Fort,
 		CuraAcelerada:   CuraAcelerada,
+		DuroDeMatar:     DuroDeMatar,
+		DuroDeFerir:     DuroDeFerir,
 		Cleave:          Cleave,
 		FlankImmune:     FlankImmune,
 		RigidezRaivosa:  RigidezRaivosa,
@@ -332,7 +357,9 @@ func main() {
 	for {
 		logger.Log(INFO, "Encounter %d begins!\n", encounter)
 		player.CurrentHP = player.MaxHP
-		player.DR = DR
+		player.TemporaryBonus = TempBonus{0, 0}
+		player.DuroDeFerir = DuroDeFerir
+		player.DuroDeMatar = DuroDeMatar
 		enemies = nil
 
 		for i := 0; i < encounter; i++ {
@@ -375,8 +402,6 @@ func main() {
 
 			if numberOfAliveEnemies(enemies) < 4 && player.PerfectMobility {
 				player.TemporaryBonus.AC = 2
-			} else {
-				player.TemporaryBonus.AC = 0
 			}
 
 			for i, enemy := range enemies {

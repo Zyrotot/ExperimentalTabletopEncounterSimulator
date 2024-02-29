@@ -23,3 +23,5 @@ Functionts planned to be done:
     Alightment
     Diferent sided dice in the same attack
     Crit enchantments
+    Espirito Tenaz
+    Rolamento defensivo

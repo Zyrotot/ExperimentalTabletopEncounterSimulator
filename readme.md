@@ -25,3 +25,4 @@ Functionts planned to be done:
     Crit enchantments
     Espirito Tenaz
     Rolamento defensivo
+    Efeito da loucura da tormenta 

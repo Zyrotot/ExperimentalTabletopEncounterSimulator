@@ -65,6 +65,9 @@ var arena int = 1
 // Run mode: 1 = Info - Just the results; 2 = Notice - Shows the fight; 3 = Debug - For debbuging purposes
 var runmode int = 2
 
+// Number of runs, to take mean
+var runs int = 1000
+
 // ---------------------------------   CODE  ---------------------------------------------------
 
 type Attack struct {
@@ -353,96 +356,107 @@ func main() {
 	}
 	var enemies []*Character
 
-	encounter := 1
+	run := 1
+	defeated := 0
 	for {
-		logger.Log(INFO, "Encounter %d begins!\n", encounter)
-		player.CurrentHP = player.MaxHP
-		player.TemporaryBonus = TempBonus{0, 0}
-		player.DuroDeFerir = DuroDeFerir
-		player.DuroDeMatar = DuroDeMatar
-		enemies = nil
-
-		for i := 0; i < encounter; i++ {
-			logger.Log(DEBUG, "Criando monstro %d\n", i)
-			enemy := monsterFactory(difficulty)
-			enemies = append(enemies, enemy)
-			logger.Log(DEBUG, "%v\n", enemies[i])
-		}
+		encounter := 1
 		for {
-			index := indexOfFirstAliveEnemy(enemies)
-			if index == -1 {
-				logger.Log(INFO, "Encounter %d finished \n", encounter)
-				break
+			logger.Log(INFO, "Encounter %d begins!\n", encounter)
+			player.CurrentHP = player.MaxHP
+			player.TemporaryBonus = TempBonus{0, 0}
+			player.DuroDeFerir = DuroDeFerir
+			player.DuroDeMatar = DuroDeMatar
+			enemies = nil
+
+			for i := 0; i < encounter; i++ {
+				logger.Log(DEBUG, "Criando monstro %d\n", i)
+				enemy := monsterFactory(difficulty)
+				enemies = append(enemies, enemy)
+				logger.Log(DEBUG, "%v\n", enemies[i])
 			}
-			player.attack(enemies[index])
-			if player.Cleave && !enemies[index].isAlive() {
-				if index+1 < len(enemies) && numberOfAliveEnemies(enemies) > 4 {
-					player.attack(enemies[index+1])
+			for {
+				index := indexOfFirstAliveEnemy(enemies)
+				if index == -1 {
+					logger.Log(INFO, "Encounter %d finished \n", encounter)
+					break
 				}
-			}
-			count := 0
-
-			if player.CuraAcelerada > 0 && player.CurrentHP < player.MaxHP {
-				logger.Log(DEBUG, "Healing %d, current HP %d, current DR %d\n", player.CuraAcelerada, player.CurrentHP, player.DR+player.TemporaryBonus.DR)
-				player.CurrentHP += player.CuraAcelerada
-				if player.RigidezRaivosa {
-					player.TemporaryBonus.DR = 0
-				}
-				if player.CurrentHP > player.MaxHP {
-					player.CurrentHP = player.MaxHP
-				}
-				logger.Log(DEBUG, "Current HP %d and DR %d after healing\n", player.CurrentHP, player.DR+player.TemporaryBonus.DR)
-			}
-
-			if numberOfAliveEnemies(enemies) > 2 && battlefield.ArenaType != 3 {
-				if !player.FlankImmune {
-					player.IsFlanked = true
-				}
-			}
-
-			if numberOfAliveEnemies(enemies) < 4 && player.PerfectMobility {
-				player.TemporaryBonus.AC = 2
-			}
-
-			for i, enemy := range enemies {
-				if enemy.isAlive() {
-					count++
-					if count <= countLimit {
-						if battlefield.ArenaType == 1 {
-							if numberOfAliveEnemies(enemies)%2 == 1 && len(enemies)-1 == i && numberOfAliveEnemies(enemies) < 8 {
-								player.IsFlanked = false
-							}
-						} else if battlefield.ArenaType == 2 {
-							if numberOfAliveEnemies(enemies) < 2 || count > 2 {
-								player.IsFlanked = false
-							}
-						}
-
-						enemy.attack(&player)
+				player.attack(enemies[index])
+				if player.Cleave && !enemies[index].isAlive() {
+					if index+1 < len(enemies) && numberOfAliveEnemies(enemies) > 4 {
+						player.attack(enemies[index+1])
 					}
-				} else {
-					logger.Log(DEBUG, "Enemy is defeated! \n")
+				}
+				count := 0
+
+				if player.CuraAcelerada > 0 && player.CurrentHP < player.MaxHP {
+					logger.Log(DEBUG, "Healing %d, current HP %d, current DR %d\n", player.CuraAcelerada, player.CurrentHP, player.DR+player.TemporaryBonus.DR)
+					player.CurrentHP += player.CuraAcelerada
+					if player.RigidezRaivosa {
+						player.TemporaryBonus.DR = 0
+					}
+					if player.CurrentHP > player.MaxHP {
+						player.CurrentHP = player.MaxHP
+					}
+					logger.Log(DEBUG, "Current HP %d and DR %d after healing\n", player.CurrentHP, player.DR+player.TemporaryBonus.DR)
+				}
+
+				if numberOfAliveEnemies(enemies) > 2 && battlefield.ArenaType != 3 {
+					if !player.FlankImmune {
+						player.IsFlanked = true
+					}
+				}
+
+				if numberOfAliveEnemies(enemies) < 4 && player.PerfectMobility {
+					player.TemporaryBonus.AC = 2
+				}
+
+				for i, enemy := range enemies {
+					if enemy.isAlive() {
+						count++
+						if count <= countLimit {
+							if battlefield.ArenaType == 1 {
+								if numberOfAliveEnemies(enemies)%2 == 1 && len(enemies)-1 == i && numberOfAliveEnemies(enemies) < 8 {
+									player.IsFlanked = false
+								}
+							} else if battlefield.ArenaType == 2 {
+								if numberOfAliveEnemies(enemies) < 2 || count > 2 {
+									player.IsFlanked = false
+								}
+							}
+
+							enemy.attack(&player)
+						}
+					} else {
+						logger.Log(DEBUG, "Enemy is defeated! \n")
+					}
+					if !player.isAlive() {
+						break
+					}
 				}
 				if !player.isAlive() {
+					logger.Log(INFO, "%v\n", "Player has been defeated!")
 					break
 				}
 			}
-			if !player.isAlive() {
-				logger.Log(INFO, "%v\n", "Player has been defeated!")
+
+			logger.Log(INFO, "Player HP: %d\n", player.CurrentHP)
+			if player.isAlive() {
+				logger.Log(INFO, "%v\n", "Proceeding to next encounter with more enemies...")
+				encounter++
+			} else {
+				if player.RigidezRaivosa {
+					logger.Log(INFO, "You managed to defeat %d enemies! (You had %d DR)", encounter-1, player.DR)
+				} else {
+					logger.Log(INFO, "You managed to defeat %d enemies!", encounter-1)
+				}
+				defeated += encounter - 1
 				break
 			}
 		}
-
-		logger.Log(INFO, "Player HP: %d\n", player.CurrentHP)
-		if player.isAlive() {
-			logger.Log(INFO, "%v\n", "Proceeding to next encounter with more enemies...")
-			encounter++
-		} else {
-			if player.RigidezRaivosa {
-				logger.Log(INFO, "You managed to defeat %d enemies! (You had %d DR)", encounter-1, player.DR)
-			} else {
-				logger.Log(INFO, "You managed to defeat %d enemies!", encounter-1)
-			}
+		run++
+		if run > runs {
+			var mean_defeated float64 = float64(defeated) / float64(run-1)
+			logger.Log(INFO, "\nYour mean number of defeated enemies was %f!", mean_defeated)
 			break
 		}
 	}

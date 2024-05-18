@@ -28,7 +28,7 @@ var DR int = 0
 
 // Fortification (chance to ignore critical hits). Must be placed as whole number, 25% = 25
 // If immune, to critical hits, put 100
-var Fort int = 0
+var Fort int = 100
 
 // Does the creatura has Cura Acelerada? Whole number
 var CuraAcelerada int = 0
@@ -46,7 +46,7 @@ var Cleave bool = false
 var FlankImmune bool = false
 
 // Does the Character have Rigidez Raivosa? true or false
-var RigidezRaivosa bool = false
+var RigidezRaivosa bool = true
 
 // Does the character have Perfect Mobility? true or false
 var PerfectMobility bool = false
@@ -57,13 +57,13 @@ var PerfectMobility bool = false
 var attacks = []string{"SwordAttack1 21 5d6+36 19 2", "SwordAttack2 21 5d6+36 19 2"}
 
 // Select enemy difficulty, ranging from 1 to 3
-var difficulty int = 2
+var difficulty int = 1
 
 // Select arena type, where 1 is an open field, 2 is the Character in front of a wall, 3 is the Character in a corner between two walls
 var arena int = 1
 
 // Run mode: 1 = Info - Just the results; 2 = Notice - Shows the fight; 3 = Debug - For debbuging purposes
-var runmode int = 2
+var runmode int = 1
 
 // Number of runs, to take mean
 var runs int = 1000
@@ -93,6 +93,7 @@ type Character struct {
 	CuraAcelerada   int
 	DuroDeMatar     int
 	DuroDeFerir     int
+	Immortal        int
 	Cleave          bool
 	FlankImmune     bool
 	RigidezRaivosa  bool
@@ -114,6 +115,7 @@ type Logger struct {
 var logger Logger
 
 const (
+	BASE   int = 0
 	INFO   int = 1
 	NOTICE int = 2
 	DEBUG  int = 3
@@ -348,6 +350,7 @@ func main() {
 		CuraAcelerada:   CuraAcelerada,
 		DuroDeMatar:     DuroDeMatar,
 		DuroDeFerir:     DuroDeFerir,
+		Immortal:        0,
 		Cleave:          Cleave,
 		FlankImmune:     FlankImmune,
 		RigidezRaivosa:  RigidezRaivosa,
@@ -367,6 +370,7 @@ func main() {
 			player.DuroDeFerir = DuroDeFerir
 			player.DuroDeMatar = DuroDeMatar
 			enemies = nil
+			ascended := false
 
 			for i := 0; i < encounter; i++ {
 				logger.Log(DEBUG, "Criando monstro %d\n", i)
@@ -438,17 +442,35 @@ func main() {
 					break
 				}
 			}
-
+			switch difficulty {
+			case 1:
+				if (player.DR+player.TemporaryBonus.DR >= 32) || (player.Fort == 100 && player.DR+player.TemporaryBonus.DR >= 16) {
+					player.Immortal++
+					ascended = true
+				}
+			case 2:
+				if (player.DR >= 36) || (player.Fort == 100 && player.DR >= 18) {
+					player.Immortal++
+					ascended = true
+				}
+			case 3:
+				if (player.DR >= 36) || (player.Fort == 100 && player.DR >= 18) {
+					player.Immortal++
+					ascended = true
+				}
+			default:
+			}
+			if ascended {
+				logger.Log(INFO, "\nImmortality Achieved!")
+				encounter++
+				break
+			}
 			logger.Log(INFO, "Player HP: %d\n", player.CurrentHP)
 			if player.isAlive() {
 				logger.Log(INFO, "%v\n", "Proceeding to next encounter with more enemies...")
 				encounter++
 			} else {
-				if player.RigidezRaivosa {
-					logger.Log(INFO, "You managed to defeat %d enemies! (You had %d DR)", encounter-1, player.DR)
-				} else {
-					logger.Log(INFO, "You managed to defeat %d enemies!", encounter-1)
-				}
+				logger.Log(INFO, "You managed to defeat %d enemies!", encounter-1)
 				defeated += encounter - 1
 				break
 			}
@@ -456,7 +478,10 @@ func main() {
 		run++
 		if run > runs {
 			var mean_defeated float64 = float64(defeated) / float64(run-1)
-			logger.Log(INFO, "\nYour mean number of defeated enemies was %f!", mean_defeated)
+			logger.Log(BASE, "\nYour mean number of defeated enemies was %f!", mean_defeated)
+			if player.Immortal != 0 {
+				logger.Log(BASE, "\nYou where immortal %d times!", player.Immortal)
+			}
 			break
 		}
 	}

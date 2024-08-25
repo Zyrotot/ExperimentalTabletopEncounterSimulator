@@ -51,6 +51,9 @@ var RigidezRaivosa bool = true
 // Does the character have Perfect Mobility? true or false
 var PerfectMobility bool = false
 
+// Does the weapon have Vampiric Touch? true or false
+var VampiricWeapon bool = false
+
 // Character attacks and damage, following the template "attack_name #attack_bonus xdy+z #critrange #crit_multyplier"
 // where: x is the number of dice, y the dice type, z the damage modifier
 // more than one value can be added
@@ -62,8 +65,8 @@ var difficulty int = 1
 // Select arena type, where 1 is an open field, 2 is the Character in front of a wall, 3 is the Character in a corner between two walls
 var arena int = 1
 
-// Run mode: 1 = Info - Just the results; 2 = Notice - Shows the fight; 3 = Debug - For debbuging purposes
-var runmode int = 1
+// Run mode: 0 = Result - Just the end results 1 = Info - The result for each encounter; 2 = Notice - Shows the fight; 3 = Debug - For debbuging purposes
+var runmode int = 0
 
 // Number of runs, to take mean
 var runs int = 1000
@@ -81,6 +84,7 @@ type Attack struct {
 type TempBonus struct {
 	AC int
 	DR int
+	HP int
 }
 
 type Character struct {
@@ -97,6 +101,7 @@ type Character struct {
 	Cleave          bool
 	FlankImmune     bool
 	RigidezRaivosa  bool
+	VampiricWeapon  bool
 	PerfectMobility bool
 	IsFlanked       bool
 	IsNPC           bool
@@ -171,12 +176,25 @@ func (c *Character) takeDamage(damage int) {
 	if c.RigidezRaivosa && damage > 0 {
 		c.TemporaryBonus.DR += 1
 	}
+
 	logger.Log(DEBUG, "Current DR %d.\n", c.DR+c.TemporaryBonus.DR)
+
 	if c.CurrentHP-damage < 0 && c.DuroDeMatar > 0 {
 		logger.Log(NOTICE, "Death avoided, %d damage negated due to Duro de matar, remaining stacks %d.\n", damage, c.DuroDeMatar-1)
 		damage = 0
 		c.DuroDeMatar--
 	}
+
+	if c.TemporaryBonus.HP > 0 && damage > 0 {
+		if c.TemporaryBonus.HP < damage {
+			damage = damage - c.TemporaryBonus.HP
+			c.TemporaryBonus.HP = 0
+		} else {
+			c.TemporaryBonus.HP -= damage
+			damage = 0
+		}
+	}
+
 	c.CurrentHP -= damage
 	logger.Log(DEBUG, "Current HP %d.\n", c.CurrentHP)
 	if c.CurrentHP < 0 {
@@ -241,8 +259,13 @@ func (c *Character) attack(target *Character) {
 				target.takeDamage(damage)
 			} else {
 				logger.Log(NOTICE, "(%d) Hit! %s deals %d damage to %s.\n", diceRoll, attack.Name, damage, target.Name)
-				target.takeDamage(damage)
 			}
+			if c.VampiricWeapon {
+				if damage/2 > c.TemporaryBonus.HP {
+					c.TemporaryBonus.HP = damage/2
+				}
+			}
+				target.takeDamage(damage)
 		} else {
 			logger.Log(NOTICE, "(%d) %s misses %s with %s.\n", diceRoll, c.Name, target.Name, attack.Name)
 		}
@@ -354,6 +377,7 @@ func main() {
 		Cleave:          Cleave,
 		FlankImmune:     FlankImmune,
 		RigidezRaivosa:  RigidezRaivosa,
+		VampiricWeapon:	 VampiricWeapon,
 		PerfectMobility: PerfectMobility,
 		Attacks:         attackParser(),
 	}
@@ -366,7 +390,7 @@ func main() {
 		for {
 			logger.Log(INFO, "Encounter %d begins!\n", encounter)
 			player.CurrentHP = player.MaxHP
-			player.TemporaryBonus = TempBonus{0, 0}
+			player.TemporaryBonus = TempBonus{0, 0, 0}
 			player.DuroDeFerir = DuroDeFerir
 			player.DuroDeMatar = DuroDeMatar
 			enemies = nil

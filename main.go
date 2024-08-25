@@ -507,7 +507,7 @@ func main() {
 			if player.isAlive() {
 				logger.Log(INFO, "%v\n", "Proceeding to next encounter with more enemies...")
 				if !ascended {
-				encounter++
+					encounter++
 				}
 			} else {
 				logger.Log(INFO, "You managed to defeat %d enemies!", encounter-1)

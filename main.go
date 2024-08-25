@@ -502,12 +502,13 @@ func main() {
 			if ascended {
 				logger.Log(INFO, "\nImmortality Achieved!")
 				encounter++
-				break
 			}
 			logger.Log(INFO, "Player HP: %d\n", player.CurrentHP)
 			if player.isAlive() {
 				logger.Log(INFO, "%v\n", "Proceeding to next encounter with more enemies...")
+				if !ascended {
 				encounter++
+				}
 			} else {
 				logger.Log(INFO, "You managed to defeat %d enemies!", encounter-1)
 				defeated += encounter - 1

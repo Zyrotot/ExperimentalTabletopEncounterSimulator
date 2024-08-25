@@ -55,7 +55,7 @@ var PerfectMobility bool = false
 var VampiricWeapon bool = false
 
 // Does the character have Erosion? true or false
-var Erosion bool = true
+var Erosion bool = false
 
 // Character attacks and damage, following the template "attack_name #attack_bonus xdy+z #critrange #crit_multyplier"
 // where: x is the number of dice, y the dice type, z the damage modifier
@@ -488,12 +488,12 @@ func main() {
 					ascended = true
 				}
 			case 2:
-				if (player.DR >= 36) || (player.Fort == 100 && player.DR >= 18) {
+				if (player.DR+player.TemporaryBonus.DR >= 36) || (player.Fort == 100 && player.DR+player.TemporaryBonus.DR >= 18) {
 					player.Immortal++
 					ascended = true
 				}
 			case 3:
-				if (player.DR >= 36) || (player.Fort == 100 && player.DR >= 18) {
+				if (player.DR+player.TemporaryBonus.DR >= 36) || (player.Fort == 100 && player.DR+player.TemporaryBonus.DR >= 18) {
 					player.Immortal++
 					ascended = true
 				}

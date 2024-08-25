@@ -51,8 +51,11 @@ var RigidezRaivosa bool = true
 // Does the character have Perfect Mobility? true or false
 var PerfectMobility bool = false
 
-// Does the weapon have Vampiric Touch? true or false
+// Does the weapon have Vampiric Weapon? true or false
 var VampiricWeapon bool = false
+
+// Does the character have Erosion? true or false
+var Erosion bool = true
 
 // Character attacks and damage, following the template "attack_name #attack_bonus xdy+z #critrange #crit_multyplier"
 // where: x is the number of dice, y the dice type, z the damage modifier
@@ -102,6 +105,7 @@ type Character struct {
 	FlankImmune     bool
 	RigidezRaivosa  bool
 	VampiricWeapon  bool
+	Erosion         bool
 	PerfectMobility bool
 	IsFlanked       bool
 	IsNPC           bool
@@ -151,10 +155,18 @@ func attackParser() []Attack {
 	return AttacksList
 }
 
-func (c *Character) takeDamage(damage int) {
+func (c *Character) takeDamage(damage int, erosion bool) {
 	if damage < 1 {
 		damage = 1
 	}
+	if erosion {
+		if c.TemporaryBonus.DR > 0 {
+			c.TemporaryBonus.DR --
+		} else if c.DR > 0 {
+			c.DR--
+		}
+	}
+
 	if c.DR+c.TemporaryBonus.DR > 0 {
 		damage -= c.DR + c.TemporaryBonus.DR
 		if damage < 1 {
@@ -256,7 +268,6 @@ func (c *Character) attack(target *Character) {
 						logger.Log(NOTICE, "(%d) Hit! %s deals %d damage to %s.\n", diceRoll, attack.Name, damage, target.Name)
 					}
 				}
-				target.takeDamage(damage)
 			} else {
 				logger.Log(NOTICE, "(%d) Hit! %s deals %d damage to %s.\n", diceRoll, attack.Name, damage, target.Name)
 			}
@@ -265,7 +276,7 @@ func (c *Character) attack(target *Character) {
 					c.TemporaryBonus.HP = damage/2
 				}
 			}
-				target.takeDamage(damage)
+			target.takeDamage(damage, c.Erosion)
 		} else {
 			logger.Log(NOTICE, "(%d) %s misses %s with %s.\n", diceRoll, c.Name, target.Name, attack.Name)
 		}
@@ -303,6 +314,7 @@ func monsterFactory(monsterType int) *Character {
 				{"Pinça", "1d8+8", 13, 20, 2},
 				{"Garra", "1d4+8", 12, 20, 2},
 			},
+			// DR: 5,
 			IsNPC: true,
 		}
 	case Geraktril:
@@ -316,6 +328,7 @@ func monsterFactory(monsterType int) *Character {
 				{"Pinça", "1d8+10", 17, 20, 2},
 				{"Garra", "1d4+10", 16, 20, 2},
 			},
+			// DR: 10,
 			IsNPC: true,
 		}
 	case Reishid:
@@ -329,6 +342,7 @@ func monsterFactory(monsterType int) *Character {
 				{"Mordida", "1d4+10", 22, 20, 2},
 				{"Garra", "1d4+10", 22, 20, 2},
 			},
+			// DR: 10,
 			IsNPC: true,
 		}
 	default:
@@ -378,6 +392,7 @@ func main() {
 		FlankImmune:     FlankImmune,
 		RigidezRaivosa:  RigidezRaivosa,
 		VampiricWeapon:	 VampiricWeapon,
+		Erosion:		 Erosion,
 		PerfectMobility: PerfectMobility,
 		Attacks:         attackParser(),
 	}

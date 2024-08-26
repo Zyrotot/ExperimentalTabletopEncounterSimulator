@@ -347,13 +347,14 @@ func monsterFactory(monsterType int) *Character {
 		}
 	default:
 		return &Character{
-			Name:      "Uktril",
-			CurrentHP: 60,
-			AC:        22,
-			Fort:      100,
+			Name:      "Darius",
+			CurrentHP: 130,
+			AC:        27,
+			Fort:      30,
+			DR:		   13,
+			CuraAcelerada: 5,
 			Attacks: []Attack{
-				{"Pinça", "1d8+8", 13, 20, 2},
-				{"Garra", "1d4+8", 12, 20, 2},
+				{"Machandejante", "4d6+27", 20, 20, 3},
 			},
 			IsNPC: true,
 		}
@@ -533,7 +534,7 @@ func main() {
 			}
 			break
 		} else {
-			logger.Log(BASE, "\nRun finished your number of defeated enemies was %d!", encounter-1)
+			logger.Log(BASE, "\nRun %d finished your number of defeated enemies was %d!", run-1, encounter-1)
 		}
 	}
 }

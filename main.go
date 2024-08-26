@@ -39,8 +39,8 @@ var DuroDeMatar int = 0
 // How many stacks of duro de ferir does the character have? Whole number
 var DuroDeFerir int = 0
 
-// Does the Character has Cleave? true or false
-var Cleave bool = false
+// Does the Character has Cleave? (0 = No, 1 = Cleave, 2 = Great Cleave)
+var Cleave int = 0
 
 // Is the Character immune to flanking? true or false
 var FlankImmune bool = false
@@ -101,7 +101,7 @@ type Character struct {
 	DuroDeMatar     int
 	DuroDeFerir     int
 	Immortal        int
-	Cleave          bool
+	Cleave          int
 	FlankImmune     bool
 	RigidezRaivosa  bool
 	VampiricWeapon  bool
@@ -424,8 +424,17 @@ func main() {
 					break
 				}
 				player.attack(enemies[index])
-				if player.Cleave && !enemies[index].isAlive() {
-					if index+1 < len(enemies) && numberOfAliveEnemies(enemies) > 4 {
+				if player.Cleave == 2 && !enemies[index].isAlive() {
+					for i := index+1; i < len(enemies); i++ {
+						logger.Log(NOTICE, "Enemy cleaved \n")
+						player.attack(enemies[i])
+						if enemies[i].isAlive() || numberOfAliveEnemies(enemies) < 3 {
+							break
+						}
+					}
+				} else if player.Cleave == 1 && !enemies[index].isAlive() {
+					if index+1 < len(enemies) && numberOfAliveEnemies(enemies) > 2 {
+						logger.Log(NOTICE, "Enemy cleaved \n")
 						player.attack(enemies[index+1])
 					}
 				}
@@ -523,6 +532,8 @@ func main() {
 				logger.Log(BASE, "\nYou where immortal %d times!", player.Immortal)
 			}
 			break
+		} else {
+			logger.Log(BASE, "\nRun finished your number of defeated enemies was %d!", encounter-1)
 		}
 	}
 }

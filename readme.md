@@ -17,7 +17,6 @@ You can run this program by copying the code in main.go to the go [playground pa
 
 Functionts planned to be done:
     
-    Great cleave
     Support for large creatures
     Alightment
     Diferent sided dice in the same attack

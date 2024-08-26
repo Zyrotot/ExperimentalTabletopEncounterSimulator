@@ -177,7 +177,7 @@ func (c *Character) takeDamage(damage int, erosion bool) {
 			damage = 0
 			c.DuroDeFerir--
 		} else {
-			logger.Log(NOTICE, "%d damage taken due to %d DR.\n", damage, c.DR)
+			logger.Log(NOTICE, "%d damage taken due to %d DR.\n", damage, c.DR+c.TemporaryBonus.DR)
 		}
 	} else if c.DuroDeFerir > 0 && damage > 0 {
 		logger.Log(NOTICE, "%d damage negated due to Duro de ferir, remaining stacks %d.\n", damage, c.DuroDeFerir-1)

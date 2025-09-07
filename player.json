@@ -1,0 +1,32 @@
+{
+  "name": "Bob",
+  "hp": 205,
+  "ac": 43,
+  "dr": 0,
+  "fort": 100,
+  "curaAcelerada": 0,
+  "duroDeMatar": 0,
+  "duroDeFerir": 0,
+  "cleave": 0,
+  "flankImmune": false,
+  "rigidezRaivosa": true,
+  "perfectMobility": false,
+  "vampiricWeapon": false,
+  "erosion": false,
+  "attacks": [
+    {
+      "name": "SwordAttack1",
+      "attackBonus": 21,
+      "damageDice": "5d6+36",
+      "critRange": 19,
+      "critBonus": 2
+    },
+    {
+      "name": "SwordAttack2",
+      "attackBonus": 21,
+      "damageDice": "5d6+36",
+      "critRange": 19,
+      "critBonus": 2
+    }
+  ]
+}

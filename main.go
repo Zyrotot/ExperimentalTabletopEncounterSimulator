@@ -315,6 +315,7 @@ func main() {
 	arena := flag.Int("arena", -1, "Arena type (1=open, 2=wall, 3=corner)")
 	runmode := flag.Int("runmode", -1, "Run mode (0=Result, 1=Info, 2=Notice, 3=Debug)")
 	runs := flag.Int("runs", -1, "Number of runs to average")
+	json := flag.String("json", "player.json", "Player character JSON file")
 	flag.Parse()
 
 	if *difficulty == -1 || *arena == -1 || *runmode == -1 || *runs == -1 {
@@ -340,7 +341,7 @@ func main() {
 		countLimit = 8
 	}
 
-	player, err := LoadCharacterFromJSON("player.json")
+	player, err := LoadCharacterFromJSON(*json)
 	if err != nil {
 		panic(err)
 	}

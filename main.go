@@ -50,7 +50,7 @@ type Character struct {
 	Erosion          bool      `json:"erosion"`
 	PerfectMobility  bool      `json:"perfectMobility"`
 	IsFlanked        bool      `json:"-"`
-	IsNPC            bool      `json:"-"`
+	IsNPC            bool      `json:"isNPC"`
 	Attacks          []Attack  `json:"attacks"`
 	TemporaryBonus   TempBonus `json:"-"`
 }
@@ -243,7 +243,7 @@ func monsterFactory(monsterType int) *Character {
 				{"Pinça", "1d8+8", 13, 20, 2},
 				{"Garra", "1d4+8", 12, 20, 2},
 			},
-			// DR: 5,
+			DR:    5,
 			IsNPC: true,
 		}
 	case Geraktril:
@@ -257,7 +257,7 @@ func monsterFactory(monsterType int) *Character {
 				{"Pinça", "1d8+10", 17, 20, 2},
 				{"Garra", "1d4+10", 16, 20, 2},
 			},
-			// DR: 10,
+			DR:    10,
 			IsNPC: true,
 		}
 	case Reishid:
@@ -271,20 +271,24 @@ func monsterFactory(monsterType int) *Character {
 				{"Mordida", "1d4+10", 22, 20, 2},
 				{"Garra", "1d4+10", 22, 20, 2},
 			},
-			// DR: 10,
+			DR:    10,
 			IsNPC: true,
 		}
 	default:
+		custom_enemy, err := LoadCharacterFromJSON("custom_enemy.json")
+		if err == nil {
+			return custom_enemy
+		}
 		return &Character{
-			Name:          "Darius",
-			CurrentHP:     130,
-			AC:            27,
-			Fort:          30,
-			DR:            13,
-			CuraAcelerada: 5,
+			Name:      "Uktril",
+			CurrentHP: 60,
+			AC:        22,
+			Fort:      100,
 			Attacks: []Attack{
-				{"Machandejante", "4d6+27", 20, 20, 3},
+				{"Pinça", "1d8+8", 13, 20, 2},
+				{"Garra", "1d4+8", 12, 20, 2},
 			},
+			DR:    5,
 			IsNPC: true,
 		}
 	}

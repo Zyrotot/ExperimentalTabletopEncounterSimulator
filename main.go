@@ -1,87 +1,27 @@
 package main
 
 import (
+	"encoding/json"
+	"flag"
 	"fmt"
 	"math/rand"
+	"os"
 	"regexp"
 	"strconv"
-	"strings"
 )
 
 ///////////////////////////////////////////////
 // EXPERIMENTAL TABLETOP ENCOUNTER SIMULATOR //
 ///////////////////////////////////////////////
 
-// INPUTS:
-
-// Character Name
-var Name string = "Bob"
-
-// Character HP
-var HP int = 205
-
-// Character Armor Class
-var AC int = 43
-
-// Damage Resistance
-var DR int = 0
-
-// Fortification (chance to ignore critical hits). Must be placed as whole number, 25% = 25
-// If immune, to critical hits, put 100
-var Fort int = 100
-
-// Does the creatura has Cura Acelerada? Whole number
-var CuraAcelerada int = 0
-
-// How many stacks of duro de matar does the character have? Whole number
-var DuroDeMatar int = 0
-
-// How many stacks of duro de ferir does the character have? Whole number
-var DuroDeFerir int = 0
-
-// Does the Character has Cleave? (0 = No, 1 = Cleave, 2 = Great Cleave)
-var Cleave int = 0
-
-// Is the Character immune to flanking? true or false
-var FlankImmune bool = false
-
-// Does the Character have Rigidez Raivosa? true or false
-var RigidezRaivosa bool = true
-
-// Does the character have Perfect Mobility? true or false
-var PerfectMobility bool = false
-
-// Does the weapon have Vampiric Weapon? true or false
-var VampiricWeapon bool = false
-
-// Does the character have Erosion? true or false
-var Erosion bool = false
-
-// Character attacks and damage, following the template "attack_name #attack_bonus xdy+z #critrange #crit_multyplier"
-// where: x is the number of dice, y the dice type, z the damage modifier
-// more than one value can be added
-var attacks = []string{"SwordAttack1 21 5d6+36 19 2", "SwordAttack2 21 5d6+36 19 2"}
-
-// Select enemy difficulty, ranging from 1 to 3
-var difficulty int = 1
-
-// Select arena type, where 1 is an open field, 2 is the Character in front of a wall, 3 is the Character in a corner between two walls
-var arena int = 1
-
-// Run mode: 0 = Result - Just the end results 1 = Info - The result for each encounter; 2 = Notice - Shows the fight; 3 = Debug - For debbuging purposes
-var runmode int = 0
-
-// Number of runs, to take mean
-var runs int = 1000
-
 // ---------------------------------   CODE  ---------------------------------------------------
 
 type Attack struct {
-	Name        string
-	DamageDice  string
-	AttackBonus int
-	CritRange   int
-	CritBonus   int
+	Name        string `json:"name"`
+	DamageDice  string `json:"damageDice"`
+	AttackBonus int    `json:"attackBonus"`
+	CritRange   int    `json:"critRange"`
+	CritBonus   int    `json:"critBonus"`
 }
 
 type TempBonus struct {
@@ -91,26 +31,28 @@ type TempBonus struct {
 }
 
 type Character struct {
-	Name            string
-	CurrentHP       int
-	MaxHP           int
-	AC              int
-	DR              int
-	Fort            int
-	CuraAcelerada   int
-	DuroDeMatar     int
-	DuroDeFerir     int
-	Immortal        int
-	Cleave          int
-	FlankImmune     bool
-	RigidezRaivosa  bool
-	VampiricWeapon  bool
-	Erosion         bool
-	PerfectMobility bool
-	IsFlanked       bool
-	IsNPC           bool
-	Attacks         []Attack
-	TemporaryBonus  TempBonus
+	Name             string    `json:"name"`
+	CurrentHP        int       `json:"-"`
+	MaxHP            int       `json:"hp"`
+	AC               int       `json:"ac"`
+	DR               int       `json:"dr"`
+	Fort             int       `json:"fort"`
+	CuraAcelerada    int       `json:"curaAcelerada"`
+	DuroDeMatar      int       `json:"duroDeMatar"`
+	DuroDeMatarAtual int       `json:"-"`
+	DuroDeFerir      int       `json:"duroDeFerir"`
+	DuroDeFerirAtual int       `json:"-"`
+	Immortal         int       `json:"-"`
+	Cleave           int       `json:"cleave"`
+	FlankImmune      bool      `json:"flankImmune"`
+	RigidezRaivosa   bool      `json:"rigidezRaivosa"`
+	VampiricWeapon   bool      `json:"vampiricWeapon"`
+	Erosion          bool      `json:"erosion"`
+	PerfectMobility  bool      `json:"perfectMobility"`
+	IsFlanked        bool      `json:"-"`
+	IsNPC            bool      `json:"-"`
+	Attacks          []Attack  `json:"attacks"`
+	TemporaryBonus   TempBonus `json:"-"`
 }
 
 type Battlefield struct {
@@ -142,26 +84,13 @@ func (log *Logger) Log(level int, format string, a ...any) {
 	}
 }
 
-func attackParser() []Attack {
-	AttacksList := []Attack{}
-	for _, attack := range attacks {
-		split := strings.Split(attack, " ")
-		AttackBonus, _ := strconv.Atoi(split[1])
-		CritRange, _ := strconv.Atoi(split[3])
-		CritBonus, _ := strconv.Atoi(split[4])
-		NewAttack := Attack{split[0], split[2], AttackBonus, CritRange, CritBonus}
-		AttacksList = append(AttacksList, NewAttack)
-	}
-	return AttacksList
-}
-
 func (c *Character) takeDamage(damage int, erosion bool) {
 	if damage < 1 {
 		damage = 1
 	}
 	if erosion {
 		if c.TemporaryBonus.DR > 0 {
-			c.TemporaryBonus.DR --
+			c.TemporaryBonus.DR--
 		} else if c.DR > 0 {
 			c.DR--
 		}
@@ -172,17 +101,17 @@ func (c *Character) takeDamage(damage int, erosion bool) {
 		if damage < 1 {
 			damage = 0
 		}
-		if c.DuroDeFerir > 0 && damage > 0 {
-			logger.Log(NOTICE, "%d damage negated due to Duro de ferir, remaining stacks %d.\n", damage, c.DuroDeFerir-1)
+		if c.DuroDeFerirAtual > 0 && damage > 0 {
+			logger.Log(NOTICE, "%d damage negated due to Duro de ferir, remaining stacks %d.\n", damage, c.DuroDeFerirAtual-1)
 			damage = 0
-			c.DuroDeFerir--
+			c.DuroDeFerirAtual--
 		} else {
 			logger.Log(NOTICE, "%d damage taken due to %d DR.\n", damage, c.DR+c.TemporaryBonus.DR)
 		}
-	} else if c.DuroDeFerir > 0 && damage > 0 {
-		logger.Log(NOTICE, "%d damage negated due to Duro de ferir, remaining stacks %d.\n", damage, c.DuroDeFerir-1)
+	} else if c.DuroDeFerirAtual > 0 && damage > 0 {
+		logger.Log(NOTICE, "%d damage negated due to Duro de ferir, remaining stacks %d.\n", damage, c.DuroDeFerirAtual-1)
 		damage = 0
-		c.DuroDeFerir--
+		c.DuroDeFerirAtual--
 	}
 
 	if c.RigidezRaivosa && damage > 0 {
@@ -191,10 +120,10 @@ func (c *Character) takeDamage(damage int, erosion bool) {
 
 	logger.Log(DEBUG, "Current DR %d.\n", c.DR+c.TemporaryBonus.DR)
 
-	if c.CurrentHP-damage < 0 && c.DuroDeMatar > 0 {
-		logger.Log(NOTICE, "Death avoided, %d damage negated due to Duro de matar, remaining stacks %d.\n", damage, c.DuroDeMatar-1)
+	if c.CurrentHP-damage < 0 && c.DuroDeMatarAtual > 0 {
+		logger.Log(NOTICE, "Death avoided, %d damage negated due to Duro de matar, remaining stacks %d.\n", damage, c.DuroDeMatarAtual-1)
 		damage = 0
-		c.DuroDeMatar--
+		c.DuroDeMatarAtual--
 	}
 
 	if c.TemporaryBonus.HP > 0 && damage > 0 {
@@ -273,7 +202,7 @@ func (c *Character) attack(target *Character) {
 			}
 			if c.VampiricWeapon {
 				if damage/2 > c.TemporaryBonus.HP {
-					c.TemporaryBonus.HP = damage/2
+					c.TemporaryBonus.HP = damage / 2
 				}
 			}
 			target.takeDamage(damage, c.Erosion)
@@ -347,11 +276,11 @@ func monsterFactory(monsterType int) *Character {
 		}
 	default:
 		return &Character{
-			Name:      "Darius",
-			CurrentHP: 130,
-			AC:        27,
-			Fort:      30,
-			DR:		   13,
+			Name:          "Darius",
+			CurrentHP:     130,
+			AC:            27,
+			Fort:          30,
+			DR:            13,
 			CuraAcelerada: 5,
 			Attacks: []Attack{
 				{"Machandejante", "4d6+27", 20, 20, 3},
@@ -361,10 +290,42 @@ func monsterFactory(monsterType int) *Character {
 	}
 }
 
-func main() {
-	logger = Logger{runmode}
+func LoadCharacterFromJSON(filename string) (*Character, error) {
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
 
-	battlefield := Battlefield{arena}
+	var c Character
+	if err := json.Unmarshal(data, &c); err != nil {
+		return nil, err
+	}
+
+	// Initialize runtime values
+	c.CurrentHP = c.MaxHP
+	c.Immortal = 0
+	c.IsNPC = false
+	c.TemporaryBonus = TempBonus{0, 0, 0}
+
+	return &c, nil
+}
+
+func main() {
+	difficulty := flag.Int("difficulty", -1, "Enemy difficulty (1 to 3)")
+	arena := flag.Int("arena", -1, "Arena type (1=open, 2=wall, 3=corner)")
+	runmode := flag.Int("runmode", -1, "Run mode (0=Result, 1=Info, 2=Notice, 3=Debug)")
+	runs := flag.Int("runs", -1, "Number of runs to average")
+	flag.Parse()
+
+	if *difficulty == -1 || *arena == -1 || *runmode == -1 || *runs == -1 {
+		fmt.Println("Error: --difficulty, --arena, --runmode, and --runs are required")
+		flag.Usage()
+		os.Exit(1)
+	}
+
+	logger = Logger{*runmode}
+
+	battlefield := Battlefield{*arena}
 
 	var countLimit int
 
@@ -379,23 +340,9 @@ func main() {
 		countLimit = 8
 	}
 
-	player := Character{
-		Name:            Name,
-		MaxHP:           HP,
-		AC:              AC,
-		DR:              DR,
-		Fort:            Fort,
-		CuraAcelerada:   CuraAcelerada,
-		DuroDeMatar:     DuroDeMatar,
-		DuroDeFerir:     DuroDeFerir,
-		Immortal:        0,
-		Cleave:          Cleave,
-		FlankImmune:     FlankImmune,
-		RigidezRaivosa:  RigidezRaivosa,
-		VampiricWeapon:	 VampiricWeapon,
-		Erosion:		 Erosion,
-		PerfectMobility: PerfectMobility,
-		Attacks:         attackParser(),
+	player, err := LoadCharacterFromJSON("player.json")
+	if err != nil {
+		panic(err)
 	}
 	var enemies []*Character
 
@@ -407,14 +354,14 @@ func main() {
 			logger.Log(INFO, "Encounter %d begins!\n", encounter)
 			player.CurrentHP = player.MaxHP
 			player.TemporaryBonus = TempBonus{0, 0, 0}
-			player.DuroDeFerir = DuroDeFerir
-			player.DuroDeMatar = DuroDeMatar
+			player.DuroDeFerirAtual = player.DuroDeFerir
+			player.DuroDeMatarAtual = player.DuroDeMatar
 			enemies = nil
 			ascended := false
 
 			for i := 0; i < encounter; i++ {
 				logger.Log(DEBUG, "Criando monstro %d\n", i)
-				enemy := monsterFactory(difficulty)
+				enemy := monsterFactory(*difficulty)
 				enemies = append(enemies, enemy)
 				logger.Log(DEBUG, "%v\n", enemies[i])
 			}
@@ -426,7 +373,7 @@ func main() {
 				}
 				player.attack(enemies[index])
 				if player.Cleave == 2 && !enemies[index].isAlive() {
-					for i := index+1; i < len(enemies); i++ {
+					for i := index + 1; i < len(enemies); i++ {
 						logger.Log(NOTICE, "Enemy cleaved \n")
 						player.attack(enemies[i])
 						if enemies[i].isAlive() || numberOfAliveEnemies(enemies) < 3 {
@@ -477,7 +424,7 @@ func main() {
 								}
 							}
 
-							enemy.attack(&player)
+							enemy.attack(player)
 						}
 					} else {
 						logger.Log(DEBUG, "Enemy is defeated! \n")
@@ -491,7 +438,7 @@ func main() {
 					break
 				}
 			}
-			switch difficulty {
+			switch *difficulty {
 			case 1:
 				if (player.DR+player.TemporaryBonus.DR >= 32) || (player.Fort == 100 && player.DR+player.TemporaryBonus.DR >= 16) {
 					player.Immortal++
@@ -526,7 +473,7 @@ func main() {
 			}
 		}
 		run++
-		if run > runs {
+		if run > *runs {
 			var mean_defeated float64 = float64(defeated) / float64(run-1)
 			logger.Log(BASE, "\nYour mean number of defeated enemies was %f!", mean_defeated)
 			if player.Immortal != 0 {

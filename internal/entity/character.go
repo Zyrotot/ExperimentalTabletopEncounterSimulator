@@ -36,3 +36,11 @@ func (c *Character) TakeDamage(ammount int) {
 func (c *Character) AddDR(ammount int) {
 	c.Runtime.TempDR += ammount
 }
+
+func (c *Character) ApplyDR(damage *int) {
+	*damage -= c.Stats.DR + c.Runtime.TempDR
+
+	if *damage < 0 {
+		*damage = 0
+	}
+}

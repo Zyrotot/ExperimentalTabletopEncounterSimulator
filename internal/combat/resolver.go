@@ -50,6 +50,8 @@ func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 				damage *= atk.CritBonus
 			}
 
+			target.Char.ApplyDR(&damage)
+
 			r.OnDamageEffects(attacker, target, &damage)
 
 			target.Char.TakeDamage(damage)

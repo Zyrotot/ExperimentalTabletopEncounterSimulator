@@ -32,3 +32,7 @@ func (c *Character) TakeDamage(ammount int) {
 	}
 	c.Runtime.HP -= ammount
 }
+
+func (c *Character) AddDR(ammount int) {
+	c.Runtime.TempDR += ammount
+}

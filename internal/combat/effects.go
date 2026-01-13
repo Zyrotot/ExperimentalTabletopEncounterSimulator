@@ -14,7 +14,7 @@ type Combatant struct {
 type VampiricWeapon struct{}
 
 func (VampiricWeapon) On(event Event, ctx any) {
-	if event != "deal_damage" {
+	if event != EventDealDamage {
 		return
 	}
 
@@ -25,4 +25,19 @@ func (VampiricWeapon) On(event Event, ctx any) {
 
 	heal := *dctx.Damage / 2
 	dctx.Attacker.Char.AddTempHP(heal)
+}
+
+type RigidezRaivosa struct{}
+
+func (RigidezRaivosa) On(event Event, ctx any) {
+	if event != EventTakeDamage {
+		return
+	}
+
+	dctx, ok := ctx.(*DamageContext)
+	if !ok {
+		return
+	}
+
+	dctx.Target.Char.AddDR(1)
 }

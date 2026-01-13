@@ -1,32 +1,28 @@
 package combat
 
-type OnAttackEffect interface {
-	OnAttack(ctx *AttackContext)
+import "zyrotot.com/ETTES/internal/entity"
+
+type Effect interface {
+	On(event Event, ctx any)
 }
 
-type OnTakeHitEffect interface {
-	OnTakeHit(ctx *HitContext)
-}
-
-type OnDealHitEffect interface {
-	OnDealHit(ctx *HitContext)
-}
-
-type OnTakeDamageEffect interface {
-	OnTakeDamage(ctx *DamageContext)
-}
-
-type OnDealDamageEffect interface {
-	OnDealDamage(ctx *DamageContext)
-}
-
-type OnTurnStartEffect interface {
-	OnTurnStart(ctx *TurnContext)
+type Combatant struct {
+	Char    *entity.Character
+	Effects []Effect
 }
 
 type VampiricWeapon struct{}
 
-func (VampiricWeapon) OnDealDamage(ctx *DamageContext) {
-	heal := *ctx.Damage / 2
-	ctx.Attacker.AddTempHP(heal)
+func (VampiricWeapon) On(event Event, ctx any) {
+	if event != "deal_damage" {
+		return
+	}
+
+	dctx, ok := ctx.(*DamageContext)
+	if !ok {
+		return
+	}
+
+	heal := *dctx.Damage / 2
+	dctx.Attacker.Char.AddTempHP(heal)
 }

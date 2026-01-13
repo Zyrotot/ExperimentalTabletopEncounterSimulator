@@ -1,28 +1,24 @@
 package combat
 
-import (
-	"zyrotot.com/ETTES/internal/entity"
-)
-
 type AttackContext struct {
-	Attacker *entity.Character
-	Target   *entity.Character
+	Attacker *Combatant
+	Target   *Combatant
 	Roll     int
 	Hit      bool
 }
 
 type DamageContext struct {
-	Attacker *entity.Character
-	Target   *entity.Character
+	Attacker *Combatant
+	Target   *Combatant
 	Damage   *int
 }
 
 type HitContext struct {
-	Attacker *entity.Character
-	Target   *entity.Character
+	Attacker *Combatant
+	Target   *Combatant
 }
 
 type TurnContext struct {
-	Target  *entity.Character
+	Target  *Combatant
 	Enemies int
 }

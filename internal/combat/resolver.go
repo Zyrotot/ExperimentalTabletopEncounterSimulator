@@ -4,7 +4,6 @@ import (
 	"log"
 
 	"zyrotot.com/ETTES/internal/dice"
-	"zyrotot.com/ETTES/internal/entity"
 )
 
 type Resolver struct {
@@ -12,51 +11,37 @@ type Resolver struct {
 	Log  *log.Logger
 }
 
-func (r *Resolver) OnDamageEffects(attacker, target *entity.Character, ammount *int) {
-	for _, e := range target.Effects {
-		if eff, ok := e.(OnTakeDamageEffect); ok {
+func (r *Resolver) OnDamageEffects(attacker, target *Combatant, ammount *int) {
+	ctx := DamageContext{attacker, target, ammount}
 
-			ctx := DamageContext{attacker, target, ammount}
-			eff.OnTakeDamage(&ctx)
-		}
+	for _, eff := range target.Effects {
+		eff.On(EventTakeDamage, &ctx)
 	}
 
 	if *ammount > 0 {
-		for _, e := range attacker.Effects {
-			if eff, ok := e.(OnDealDamageEffect); ok {
-
-				ctx := DamageContext{attacker, target, ammount}
-				eff.OnDealDamage(&ctx)
-			}
+		for _, eff := range attacker.Effects {
+			eff.On(EventDealDamage, &ctx)
 		}
 	}
 }
 
-func (r *Resolver) OnHitEffects(attacker, target *entity.Character) {
-	for _, e := range target.Effects {
-		if eff, ok := e.(OnTakeHitEffect); ok {
-
-			ctx := HitContext{attacker, target}
-			eff.OnTakeHit(&ctx)
-		}
+func (r *Resolver) OnHitEffects(attacker, target *Combatant) {
+	ctx := HitContext{attacker, target}
+	for _, eff := range target.Effects {
+		eff.On(EventTakeHit, &ctx)
 	}
 
-	for _, e := range target.Effects {
-		if eff, ok := e.(OnDealHitEffect); ok {
-
-			ctx := HitContext{attacker, target}
-			eff.OnDealHit(&ctx)
-		}
+	for _, eff := range target.Effects {
+		eff.On(EventDealHit, &ctx)
 	}
 }
 
-func (r *Resolver) ResolveAttack(attacker, target *entity.Character) {
-	for _, atk := range attacker.Attacks {
+func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
+	for _, atk := range attacker.Char.Attacks {
 		roll := r.Dice.Roll("1d20") + atk.AttackBonus
-		ac := target.Stats.AC + target.Runtime.BonusAC
+		ac := target.Char.Stats.AC + target.Char.Runtime.BonusAC
 
 		if roll >= ac {
-
 			r.OnHitEffects(attacker, target)
 
 			damage := r.Dice.Roll(atk.DamageDice)
@@ -67,10 +52,10 @@ func (r *Resolver) ResolveAttack(attacker, target *entity.Character) {
 
 			r.OnDamageEffects(attacker, target, &damage)
 
-			target.TakeDamage(damage)
-			r.Log.Printf("%s hits %s for %d damage!", attacker.Name, target.Name, damage)
+			target.Char.TakeDamage(damage)
+			r.Log.Printf("%s hits %s for %d damage!", attacker.Char.Name, target.Char.Name, damage)
 		} else {
-			r.Log.Printf("%s misses %s.", attacker.Name, target.Name)
+			r.Log.Printf("%s misses %s.", attacker.Char.Name, target.Char.Name)
 		}
 	}
 }

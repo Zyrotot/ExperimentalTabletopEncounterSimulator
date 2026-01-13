@@ -1,11 +1,11 @@
 package entity
 
 type Attack struct {
-	Name        string `json:"name"`
-	DamageDice  string `json:"damageDice"`
-	AttackBonus int    `json:"attackBonus"`
-	CritRange   int    `json:"critRange"`
-	CritBonus   int    `json:"critBonus"`
+	Name        string
+	DamageDice  string
+	AttackBonus int
+	CritRange   int
+	CritBonus   int
 }
 
 type Character struct {
@@ -34,11 +34,11 @@ func (c *Character) TakeDamage(ammount int) {
 }
 
 func (c *Character) AddDR(ammount int) {
-	c.Runtime.TempDR += ammount
+	c.Runtime.DR += ammount
 }
 
 func (c *Character) ApplyDR(damage *int) {
-	*damage -= c.Stats.DR + c.Runtime.TempDR
+	*damage -= c.Runtime.DR
 
 	if *damage < 0 {
 		*damage = 0

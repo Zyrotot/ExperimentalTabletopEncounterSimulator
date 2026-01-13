@@ -1,3 +1,3 @@
-module zyrotot.com/ETTES
+module github.com/Zyrotot/ExperimentalTabletopEncounterSimulator
 
-go 1.22.0
+go 1.23

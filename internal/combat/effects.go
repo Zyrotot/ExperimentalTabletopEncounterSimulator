@@ -1,6 +1,6 @@
 package combat
 
-import "zyrotot.com/ETTES/internal/entity"
+import "github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/entity"
 
 type Effect interface {
 	On(event Event, ctx any)

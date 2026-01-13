@@ -4,12 +4,20 @@ type OnAttackEffect interface {
 	OnAttack(ctx *AttackContext)
 }
 
-type OnHitEffect interface {
-	OnHit(ctx *HitContext)
+type OnTakeHitEffect interface {
+	OnTakeHit(ctx *HitContext)
 }
 
-type OnDamageEffect interface {
-	OnDamage(ctx *DamageContext)
+type OnDealHitEffect interface {
+	OnDealHit(ctx *HitContext)
+}
+
+type OnTakeDamageEffect interface {
+	OnTakeDamage(ctx *DamageContext)
+}
+
+type OnDealDamageEffect interface {
+	OnDealDamage(ctx *DamageContext)
 }
 
 type OnTurnStartEffect interface {
@@ -18,7 +26,7 @@ type OnTurnStartEffect interface {
 
 type VampiricWeapon struct{}
 
-func (VampiricWeapon) OnHit(ctx *DamageContext) {
+func (VampiricWeapon) OnDealDamage(ctx *DamageContext) {
 	heal := *ctx.Damage / 2
 	ctx.Attacker.AddTempHP(heal)
 }

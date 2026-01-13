@@ -20,5 +20,5 @@ type HitContext struct {
 
 type TurnContext struct {
 	Target  *Combatant
-	Enemies int
+	Enemies *int
 }

@@ -3,7 +3,7 @@ package combat
 import (
 	"log"
 
-	"zyrotot.com/ETTES/internal/dice"
+	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/dice"
 )
 
 type Resolver struct {
@@ -39,7 +39,7 @@ func (r *Resolver) OnHitEffects(attacker, target *Combatant) {
 func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 	for _, atk := range attacker.Char.Attacks {
 		roll := r.Dice.Roll("1d20") + atk.AttackBonus
-		ac := target.Char.Stats.AC + target.Char.Runtime.BonusAC
+		ac := target.Char.Runtime.AC
 
 		if roll >= ac {
 			r.OnHitEffects(attacker, target)

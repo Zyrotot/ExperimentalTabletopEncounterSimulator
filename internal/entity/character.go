@@ -13,7 +13,6 @@ type Character struct {
 	Stats   Stats
 	Runtime Runtime
 	Attacks []Attack
-	Effects []any
 	IsNPC   bool
 }
 
@@ -30,6 +29,9 @@ func (c *Character) TakeDamage(ammount int) {
 			c.Runtime.TempHP = 0
 		}
 	}
+
+	// TODO: Add Duro de Matar and Ferir stacks (as events?)
+
 	c.Runtime.HP -= ammount
 }
 

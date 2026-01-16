@@ -1,7 +1,9 @@
 package dice
 
 import (
+	"log"
 	"math/rand"
+	"os"
 	"regexp"
 	"strconv"
 )
@@ -10,10 +12,34 @@ type Roller interface {
 	Roll(dice string) int
 }
 
-type RandomRoller struct{}
+type BaseRoller struct {
+	Log *log.Logger
+}
+
+type RandomRoller struct {
+	BaseRoller
+}
 
 type FixedRoller struct {
+	BaseRoller
 	Value int
+}
+
+func NewRandomRoller() *RandomRoller {
+	return &RandomRoller{
+		BaseRoller: BaseRoller{
+			Log: log.New(os.Stdout, "[dice] ", log.LstdFlags),
+		},
+	}
+}
+
+func NewFixedRoller(value int) *FixedRoller {
+	return &FixedRoller{
+		BaseRoller: BaseRoller{
+			Log: log.New(os.Stdout, "[dice] ", log.LstdFlags),
+		},
+		Value: value,
+	}
 }
 
 func (r *RandomRoller) Roll(dice string) int {
@@ -29,9 +55,13 @@ func (r *RandomRoller) Roll(dice string) int {
 		modifier, _ = strconv.Atoi(match[3])
 	}
 
+	r.Log.Printf("Rolling %d dice of %d sides with a bonus of %d", numDice, diceSides, modifier)
+
 	total := modifier
 	for range numDice {
-		total += rand.Intn(diceSides) + 1
+		rolled_dice := rand.Intn(diceSides) + 1
+		total += rolled_dice
+		r.Log.Printf("Rolled a %d", rolled_dice)
 	}
 	return total
 }

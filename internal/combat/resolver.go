@@ -2,6 +2,7 @@ package combat
 
 import (
 	"log"
+	"os"
 
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/dice"
 )
@@ -9,6 +10,13 @@ import (
 type Resolver struct {
 	Dice dice.Roller
 	Log  *log.Logger
+}
+
+func NewResolver(dice dice.Roller) *Resolver {
+	return &Resolver{
+		Dice: dice,
+		Log:  log.New(os.Stdout, "[combat] ", log.LstdFlags),
+	}
 }
 
 func (r *Resolver) OnDamageEffects(attacker, target *Combatant, ammount *int) {
@@ -38,10 +46,13 @@ func (r *Resolver) OnHitEffects(attacker, target *Combatant) {
 
 func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 	for _, atk := range attacker.Char.Attacks {
-		roll := r.Dice.Roll("1d20") + atk.AttackBonus
+		roll := r.Dice.Roll("1d20")
+		atk_total := roll + atk.AttackBonus
 		ac := target.Char.Runtime.AC
 
-		if roll >= ac {
+		r.Log.Printf("Rolled a %d against %d AC", atk_total, ac)
+
+		if atk_total >= ac {
 			r.OnHitEffects(attacker, target)
 
 			damage := r.Dice.Roll(atk.DamageDice)

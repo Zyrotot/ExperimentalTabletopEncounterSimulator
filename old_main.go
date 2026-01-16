@@ -314,7 +314,7 @@ func LoadCharacterFromJSON(filename string) (*Character, error) {
 	return &c, nil
 }
 
-func main() {
+func old() {
 	difficulty := flag.Int("difficulty", 1, "Enemy difficulty (1 to 3)")
 	arena := flag.Int("arena", 1, "Arena type (1=open, 2=wall, 3=corner)")
 	runmode := flag.Int("runmode", 1, "Run mode (0=Result, 1=Info, 2=Notice, 3=Debug)")

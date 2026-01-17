@@ -1,11 +1,11 @@
 package dice
 
 import (
-	"log"
 	"math/rand"
-	"os"
 	"regexp"
 	"strconv"
+
+	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/logging"
 )
 
 type Roller interface {
@@ -13,7 +13,7 @@ type Roller interface {
 }
 
 type BaseRoller struct {
-	Log *log.Logger
+	Log *logging.Logger
 }
 
 type RandomRoller struct {
@@ -25,18 +25,18 @@ type FixedRoller struct {
 	Value int
 }
 
-func NewRandomRoller() *RandomRoller {
+func NewRandomRoller(log *logging.Logger) *RandomRoller {
 	return &RandomRoller{
 		BaseRoller: BaseRoller{
-			Log: log.New(os.Stdout, "[dice] ", log.LstdFlags),
+			Log: log,
 		},
 	}
 }
 
-func NewFixedRoller(value int) *FixedRoller {
+func NewFixedRoller(value int, log *logging.Logger) *FixedRoller {
 	return &FixedRoller{
 		BaseRoller: BaseRoller{
-			Log: log.New(os.Stdout, "[dice] ", log.LstdFlags),
+			Log: log,
 		},
 		Value: value,
 	}
@@ -55,13 +55,13 @@ func (r *RandomRoller) Roll(dice string) int {
 		modifier, _ = strconv.Atoi(match[3])
 	}
 
-	r.Log.Printf("Rolling %d dice of %d sides with a bonus of %d", numDice, diceSides, modifier)
+	r.Log.Infof("Rolling %d dice of %d sides with a bonus of %d", numDice, diceSides, modifier)
 
 	total := modifier
 	for range numDice {
 		rolled_dice := rand.Intn(diceSides) + 1
 		total += rolled_dice
-		r.Log.Printf("Rolled a %d", rolled_dice)
+		r.Log.Debugf("Rolled a %d", rolled_dice)
 	}
 	return total
 }

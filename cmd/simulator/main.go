@@ -4,6 +4,7 @@ import (
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/combat"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/dice"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/entity"
+	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/logging"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/monsters"
 )
 
@@ -15,7 +16,10 @@ func main() {
 	base_enemie := combat.Combatant{}
 	base_enemie.Char = monsters.MonsterFactory(monsters.Geraktril)
 
-	resolver := combat.NewResolver(dice.NewRandomRoller())
+	combatLog := logging.New("combat", logging.INFO)
+	diceLog := logging.New("dice", logging.WARN) // silence dice spam
+
+	resolver := combat.NewResolver(dice.NewRandomRoller(diceLog), combatLog)
 
 	resolver.ResolveAttack(&character, &base_enemie)
 }

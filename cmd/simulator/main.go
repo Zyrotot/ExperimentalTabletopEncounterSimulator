@@ -6,6 +6,7 @@ import (
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/entity"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/logging"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/monsters"
+	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/rules"
 )
 
 func main() {
@@ -13,8 +14,8 @@ func main() {
 	attack := combat.Attack{
 		Name: "SwordAttack1",
 		DamageDice: combat.DamageExpression{
-			Components: map[combat.DamageType]dice.Term{
-				combat.Pierce: { // 5d6+36
+			Components: map[rules.DamageType]dice.Term{
+				rules.Pierce: { // 5d6+36
 					Count: 5,
 					Sides: 6,
 					Flat:  36,
@@ -30,13 +31,13 @@ func main() {
 		Stats: entity.Stats{
 			MaxHP: 205,
 			AC:    43,
-			DR:    0,
+			DR:    []entity.DamageReduction{},
 			Fort:  100,
 		},
 		Runtime: entity.Runtime{
 			HP: 205,
 			AC: 43,
-			DR: 0,
+			DR: []entity.DamageReduction{},
 		},
 		IsNPC: false,
 	}

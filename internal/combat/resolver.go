@@ -4,6 +4,7 @@ import (
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/dice"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/entity"
 	logging "github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/logging"
+	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/rules"
 )
 
 type Combatant struct {
@@ -24,7 +25,7 @@ func NewResolver(dice dice.Roller, log *logging.Logger) *Resolver {
 	}
 }
 
-func hasPositiveDamage(damage map[DamageType]int) bool {
+func hasPositiveDamage(damage map[rules.DamageType]int) bool {
 	for _, v := range damage {
 		if v > 0 {
 			return true
@@ -33,7 +34,15 @@ func hasPositiveDamage(damage map[DamageType]int) bool {
 	return false
 }
 
-func (r *Resolver) OnDamageEffects(attacker, target *Combatant, ammount map[DamageType]int) {
+func SumDamage(damage map[rules.DamageType]int) int {
+	total := 0
+	for _, v := range damage {
+		total += v
+	}
+	return total
+}
+
+func (r *Resolver) OnDamageEffects(attacker, target *Combatant, ammount map[rules.DamageType]int) {
 	ctx := DamageContext{
 		Attacker: attacker,
 		Target:   target,
@@ -80,7 +89,7 @@ func (r *Resolver) ResolveCrit(roll int, crit_range int, fortification int) bool
 func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 	for _, atk := range attacker.Attacks {
 		atkResult := AttackResult{}
-		atkResult.Damage = make(map[DamageType]int)
+		atkResult.Damage = make(map[rules.DamageType]int)
 		atkResult.AttackRoll = r.Dice.Roll(dice.Term{
 			Count: 1,
 			Sides: 20,
@@ -120,13 +129,11 @@ func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 				}
 			}
 
-			// target.Char.ApplyDR(&damage)
+			target.Char.ApplyDR(atkResult.Damage)
 
 			r.OnDamageEffects(attacker, target, atkResult.Damage)
 
-			for _, damage := range atkResult.Damage {
-				atkResult.TotalDamage += damage
-			}
+			atkResult.TotalDamage = SumDamage(atkResult.Damage)
 
 			target.Char.TakeDamage(atkResult.TotalDamage)
 			r.Log.Infof("%s hits %s for %d damage!", attacker.Char.Name, target.Char.Name, atkResult.TotalDamage)

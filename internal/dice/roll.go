@@ -2,14 +2,22 @@ package dice
 
 import (
 	"math/rand"
-	"regexp"
-	"strconv"
 
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/logging"
 )
 
+type Term struct {
+	Count int
+	Sides int
+	Flat  int
+}
+
+type Expression struct {
+	Terms []Term
+}
+
 type Roller interface {
-	Roll(dice string) int
+	Roll(term Term) int
 }
 
 type BaseRoller struct {
@@ -42,45 +50,22 @@ func NewFixedRoller(value int, log *logging.Logger) *FixedRoller {
 	}
 }
 
-func (r *RandomRoller) Roll(dice string) int {
-	re := regexp.MustCompile(`(\d+)d(\d+)([+-]\d+)?`)
-	match := re.FindStringSubmatch(dice)
-	if match == nil {
-		return 0
-	}
-	numDice, _ := strconv.Atoi(match[1])
-	diceSides, _ := strconv.Atoi(match[2])
-	modifier := 0
-	if len(match) > 3 {
-		modifier, _ = strconv.Atoi(match[3])
-	}
+func (r *RandomRoller) Roll(term Term) int {
+	r.Log.Infof("Rolling %d dice of %d sides with a bonus of %d", term.Count, term.Sides, term.Flat)
 
-	r.Log.Infof("Rolling %d dice of %d sides with a bonus of %d", numDice, diceSides, modifier)
-
-	total := modifier
-	for range numDice {
-		rolled_dice := rand.Intn(diceSides) + 1
+	total := term.Flat
+	for range term.Count {
+		rolled_dice := rand.Intn(term.Sides) + 1
 		total += rolled_dice
 		r.Log.Debugf("Rolled a %d", rolled_dice)
 	}
 	return total
 }
 
-func (f *FixedRoller) Roll(dice string) int {
-	re := regexp.MustCompile(`(\d+)d(\d+)([+-]\d+)?`)
-	match := re.FindStringSubmatch(dice)
-	if match == nil {
-		return 0
-	}
-	numDice, _ := strconv.Atoi(match[1])
-	diceSides, _ := strconv.Atoi(match[2])
-	modifier := 0
-	if len(match) > 3 {
-		modifier, _ = strconv.Atoi(match[3])
-	}
-	total := modifier
-	for range numDice {
-		total += diceSides
+func (f *FixedRoller) Roll(term Term) int {
+	total := term.Flat
+	for range term.Count {
+		total += term.Sides
 	}
 	return total
 }

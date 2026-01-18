@@ -1,19 +1,28 @@
 package entity
 
-type Attack struct {
-	Name        string
-	DamageDice  string
-	AttackBonus int
-	CritRange   int
-	CritBonus   int
+type MoralAlignment string
+type EthicAlignment string
+
+const (
+	Good         MoralAlignment = "Good"
+	Evil         MoralAlignment = "Evil"
+	NeutralMoral MoralAlignment = "Neutral"
+	Chaotic      EthicAlignment = "Chaotic"
+	Lawful       EthicAlignment = "Lawful"
+	NeutralEthic EthicAlignment = "Neutral"
+)
+
+type Alignment struct {
+	Moral MoralAlignment
+	Ethic EthicAlignment
 }
 
 type Character struct {
-	Name    string
-	Stats   Stats
-	Runtime Runtime
-	Attacks []Attack
-	IsNPC   bool
+	Name      string
+	Stats     Stats
+	Runtime   Runtime
+	Alignment Alignment
+	IsNPC     bool
 }
 
 func (c *Character) AddTempHP(ammount int) {

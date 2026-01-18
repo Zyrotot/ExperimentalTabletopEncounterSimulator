@@ -10,7 +10,7 @@ type AttackContext struct {
 type DamageContext struct {
 	Attacker *Combatant
 	Target   *Combatant
-	Damage   *int
+	Damage   map[DamageType]int
 }
 
 type HitContext struct {

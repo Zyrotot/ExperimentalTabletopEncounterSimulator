@@ -1,14 +1,7 @@
 package combat
 
-import "github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/entity"
-
 type Effect interface {
 	On(event Event, ctx any)
-}
-
-type Combatant struct {
-	Char    *entity.Character
-	Effects []Effect
 }
 
 type VampiricWeapon struct{}
@@ -23,7 +16,12 @@ func (VampiricWeapon) On(event Event, ctx any) {
 		return
 	}
 
-	heal := *dctx.Damage / 2
+	totalDamage := 0
+	for _, dmg := range dctx.Damage {
+		totalDamage += dmg
+	}
+
+	heal := totalDamage / 2
 	dctx.Attacker.Char.AddTempHP(heal)
 }
 

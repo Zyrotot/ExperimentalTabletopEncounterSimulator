@@ -1,6 +1,8 @@
 package monsters
 
 import (
+	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/combat"
+	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/dice"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/entity"
 )
 
@@ -10,115 +12,181 @@ const (
 	Reishid   int = 3
 )
 
-func MonsterFactory(monsterType int) *entity.Character {
+func MonsterFactory(monsterType int) *combat.Combatant {
 	switch monsterType {
 	case Uktril:
-		return &entity.Character{
-			Name: "Uktril",
-			Stats: entity.Stats{
-				MaxHP: 60,
-				AC:    22,
-				DR:    5,
-				Fort:  100,
+		return &combat.Combatant{
+			Char: &entity.Character{
+				Name: "Uktril",
+				Stats: entity.Stats{
+					MaxHP: 60,
+					AC:    22,
+					DR:    5,
+					Fort:  100,
+				},
+				Runtime: entity.Runtime{
+					HP: 60,
+					AC: 22,
+					DR: 5,
+				},
+				IsNPC: true,
 			},
-			Runtime: entity.Runtime{
-				HP: 60,
-				AC: 22,
-				DR: 5,
-			},
-			Attacks: []entity.Attack{
+			Attacks: []combat.Attack{
 				{
-					Name:        "Pinça",
-					DamageDice:  "1d8+8",
+					Name: "Pinça",
+					DamageDice: combat.DamageExpression{
+						Components: map[combat.DamageType]dice.Term{
+							combat.Slash: { // 1d8+8
+								Count: 1,
+								Sides: 8,
+								Flat:  8,
+							},
+						},
+					},
 					AttackBonus: 13,
 					CritRange:   20,
 					CritBonus:   2,
 				},
 				{
-					Name:        "Garra",
-					DamageDice:  "1d4+8",
+					Name: "Garra",
+					DamageDice: combat.DamageExpression{
+						Components: map[combat.DamageType]dice.Term{
+							combat.Slash: { // 1d4+8
+								Count: 1,
+								Sides: 4,
+								Flat:  8,
+							},
+						},
+					},
 					AttackBonus: 12,
 					CritRange:   20,
 					CritBonus:   2,
 				},
 			},
-			IsNPC: true,
 		}
 	case Geraktril:
-		return &entity.Character{
-			Name: "Geraktril",
-			Stats: entity.Stats{
-				MaxHP: 99,
-				AC:    25,
-				DR:    10,
-				Fort:  100,
+		return &combat.Combatant{
+			Char: &entity.Character{
+				Name: "Geraktril",
+				Stats: entity.Stats{
+					MaxHP: 99,
+					AC:    25,
+					DR:    10,
+					Fort:  100,
+				},
+				Runtime: entity.Runtime{
+					HP: 99,
+					AC: 25,
+					DR: 10,
+				},
+				IsNPC: true,
 			},
-			Runtime: entity.Runtime{
-				HP: 99,
-				AC: 25,
-				DR: 10,
-			},
-			Attacks: []entity.Attack{
+			Attacks: []combat.Attack{
 				{
-					Name:        "Pinça",
-					DamageDice:  "1d8+10",
+					Name: "Pinça",
+					DamageDice: combat.DamageExpression{
+						Components: map[combat.DamageType]dice.Term{
+							combat.Slash: { // 1d8+10
+								Count: 1,
+								Sides: 8,
+								Flat:  10,
+							},
+						},
+					},
 					AttackBonus: 17,
 					CritRange:   20,
 					CritBonus:   2,
 				},
 				{
-					Name:        "Pinça",
-					DamageDice:  "1d8+10",
-					AttackBonus: 17, CritRange: 20,
-					CritBonus: 2,
-				},
-				{
-					Name:        "Garra",
-					DamageDice:  "1d4+10",
+					Name: "Garra",
+					DamageDice: combat.DamageExpression{
+						Components: map[combat.DamageType]dice.Term{
+							combat.Slash: { // 1d4+10
+								Count: 1,
+								Sides: 4,
+								Flat:  10,
+							},
+						},
+					},
 					AttackBonus: 16, CritRange: 20,
 					CritBonus: 2,
 				},
 			},
-			IsNPC: true,
 		}
 	case Reishid:
-		return &entity.Character{
-			Name: "Reishid",
-			Stats: entity.Stats{
-				MaxHP: 143,
-				AC:    30,
-				DR:    10,
-				Fort:  100,
+		return &combat.Combatant{
+			Char: &entity.Character{
+				Name: "Reishid",
+				Stats: entity.Stats{
+					MaxHP: 143,
+					AC:    30,
+					DR:    10,
+					Fort:  100,
+				},
+				Runtime: entity.Runtime{
+					HP: 143,
+					AC: 30,
+					DR: 10,
+				},
+				IsNPC: true,
 			},
-			Runtime: entity.Runtime{
-				HP: 143,
-				AC: 30,
-				DR: 10,
-			},
-			Attacks: []entity.Attack{
+			Attacks: []combat.Attack{
 				{
-					Name:        "Adaga",
-					DamageDice:  "1d4+14",
+					Name: "Adaga",
+					DamageDice: combat.DamageExpression{
+						Components: map[combat.DamageType]dice.Term{
+							combat.Pierce: { // 1d4+14
+								Count: 1,
+								Sides: 4,
+								Flat:  14,
+							},
+						},
+					},
+					DamageModifiers: []combat.DamageModifier{
+						combat.EvilVsGood{
+							BaseDamageModifier: combat.BaseDamageModifier{
+								Term: dice.Term{
+									Count: 2,
+									Sides: 6,
+								},
+							},
+						},
+					},
 					AttackBonus: 26,
 					CritRange:   19,
 					CritBonus:   2,
 				},
 				{
-					Name:        "Mordida",
-					DamageDice:  "1d4+10",
+					Name: "Mordida",
+					DamageDice: combat.DamageExpression{
+						Components: map[combat.DamageType]dice.Term{
+							combat.Pierce: { // 1d4+14
+								Count: 1,
+								Sides: 4,
+								Flat:  14,
+							},
+						},
+					},
 					AttackBonus: 22,
 					CritRange:   20,
 					CritBonus:   2,
 				},
 				{
-					Name:        "Garra",
-					DamageDice:  "1d4+10",
+					Name: "Garra",
+					DamageDice: combat.DamageExpression{
+						Components: map[combat.DamageType]dice.Term{
+							combat.Slash: { // 1d4+10
+								Count: 1,
+								Sides: 4,
+								Flat:  10,
+							},
+						},
+					},
 					AttackBonus: 22,
 					CritRange:   20,
 					CritBonus:   2,
 				},
 			},
-			IsNPC: true,
 		}
 	default:
 		// custom_enemy, err := LoadCharacterFromJSON("custom_enemy.json")

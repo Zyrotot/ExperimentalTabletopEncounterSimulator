@@ -3,8 +3,8 @@ package entity
 import "github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/rules"
 
 type DamageReduction struct {
-	Value       int
-	BypassTypes []rules.DamageType
+	Value      int
+	BypassType rules.DamageType
 }
 
 type Stats struct {

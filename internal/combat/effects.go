@@ -2,7 +2,6 @@ package combat
 
 import (
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/entity"
-	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/rules"
 )
 
 type Effect interface {
@@ -43,8 +42,8 @@ func (RigidezRaivosa) On(event Event, ctx any) {
 	}
 
 	dr := entity.DamageReduction{
-		Value:       1,
-		BypassTypes: []rules.DamageType{},
+		Value:      1,
+		BypassType: "",
 	}
 
 	dctx.Target.Char.AddDR(dr)

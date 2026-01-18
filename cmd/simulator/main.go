@@ -10,14 +10,38 @@ import (
 
 func main() {
 	character := combat.Combatant{}
-	attack := entity.Attack{Name: "SwordAttack1", DamageDice: "5d6+36", AttackBonus: 21, CritRange: 19, CritBonus: 2}
-	character.Char = &entity.Character{Name: "Bob", Stats: entity.Stats{MaxHP: 205, AC: 43, DR: 0, Fort: 100}, Runtime: entity.Runtime{HP: 205, AC: 43, DR: 0}, Attacks: []entity.Attack{attack, attack}, IsNPC: false}
+	attack := entity.Attack{
+		Name:        "SwordAttack1",
+		DamageDice:  "5d6+36",
+		AttackBonus: 21,
+		CritRange:   19,
+		CritBonus:   2,
+	}
+	character.Char = &entity.Character{
+		Name: "Bob",
+		Stats: entity.Stats{
+			MaxHP: 205,
+			AC:    43,
+			DR:    0,
+			Fort:  100,
+		},
+		Runtime: entity.Runtime{
+			HP: 205,
+			AC: 43,
+			DR: 0,
+		},
+		Attacks: []entity.Attack{
+			attack,
+			attack,
+		},
+		IsNPC: false,
+	}
 
 	base_enemie := combat.Combatant{}
 	base_enemie.Char = monsters.MonsterFactory(monsters.Geraktril)
 
 	combatLog := logging.New("combat", logging.INFO)
-	diceLog := logging.New("dice", logging.WARN) // silence dice spam
+	diceLog := logging.New("dice", logging.WARN)
 
 	resolver := combat.NewResolver(dice.NewRandomRoller(diceLog), combatLog)
 

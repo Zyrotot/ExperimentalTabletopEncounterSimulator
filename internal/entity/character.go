@@ -1,6 +1,8 @@
 package entity
 
-import "github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/rules"
+import (
+	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/rules"
+)
 
 type MoralAlignment string
 type EthicAlignment string
@@ -51,10 +53,8 @@ func (c *Character) ApplyDR(damage map[rules.DamageType]int) {
 		remaining := amount
 
 		for _, dr := range c.Runtime.DR {
-			for _, bypassType := range dr.BypassTypes {
-				if bypassType == dmgType {
-					continue
-				}
+			if dr.BypassType == dmgType {
+				continue
 			}
 
 			if remaining <= 0 {
@@ -69,6 +69,13 @@ func (c *Character) ApplyDR(damage map[rules.DamageType]int) {
 	}
 }
 
-func (c *Character) AddDR(dr DamageReduction) {
-	c.Runtime.DR = append(c.Runtime.DR, dr)
+func (c *Character) AddDR(newDR DamageReduction) {
+	for i, existing := range c.Runtime.DR {
+		if existing.BypassType == newDR.BypassType {
+			c.Runtime.DR[i].Value += newDR.Value
+			return
+		}
+	}
+
+	c.Runtime.DR = append(c.Runtime.DR, newDR)
 }

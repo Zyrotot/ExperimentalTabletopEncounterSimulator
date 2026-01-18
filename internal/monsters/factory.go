@@ -22,13 +22,13 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 				Stats: entity.Stats{
 					MaxHP: 60,
 					AC:    22,
-					DR:    []entity.DamageReduction{entity.DamageReduction{Value: 5, BypassTypes: []rules.DamageType{rules.Magic}}}, // DR 5/magic
+					DR:    []entity.DamageReduction{{Value: 5, BypassType: rules.Magic}}, // DR 5/magic
 					Fort:  100,
 				},
 				Runtime: entity.Runtime{
 					HP: 60,
 					AC: 22,
-					DR: []entity.DamageReduction{entity.DamageReduction{Value: 5, BypassTypes: []rules.DamageType{rules.Magic}}}, // DR 5/magic
+					DR: []entity.DamageReduction{{Value: 5, BypassType: rules.Magic}}, // DR 5/magic
 				},
 				IsNPC: true,
 			},
@@ -72,13 +72,13 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 				Stats: entity.Stats{
 					MaxHP: 99,
 					AC:    25,
-					DR:    []entity.DamageReduction{entity.DamageReduction{Value: 10, BypassTypes: []rules.DamageType{rules.Magic}}}, // DR 10/magic
+					DR:    []entity.DamageReduction{{Value: 10, BypassType: rules.Magic}}, // DR 10/magic
 					Fort:  100,
 				},
 				Runtime: entity.Runtime{
 					HP: 99,
 					AC: 25,
-					DR: []entity.DamageReduction{entity.DamageReduction{Value: 10, BypassTypes: []rules.DamageType{rules.Magic}}}, // DR 10/magic
+					DR: []entity.DamageReduction{{Value: 10, BypassType: rules.Magic}}, // DR 10/magic
 				},
 				IsNPC: true,
 			},
@@ -121,13 +121,13 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 				Stats: entity.Stats{
 					MaxHP: 143,
 					AC:    30,
-					DR:    []entity.DamageReduction{entity.DamageReduction{Value: 10, BypassTypes: []rules.DamageType{rules.Magic}}}, // DR 10/magic
+					DR:    []entity.DamageReduction{{Value: 10, BypassType: rules.Magic}}, // DR 10/magic
 					Fort:  100,
 				},
 				Runtime: entity.Runtime{
 					HP: 143,
 					AC: 30,
-					DR: []entity.DamageReduction{entity.DamageReduction{Value: 10, BypassTypes: []rules.DamageType{rules.Magic}}}, // DR 10/magic
+					DR: []entity.DamageReduction{{Value: 10, BypassType: rules.Magic}}, // DR 10/magic
 				},
 				IsNPC: true,
 			},

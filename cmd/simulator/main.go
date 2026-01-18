@@ -10,9 +10,17 @@ import (
 
 func main() {
 	character := combat.Combatant{}
-	attack := entity.Attack{
-		Name:        "SwordAttack1",
-		DamageDice:  "5d6+36",
+	attack := combat.Attack{
+		Name: "SwordAttack1",
+		DamageDice: combat.DamageExpression{
+			Components: map[combat.DamageType]dice.Term{
+				combat.Pierce: { // 5d6+36
+					Count: 5,
+					Sides: 6,
+					Flat:  36,
+				},
+			},
+		},
 		AttackBonus: 21,
 		CritRange:   19,
 		CritBonus:   2,
@@ -30,22 +38,18 @@ func main() {
 			AC: 43,
 			DR: 0,
 		},
-		Attacks: []entity.Attack{
-			attack,
-			attack,
-		},
 		IsNPC: false,
 	}
+	character.Attacks = []combat.Attack{attack, attack}
 
-	base_enemie := combat.Combatant{}
-	base_enemie.Char = monsters.MonsterFactory(monsters.Geraktril)
+	base_enemie := monsters.MonsterFactory(monsters.Geraktril)
 
-	combatLog := logging.New("combat", logging.INFO)
-	diceLog := logging.New("dice", logging.WARN)
+	combatLog := logging.New("combat", logging.DEBUG)
+	diceLog := logging.New("dice", logging.DEBUG)
 
 	resolver := combat.NewResolver(dice.NewRandomRoller(diceLog), combatLog)
 
-	resolver.ResolveAttack(&character, &base_enemie)
+	resolver.ResolveAttack(&character, base_enemie)
 }
 
 // {

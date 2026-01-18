@@ -17,3 +17,8 @@ const (
 	Chaotic  DamageType = "chaotic"
 	Lawful   DamageType = "lawful"
 )
+
+type DamageInstance struct {
+	Amount int
+	Types  []DamageType
+}

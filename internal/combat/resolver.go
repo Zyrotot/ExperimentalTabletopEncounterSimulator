@@ -25,35 +25,35 @@ func NewResolver(dice dice.Roller, log *logging.Logger) *Resolver {
 	}
 }
 
-func hasPositiveDamage(damage map[rules.DamageType]int) bool {
-	for _, v := range damage {
-		if v > 0 {
+func hasPositiveDamage(damageInstances []rules.DamageInstance) bool {
+	for _, v := range damageInstances {
+		if v.Amount > 0 {
 			return true
 		}
 	}
 	return false
 }
 
-func SumDamage(damage map[rules.DamageType]int) int {
+func SumDamage(damageInstances []rules.DamageInstance) int {
 	total := 0
-	for _, v := range damage {
-		total += v
+	for _, v := range damageInstances {
+		total += v.Amount
 	}
 	return total
 }
 
-func (r *Resolver) OnDamageEffects(attacker, target *Combatant, ammount map[rules.DamageType]int) {
+func (r *Resolver) OnDamageEffects(attacker, target *Combatant, damageInstances []rules.DamageInstance) {
 	ctx := DamageContext{
 		Attacker: attacker,
 		Target:   target,
-		Damage:   ammount,
+		Damage:   damageInstances,
 	}
 
 	for _, eff := range target.Effects {
 		eff.On(EventTakeDamage, &ctx)
 	}
 
-	if hasPositiveDamage(ammount) {
+	if hasPositiveDamage(damageInstances) {
 		for _, eff := range attacker.Effects {
 			eff.On(EventDealDamage, &ctx)
 		}
@@ -89,7 +89,6 @@ func (r *Resolver) ResolveCrit(roll int, crit_range int, fortification int) bool
 func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 	for _, atk := range attacker.Attacks {
 		atkResult := AttackResult{}
-		atkResult.Damage = make(map[rules.DamageType]int)
 		atkResult.AttackRoll = r.Dice.Roll(dice.Term{
 			Count: 1,
 			Sides: 20,
@@ -105,15 +104,23 @@ func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 		if atkResult.Hit {
 			r.OnHitEffects(attacker, target)
 
-			for dmgType, dmg := range atk.DamageDice.Components {
-				damage := r.Dice.Roll(dmg)
-				atkResult.Damage[dmgType] += damage
+			atkResult.Damage = make([]rules.DamageInstance, len(atk.DamageDice))
+
+			for i, dmgExp := range atk.DamageDice {
+				damage := r.Dice.Roll(dmgExp.DamageRoll)
+				atkResult.Damage[i] = rules.DamageInstance{
+					Amount: damage,
+					Types:  dmgExp.DamageTypes,
+				}
 			}
 
 			atkResult.Crit = r.ResolveCrit(atkResult.AttackRoll, atk.CritRange, target.Char.Stats.Fort)
 			if atkResult.Crit {
-				for _, damage := range atkResult.Damage {
-					damage *= atk.CritBonus
+				for i, damage := range atkResult.Damage {
+					atkResult.Damage[i] = rules.DamageInstance{
+						Amount: damage.Amount * atk.CritBonus,
+						Types:  damage.Types,
+					}
 				}
 			}
 
@@ -125,7 +132,10 @@ func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 				})
 				if affected {
 					r.Log.Infof("Damage modifier applied!")
-					atkResult.Damage[damageType] += r.Dice.Roll(mod.GetTerm())
+					atkResult.Damage = append(atkResult.Damage, rules.DamageInstance{
+						Amount: r.Dice.Roll(mod.GetTerm()),
+						Types:  []rules.DamageType{damageType},
+					})
 				}
 			}
 

@@ -21,8 +21,8 @@ func (VampiricWeapon) On(event Event, ctx any) {
 	}
 
 	totalDamage := 0
-	for _, dmg := range dctx.Damage {
-		totalDamage += dmg
+	for _, dmgInst := range dctx.Damage {
+		totalDamage += dmgInst.Amount
 	}
 
 	heal := totalDamage / 2

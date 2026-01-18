@@ -30,14 +30,19 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 					AC: 22,
 					DR: []entity.DamageReduction{{Value: 5, BypassType: rules.Magic}}, // DR 5/magic
 				},
+				Alignment: entity.Alignment{
+					Moral: entity.Evil,
+					Ethic: entity.Chaotic,
+				},
 				IsNPC: true,
 			},
 			Attacks: []combat.Attack{
 				{
 					Name: "Pinça",
-					DamageDice: combat.DamageExpression{
-						Components: map[rules.DamageType]dice.Term{
-							rules.Slash: { // 1d8+8
+					DamageDice: []combat.DamageExpression{
+						{
+							DamageTypes: []rules.DamageType{rules.Slash},
+							DamageRoll: dice.Term{ // 1d8+8
 								Count: 1,
 								Sides: 8,
 								Flat:  8,
@@ -50,9 +55,10 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 				},
 				{
 					Name: "Garra",
-					DamageDice: combat.DamageExpression{
-						Components: map[rules.DamageType]dice.Term{
-							rules.Slash: { // 1d4+8
+					DamageDice: []combat.DamageExpression{
+						{
+							DamageTypes: []rules.DamageType{rules.Slash},
+							DamageRoll: dice.Term{ // 1d4+8
 								Count: 1,
 								Sides: 4,
 								Flat:  8,
@@ -80,14 +86,19 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 					AC: 25,
 					DR: []entity.DamageReduction{{Value: 10, BypassType: rules.Magic}}, // DR 10/magic
 				},
+				Alignment: entity.Alignment{
+					Moral: entity.Evil,
+					Ethic: entity.Chaotic,
+				},
 				IsNPC: true,
 			},
 			Attacks: []combat.Attack{
 				{
 					Name: "Pinça",
-					DamageDice: combat.DamageExpression{
-						Components: map[rules.DamageType]dice.Term{
-							rules.Slash: { // 1d8+10
+					DamageDice: []combat.DamageExpression{
+						{
+							DamageTypes: []rules.DamageType{rules.Slash},
+							DamageRoll: dice.Term{ // 1d8+10
 								Count: 1,
 								Sides: 8,
 								Flat:  10,
@@ -100,9 +111,10 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 				},
 				{
 					Name: "Garra",
-					DamageDice: combat.DamageExpression{
-						Components: map[rules.DamageType]dice.Term{
-							rules.Slash: { // 1d4+10
+					DamageDice: []combat.DamageExpression{
+						{
+							DamageTypes: []rules.DamageType{rules.Slash},
+							DamageRoll: dice.Term{ // 1d4+10
 								Count: 1,
 								Sides: 4,
 								Flat:  10,
@@ -129,14 +141,19 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 					AC: 30,
 					DR: []entity.DamageReduction{{Value: 10, BypassType: rules.Magic}}, // DR 10/magic
 				},
+				Alignment: entity.Alignment{
+					Moral: entity.Evil,
+					Ethic: entity.Chaotic,
+				},
 				IsNPC: true,
 			},
 			Attacks: []combat.Attack{
 				{
 					Name: "Adaga",
-					DamageDice: combat.DamageExpression{
-						Components: map[rules.DamageType]dice.Term{
-							rules.Pierce: { // 1d4+14
+					DamageDice: []combat.DamageExpression{
+						{
+							DamageTypes: []rules.DamageType{rules.Pierce, rules.Magic},
+							DamageRoll: dice.Term{ // 1d4+14
 								Count: 1,
 								Sides: 4,
 								Flat:  14,
@@ -159,9 +176,10 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 				},
 				{
 					Name: "Mordida",
-					DamageDice: combat.DamageExpression{
-						Components: map[rules.DamageType]dice.Term{
-							rules.Pierce: { // 1d4+14
+					DamageDice: []combat.DamageExpression{
+						{
+							DamageTypes: []rules.DamageType{rules.Pierce},
+							DamageRoll: dice.Term{ // 1d4+14
 								Count: 1,
 								Sides: 4,
 								Flat:  14,
@@ -174,9 +192,10 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 				},
 				{
 					Name: "Garra",
-					DamageDice: combat.DamageExpression{
-						Components: map[rules.DamageType]dice.Term{
-							rules.Slash: { // 1d4+10
+					DamageDice: []combat.DamageExpression{
+						{
+							DamageTypes: []rules.DamageType{rules.Slash},
+							DamageRoll: dice.Term{ // 1d4+10
 								Count: 1,
 								Sides: 4,
 								Flat:  10,

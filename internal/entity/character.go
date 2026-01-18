@@ -1,8 +1,6 @@
 package entity
 
-import (
-	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/rules"
-)
+import "github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/rules"
 
 type MoralAlignment string
 type EthicAlignment string
@@ -48,24 +46,37 @@ func (c *Character) TakeDamage(ammount int) {
 	c.Runtime.HP -= ammount
 }
 
-func (c *Character) ApplyDR(damage map[rules.DamageType]int) {
-	for dmgType, amount := range damage {
-		remaining := amount
+func (dr DamageReduction) IsBypassedBy(types []rules.DamageType) bool {
+	for _, t := range types {
+		if t == dr.BypassType {
+			return true
+		}
+	}
+	return false
+}
 
-		for _, dr := range c.Runtime.DR {
-			if dr.BypassType == dmgType {
+func (c *Character) ApplyDR(damage []rules.DamageInstance) { // Immunities and aço-rubi
+	for _, dr := range c.Runtime.DR {
+		totalDR := dr.Value
+		for i := range damage {
+			for i := range damage[i].Types {
+				println(i)
+			}
+			if dr.IsBypassedBy(damage[i].Types) {
 				continue
 			}
 
-			if remaining <= 0 {
-				break
+			reduced := min(damage[i].Amount, totalDR)
+			damage[i].Amount -= reduced
+			totalDR -= reduced
+
+			if damage[i].Amount <= 0 {
+				continue
 			}
-
-			reduced := min(remaining, dr.Value)
-			remaining -= reduced
 		}
-
-		damage[dmgType] = remaining
+		if totalDR <= 0 {
+			continue
+		}
 	}
 }
 

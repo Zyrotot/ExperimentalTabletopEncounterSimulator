@@ -12,7 +12,7 @@ type AttackContext struct {
 type DamageContext struct {
 	Attacker *Combatant
 	Target   *Combatant
-	Damage   map[rules.DamageType]int
+	Damage   []rules.DamageInstance
 }
 
 type HitContext struct {

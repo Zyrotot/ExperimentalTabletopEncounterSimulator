@@ -4,6 +4,7 @@ import (
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/combat"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/dice"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/entity"
+	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/rules"
 )
 
 const (
@@ -21,13 +22,13 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 				Stats: entity.Stats{
 					MaxHP: 60,
 					AC:    22,
-					DR:    5,
+					DR:    []entity.DamageReduction{entity.DamageReduction{Value: 5, BypassTypes: []rules.DamageType{rules.Magic}}}, // DR 5/magic
 					Fort:  100,
 				},
 				Runtime: entity.Runtime{
 					HP: 60,
 					AC: 22,
-					DR: 5,
+					DR: []entity.DamageReduction{entity.DamageReduction{Value: 5, BypassTypes: []rules.DamageType{rules.Magic}}}, // DR 5/magic
 				},
 				IsNPC: true,
 			},
@@ -35,8 +36,8 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 				{
 					Name: "Pinça",
 					DamageDice: combat.DamageExpression{
-						Components: map[combat.DamageType]dice.Term{
-							combat.Slash: { // 1d8+8
+						Components: map[rules.DamageType]dice.Term{
+							rules.Slash: { // 1d8+8
 								Count: 1,
 								Sides: 8,
 								Flat:  8,
@@ -50,8 +51,8 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 				{
 					Name: "Garra",
 					DamageDice: combat.DamageExpression{
-						Components: map[combat.DamageType]dice.Term{
-							combat.Slash: { // 1d4+8
+						Components: map[rules.DamageType]dice.Term{
+							rules.Slash: { // 1d4+8
 								Count: 1,
 								Sides: 4,
 								Flat:  8,
@@ -71,13 +72,13 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 				Stats: entity.Stats{
 					MaxHP: 99,
 					AC:    25,
-					DR:    10,
+					DR:    []entity.DamageReduction{entity.DamageReduction{Value: 10, BypassTypes: []rules.DamageType{rules.Magic}}}, // DR 10/magic
 					Fort:  100,
 				},
 				Runtime: entity.Runtime{
 					HP: 99,
 					AC: 25,
-					DR: 10,
+					DR: []entity.DamageReduction{entity.DamageReduction{Value: 10, BypassTypes: []rules.DamageType{rules.Magic}}}, // DR 10/magic
 				},
 				IsNPC: true,
 			},
@@ -85,8 +86,8 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 				{
 					Name: "Pinça",
 					DamageDice: combat.DamageExpression{
-						Components: map[combat.DamageType]dice.Term{
-							combat.Slash: { // 1d8+10
+						Components: map[rules.DamageType]dice.Term{
+							rules.Slash: { // 1d8+10
 								Count: 1,
 								Sides: 8,
 								Flat:  10,
@@ -100,8 +101,8 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 				{
 					Name: "Garra",
 					DamageDice: combat.DamageExpression{
-						Components: map[combat.DamageType]dice.Term{
-							combat.Slash: { // 1d4+10
+						Components: map[rules.DamageType]dice.Term{
+							rules.Slash: { // 1d4+10
 								Count: 1,
 								Sides: 4,
 								Flat:  10,
@@ -120,13 +121,13 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 				Stats: entity.Stats{
 					MaxHP: 143,
 					AC:    30,
-					DR:    10,
+					DR:    []entity.DamageReduction{entity.DamageReduction{Value: 10, BypassTypes: []rules.DamageType{rules.Magic}}}, // DR 10/magic
 					Fort:  100,
 				},
 				Runtime: entity.Runtime{
 					HP: 143,
 					AC: 30,
-					DR: 10,
+					DR: []entity.DamageReduction{entity.DamageReduction{Value: 10, BypassTypes: []rules.DamageType{rules.Magic}}}, // DR 10/magic
 				},
 				IsNPC: true,
 			},
@@ -134,8 +135,8 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 				{
 					Name: "Adaga",
 					DamageDice: combat.DamageExpression{
-						Components: map[combat.DamageType]dice.Term{
-							combat.Pierce: { // 1d4+14
+						Components: map[rules.DamageType]dice.Term{
+							rules.Pierce: { // 1d4+14
 								Count: 1,
 								Sides: 4,
 								Flat:  14,
@@ -159,8 +160,8 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 				{
 					Name: "Mordida",
 					DamageDice: combat.DamageExpression{
-						Components: map[combat.DamageType]dice.Term{
-							combat.Pierce: { // 1d4+14
+						Components: map[rules.DamageType]dice.Term{
+							rules.Pierce: { // 1d4+14
 								Count: 1,
 								Sides: 4,
 								Flat:  14,
@@ -174,8 +175,8 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 				{
 					Name: "Garra",
 					DamageDice: combat.DamageExpression{
-						Components: map[combat.DamageType]dice.Term{
-							combat.Slash: { // 1d4+10
+						Components: map[rules.DamageType]dice.Term{
+							rules.Slash: { // 1d4+10
 								Count: 1,
 								Sides: 4,
 								Flat:  10,

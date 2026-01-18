@@ -3,10 +3,11 @@ package combat
 import (
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/dice"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/entity"
+	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/rules"
 )
 
 type DamageModifier interface {
-	ModifyDamage(ctx *DamageContext) (bool, DamageType)
+	ModifyDamage(ctx *DamageContext) (bool, rules.DamageType)
 	GetTerm() dice.Term
 }
 
@@ -18,12 +19,12 @@ type EvilVsGood struct {
 	BaseDamageModifier
 }
 
-func (e EvilVsGood) ModifyDamage(ctx *DamageContext) (bool, DamageType) {
+func (e EvilVsGood) ModifyDamage(ctx *DamageContext) (bool, rules.DamageType) {
 	if ctx.Target.Char.Alignment.Moral != entity.Good {
 		return false, ""
 	}
 
-	return true, Evil
+	return true, rules.Evil
 }
 
 func (e BaseDamageModifier) GetTerm() dice.Term {

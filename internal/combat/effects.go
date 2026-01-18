@@ -1,5 +1,10 @@
 package combat
 
+import (
+	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/entity"
+	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/rules"
+)
+
 type Effect interface {
 	On(event Event, ctx any)
 }
@@ -37,5 +42,10 @@ func (RigidezRaivosa) On(event Event, ctx any) {
 		return
 	}
 
-	dctx.Target.Char.AddDR(1)
+	dr := entity.DamageReduction{
+		Value:       1,
+		BypassTypes: []rules.DamageType{},
+	}
+
+	dctx.Target.Char.AddDR(dr)
 }

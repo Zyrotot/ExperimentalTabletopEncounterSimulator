@@ -6,12 +6,13 @@ import (
 )
 
 type DamageExpression struct {
-	Components map[rules.DamageType]dice.Term
+	DamageTypes []rules.DamageType
+	DamageRoll  dice.Term
 }
 
 type Attack struct {
 	Name            string
-	DamageDice      DamageExpression
+	DamageDice      []DamageExpression
 	DamageModifiers []DamageModifier
 	AttackBonus     int
 	CritRange       int
@@ -23,6 +24,6 @@ type AttackResult struct {
 	TotalAtk    int
 	Hit         bool
 	Crit        bool
-	Damage      map[rules.DamageType]int
+	Damage      []rules.DamageInstance
 	TotalDamage int
 }

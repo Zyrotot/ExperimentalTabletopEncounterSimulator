@@ -13,9 +13,10 @@ func main() {
 	character := combat.Combatant{}
 	attack := combat.Attack{
 		Name: "SwordAttack1",
-		DamageDice: combat.DamageExpression{
-			Components: map[rules.DamageType]dice.Term{
-				rules.Pierce: { // 5d6+36
+		DamageDice: []combat.DamageExpression{
+			{
+				DamageTypes: []rules.DamageType{rules.Slash, rules.Magic},
+				DamageRoll: dice.Term{ // 5d6+36
 					Count: 5,
 					Sides: 6,
 					Flat:  36,
@@ -38,6 +39,10 @@ func main() {
 			HP: 205,
 			AC: 43,
 			DR: []entity.DamageReduction{},
+		},
+		Alignment: entity.Alignment{
+			Moral: entity.Good,
+			Ethic: entity.Lawful,
 		},
 		IsNPC: false,
 	}

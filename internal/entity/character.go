@@ -1,6 +1,10 @@
 package entity
 
-import "github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/rules"
+import (
+	"slices"
+
+	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/rules"
+)
 
 type MoralAlignment string
 type EthicAlignment string
@@ -47,12 +51,7 @@ func (c *Character) TakeDamage(ammount int) {
 }
 
 func (dr DamageReduction) IsBypassedBy(types []rules.DamageType) bool {
-	for _, t := range types {
-		if t == dr.BypassType {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(types, dr.BypassType)
 }
 
 func (c *Character) ApplyDR(damage []rules.DamageInstance) { // Immunities and aço-rubi

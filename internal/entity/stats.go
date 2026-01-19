@@ -7,9 +7,15 @@ type DamageReduction struct {
 	BypassType rules.DamageType
 }
 
+type EnergyResistance struct {
+	Value        int
+	AffectedType rules.DamageType
+}
+
 type Stats struct {
 	MaxHP int
 	AC    int
 	DR    []DamageReduction
+	ER    []EnergyResistance
 	Fort  int
 }

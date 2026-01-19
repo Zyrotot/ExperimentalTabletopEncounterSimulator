@@ -1,8 +1,6 @@
 package entity
 
 import (
-	"slices"
-
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/rules"
 )
 
@@ -50,32 +48,43 @@ func (c *Character) TakeDamage(ammount int) {
 	c.Runtime.HP -= ammount
 }
 
-func (dr DamageReduction) IsBypassedBy(types []rules.DamageType) bool {
-	return slices.Contains(types, dr.BypassType)
+func (c *Character) ApplyResistances(damage []rules.DamageInstance) { // Immunities and aço-rubi
+	c.ApplyDR(damage)
+	c.ApplyER(damage)
 }
 
-func (c *Character) ApplyDR(damage []rules.DamageInstance) { // Immunities and aço-rubi
-	for _, dr := range c.Runtime.DR {
-		totalDR := dr.Value
-		for i := range damage {
-			if !damage[i].IsPhysical() {
-				log.Infof("Not physical, ignoring")
-				continue
-			}
-			if dr.IsBypassedBy(damage[i].Types) {
-				continue
-			}
-
-			reduced := min(damage[i].Amount, totalDR)
-			damage[i].Amount -= reduced
-			totalDR -= reduced
-
-			if damage[i].Amount <= 0 {
-				continue
-			}
+func (dr DamageReduction) IsBypassedBy(d rules.DamageInstance) bool {
+	if !d.IsPhysical() {
+		log.Infof("Not physical, ignoring")
+		return true
+	}
+	for _, t := range d.Types {
+		if t == dr.BypassType {
+			log.Infof("Has bypass type, ignoring")
+			return true
 		}
-		if totalDR <= 0 {
-			continue
+	}
+	return false
+}
+
+func (c *Character) ApplyDR(damage []rules.DamageInstance) {
+	for _, dr := range c.Runtime.DR {
+		remaining := dr.Value
+
+		for i := range damage {
+			if remaining <= 0 {
+				break
+			}
+
+			if dr.IsBypassedBy(damage[i]) {
+				continue
+			}
+
+			reduced := min(damage[i].Amount, remaining)
+			log.Infof("DR - Reduced by %d", reduced)
+
+			damage[i].Amount -= reduced
+			remaining -= reduced
 		}
 	}
 }
@@ -89,4 +98,39 @@ func (c *Character) AddDR(newDR DamageReduction) {
 	}
 
 	c.Runtime.DR = append(c.Runtime.DR, newDR)
+}
+
+func (er EnergyResistance) Affects(d rules.DamageInstance) bool {
+	if !d.IsEnergy() {
+		log.Infof("Not energy, ignoring")
+		return false
+	}
+
+	if er.AffectedType == "" {
+		return true
+	}
+
+	return d.HasType(er.AffectedType)
+}
+
+func (c *Character) ApplyER(damage []rules.DamageInstance) {
+	for _, er := range c.Runtime.ER {
+		remaining := er.Value
+
+		for i := range damage {
+			if remaining <= 0 {
+				break
+			}
+
+			if !er.Affects(damage[i]) {
+				continue
+			}
+
+			reduced := min(damage[i].Amount, remaining)
+			log.Infof("ER - Reduced by %d", reduced)
+
+			damage[i].Amount -= reduced
+			remaining -= reduced
+		}
+	}
 }

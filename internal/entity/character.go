@@ -58,9 +58,6 @@ func (c *Character) ApplyDR(damage []rules.DamageInstance) { // Immunities and a
 	for _, dr := range c.Runtime.DR {
 		totalDR := dr.Value
 		for i := range damage {
-			for i := range damage[i].Types {
-				println(i)
-			}
 			if dr.IsBypassedBy(damage[i].Types) {
 				continue
 			}

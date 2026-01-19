@@ -48,9 +48,32 @@ func (c *Character) TakeDamage(ammount int) {
 	c.Runtime.HP -= ammount
 }
 
-func (c *Character) ApplyResistances(damage []rules.DamageInstance) { // Immunities and aço-rubi
+func (c *Character) ApplyResistances(damage []rules.DamageInstance) {
+	c.ApplyImmunities(damage)
 	c.ApplyDR(damage)
 	c.ApplyER(damage)
+}
+
+func (im Immunity) Affects(d rules.DamageInstance) bool {
+	if im.Type != "" && d.HasType(im.Type) {
+		return true
+	}
+	if im.Category != 0 && d.HasCategory(im.Category) {
+		return true
+	}
+	return false
+}
+
+func (c *Character) ApplyImmunities(damage []rules.DamageInstance) {
+	for i := range damage {
+		for _, im := range c.Runtime.Immunities {
+			if im.Affects(damage[i]) {
+				log.Infof("Immunity applied")
+				damage[i].Amount = 0
+				break
+			}
+		}
+	}
 }
 
 func (dr DamageReduction) IsBypassedBy(d rules.DamageInstance) bool {

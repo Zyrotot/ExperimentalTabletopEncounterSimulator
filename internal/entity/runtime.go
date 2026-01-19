@@ -4,6 +4,7 @@ type Runtime struct {
 	HP        int
 	TempHP    int
 	DR        []DamageReduction
+	ER        []EnergyResistance
 	AC        int
 	Stacks    map[string]int
 	IsFlanked bool

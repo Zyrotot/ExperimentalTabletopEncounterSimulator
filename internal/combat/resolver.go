@@ -136,7 +136,7 @@ func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 				}
 			}
 
-			target.Char.ApplyDR(atkResult.Damage)
+			target.Char.ApplyResistances(atkResult.Damage)
 
 			r.OnDamageEffects(attacker, target, atkResult.Damage)
 

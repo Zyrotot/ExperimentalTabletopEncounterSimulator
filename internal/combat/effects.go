@@ -2,6 +2,7 @@ package combat
 
 import (
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/entity"
+	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/rules"
 )
 
 type Effect interface {
@@ -10,7 +11,7 @@ type Effect interface {
 
 type VampiricWeapon struct{}
 
-func (VampiricWeapon) On(event Event, ctx any) {
+func (vw *VampiricWeapon) On(event Event, ctx any) {
 	if event != EventDealDamage {
 		return
 	}
@@ -29,9 +30,53 @@ func (VampiricWeapon) On(event Event, ctx any) {
 	dctx.Attacker.Char.AddTempHP(heal)
 }
 
+type DuroDeFerir struct {
+	Stacks int
+}
+
+func (ddf *DuroDeFerir) On(event Event, ctx any) {
+	if event != EventTakeDamage {
+		return
+	}
+
+	dctx, ok := ctx.(*DamageContext)
+	if !ok {
+		return
+	}
+
+	if ddf.Stacks > 0 {
+		for i := range dctx.Damage {
+			dctx.Damage[i].Amount = 0
+		}
+		ddf.Stacks--
+	}
+}
+
+type DuroDeMatar struct {
+	Stacks int
+}
+
+func (ddm *DuroDeMatar) On(event Event, ctx any) {
+	if event != EventTakeDamage {
+		return
+	}
+
+	dctx, ok := ctx.(*DamageContext)
+	if !ok {
+		return
+	}
+
+	if ddm.Stacks > 0 && rules.SumDamage(dctx.Damage) > dctx.Target.Char.Runtime.GetTotalHP() {
+		for i := range dctx.Damage {
+			dctx.Damage[i].Amount = 0
+		}
+		ddm.Stacks--
+	}
+}
+
 type RigidezRaivosa struct{}
 
-func (RigidezRaivosa) On(event Event, ctx any) {
+func (rr *RigidezRaivosa) On(event Event, ctx any) {
 	if event != EventTakeDamage {
 		return
 	}

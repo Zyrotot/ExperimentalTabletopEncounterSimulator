@@ -22,3 +22,11 @@ type DamageInstance struct {
 	Amount int
 	Types  []DamageType
 }
+
+func SumDamage(damageInstances []DamageInstance) int {
+	total := 0
+	for _, v := range damageInstances {
+		total += v.Amount
+	}
+	return total
+}

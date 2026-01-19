@@ -32,7 +32,9 @@ type Character struct {
 }
 
 func (c *Character) AddTempHP(ammount int) {
-	c.Runtime.TempHP = ammount
+	if c.Runtime.TempHP < ammount {
+		c.Runtime.TempHP = ammount
+	}
 }
 
 func (c *Character) TakeDamage(ammount int) {

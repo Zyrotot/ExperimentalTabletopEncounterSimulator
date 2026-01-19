@@ -15,11 +15,15 @@ type BaseDamageModifier struct {
 	Term dice.Term
 }
 
-type EvilVsGood struct {
+func (e BaseDamageModifier) GetTerm() dice.Term {
+	return e.Term
+}
+
+type EvilWeapon struct {
 	BaseDamageModifier
 }
 
-func (e EvilVsGood) ModifyDamage(ctx *DamageContext) (bool, rules.DamageType) {
+func (e EvilWeapon) ModifyDamage(ctx *DamageContext) (bool, rules.DamageType) {
 	if ctx.Target.Char.Alignment.Moral != entity.Good {
 		return false, ""
 	}
@@ -27,6 +31,10 @@ func (e EvilVsGood) ModifyDamage(ctx *DamageContext) (bool, rules.DamageType) {
 	return true, rules.Evil
 }
 
-func (e BaseDamageModifier) GetTerm() dice.Term {
-	return e.Term
+type FlammingWeapon struct {
+	BaseDamageModifier
+}
+
+func (f FlammingWeapon) ModifyDamage(ctx *DamageContext) (bool, rules.DamageType) {
+	return true, rules.Fire
 }

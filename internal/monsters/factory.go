@@ -20,15 +20,17 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 			Char: &entity.Character{
 				Name: "Uktril",
 				Stats: entity.Stats{
-					MaxHP: 60,
-					AC:    22,
-					DR:    []entity.DamageReduction{{Value: 5, BypassType: rules.Magic}}, // DR 5/magic
-					Fort:  100,
+					MaxHP:      60,
+					AC:         22,
+					Immunities: []entity.Immunity{{Category: rules.Energy}},
+					DR:         []entity.DamageReduction{{Value: 5, BypassType: rules.Magic}}, // DR 5/magic
+					Fort:       100,
 				},
 				Runtime: entity.Runtime{
-					HP: 60,
-					AC: 22,
-					DR: []entity.DamageReduction{{Value: 5, BypassType: rules.Magic}}, // DR 5/magic
+					HP:         60,
+					AC:         22,
+					Immunities: []entity.Immunity{{Category: rules.Energy}},
+					DR:         []entity.DamageReduction{{Value: 5, BypassType: rules.Magic}}, // DR 5/magic
 				},
 				Alignment: entity.Alignment{
 					Moral: entity.Evil,
@@ -84,15 +86,17 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 			Char: &entity.Character{
 				Name: "Geraktril",
 				Stats: entity.Stats{
-					MaxHP: 99,
-					AC:    25,
-					DR:    []entity.DamageReduction{{Value: 10, BypassType: rules.Magic}}, // DR 10/magic
-					Fort:  100,
+					MaxHP:      99,
+					AC:         25,
+					Immunities: []entity.Immunity{{Category: rules.Energy}},
+					DR:         []entity.DamageReduction{{Value: 10, BypassType: rules.Magic}}, // DR 10/magic
+					Fort:       100,
 				},
 				Runtime: entity.Runtime{
-					HP: 99,
-					AC: 25,
-					DR: []entity.DamageReduction{{Value: 10, BypassType: rules.Magic}}, // DR 10/magic
+					HP:         99,
+					AC:         25,
+					Immunities: []entity.Immunity{{Category: rules.Energy}},
+					DR:         []entity.DamageReduction{{Value: 10, BypassType: rules.Magic}}, // DR 10/magic
 				},
 				Alignment: entity.Alignment{
 					Moral: entity.Evil,
@@ -147,15 +151,17 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 			Char: &entity.Character{
 				Name: "Reishid",
 				Stats: entity.Stats{
-					MaxHP: 143,
-					AC:    30,
-					DR:    []entity.DamageReduction{{Value: 10, BypassType: rules.Magic}}, // DR 10/magic
-					Fort:  100,
+					MaxHP:      143,
+					AC:         30,
+					Immunities: []entity.Immunity{{Category: rules.Energy}},
+					DR:         []entity.DamageReduction{{Value: 10, BypassType: rules.Magic}}, // DR 10/magic
+					Fort:       100,
 				},
 				Runtime: entity.Runtime{
-					HP: 143,
-					AC: 30,
-					DR: []entity.DamageReduction{{Value: 10, BypassType: rules.Magic}}, // DR 10/magic
+					HP:         143,
+					AC:         30,
+					Immunities: []entity.Immunity{{Category: rules.Energy}},
+					DR:         []entity.DamageReduction{{Value: 10, BypassType: rules.Magic}}, // DR 10/magic
 				},
 				Alignment: entity.Alignment{
 					Moral: entity.Evil,

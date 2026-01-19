@@ -1,13 +1,14 @@
 package entity
 
 type Runtime struct {
-	HP        int
-	TempHP    int
-	DR        []DamageReduction
-	ER        []EnergyResistance
-	AC        int
-	Stacks    map[string]int
-	IsFlanked bool
+	HP         int
+	TempHP     int
+	Immunities []Immunity
+	DR         []DamageReduction
+	ER         []EnergyResistance
+	AC         int
+	Stacks     map[string]int
+	IsFlanked  bool
 }
 
 func (rt *Runtime) GetTotalHP() int {

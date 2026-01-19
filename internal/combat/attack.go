@@ -7,7 +7,7 @@ import (
 
 type DamageExpression struct {
 	DamageTypes []rules.DamageType
-	DamageRoll  dice.Term
+	DamageRoll  dice.Expression
 }
 
 type Attack struct {

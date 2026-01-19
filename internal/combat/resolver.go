@@ -78,10 +78,11 @@ func (r *Resolver) ResolveCrit(roll int, crit_range int, fortification int) bool
 			Sides: 100,
 			Flat:  0,
 		})
+		r.Log.Infof("Fortification roll: %d against %d", fort_roll, fortification)
 		if fort_roll > fortification {
-			return false
+			return true
 		}
-		return true
+		return false
 	}
 	return false
 }
@@ -99,7 +100,7 @@ func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 
 		r.Log.Infof("Rolled a %d against %d AC", atkResult.TotalAtk, ac)
 
-		atkResult.Hit = atkResult.TotalAtk >= ac
+		atkResult.Hit = (atkResult.AttackRoll == 20) || (atkResult.TotalAtk >= ac)
 
 		if atkResult.Hit {
 			r.OnHitEffects(attacker, target)
@@ -107,7 +108,11 @@ func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 			atkResult.Damage = make([]rules.DamageInstance, len(atk.DamageDice))
 
 			for i, dmgExp := range atk.DamageDice {
-				damage := r.Dice.Roll(dmgExp.DamageRoll)
+				damage := 0
+				for _, term := range dmgExp.DamageRoll.Terms {
+					damage += r.Dice.Roll(term)
+				}
+				r.Log.Debugf("Calculated damage for expression %d: %d", i, damage)
 				atkResult.Damage[i] = rules.DamageInstance{
 					Amount: damage,
 					Types:  dmgExp.DamageTypes,
@@ -117,6 +122,7 @@ func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 			atkResult.Crit = r.ResolveCrit(atkResult.AttackRoll, atk.CritRange, target.Char.Stats.Fort)
 			if atkResult.Crit {
 				for i, damage := range atkResult.Damage {
+					r.Log.Debugf("Critical hit! Multiplying damage instance %d by %d", i, atk.CritBonus)
 					atkResult.Damage[i] = rules.DamageInstance{
 						Amount: damage.Amount * atk.CritBonus,
 						Types:  damage.Types,
@@ -132,10 +138,12 @@ func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 				})
 				if affected {
 					r.Log.Infof("Damage modifier applied!")
-					atkResult.Damage = append(atkResult.Damage, rules.DamageInstance{
+					extraDamage := rules.DamageInstance{
 						Amount: r.Dice.Roll(mod.GetTerm()),
 						Types:  []rules.DamageType{damageType},
-					})
+					}
+					r.Log.Infof("Extra damage instance: %+v", extraDamage)
+					atkResult.Damage = append(atkResult.Damage, extraDamage)
 				}
 			}
 
@@ -150,5 +158,7 @@ func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 		} else {
 			r.Log.Infof("%s misses %s.", attacker.Char.Name, target.Char.Name)
 		}
+		r.Log.Infof("----- Attack ended -----")
 	}
+	r.Log.Infof("----- Turn ended -----")
 }

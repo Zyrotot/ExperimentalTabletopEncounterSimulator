@@ -16,10 +16,14 @@ func main() {
 		DamageDice: []combat.DamageExpression{
 			{
 				DamageTypes: []rules.DamageType{rules.Slash, rules.Magic},
-				DamageRoll: dice.Term{ // 5d6+36
-					Count: 5,
-					Sides: 6,
-					Flat:  36,
+				DamageRoll: dice.Expression{
+					Terms: []dice.Term{
+						{ // 5d6+36
+							Count: 5,
+							Sides: 6,
+							Flat:  36,
+						},
+					},
 				},
 			},
 		},
@@ -56,32 +60,5 @@ func main() {
 	resolver := combat.NewResolver(dice.NewRandomRoller(diceLog), combatLog)
 
 	resolver.ResolveAttack(&character, base_enemie)
+	resolver.ResolveAttack(base_enemie, &character)
 }
-
-// {
-//   "curaAcelerada": 0,
-//   "duroDeMatar": 0,
-//   "duroDeFerir": 0,
-//   "cleave": 0,
-//   "flankImmune": false,
-//   "rigidezRaivosa": true,
-//   "perfectMobility": false,
-//   "vampiricWeapon": false,
-//   "erosion": false,
-//   "attacks": [
-//     {
-//       "name": "SwordAttack1",
-//       "attackBonus": 21,
-//       "damageDice": "5d6+36",
-//       "critRange": 19,
-//       "critBonus": 2
-//     },
-//     {
-//       "name": "SwordAttack2",
-//       "attackBonus": 21,
-//       "damageDice": "5d6+36",
-//       "critRange": 19,
-//       "critBonus": 2
-//     }
-//   ]
-// }

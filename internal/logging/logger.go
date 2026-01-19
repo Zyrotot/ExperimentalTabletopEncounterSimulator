@@ -25,7 +25,7 @@ func New(name string, level Level) *Logger {
 	return &Logger{
 		level: level,
 		name:  name,
-		base:  log.New(os.Stdout, "", log.LstdFlags),
+		base:  log.New(os.Stdout, "", log.Lmsgprefix),
 	}
 }
 

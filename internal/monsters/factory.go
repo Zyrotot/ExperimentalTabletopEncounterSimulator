@@ -42,10 +42,14 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 					DamageDice: []combat.DamageExpression{
 						{
 							DamageTypes: []rules.DamageType{rules.Slash},
-							DamageRoll: dice.Term{ // 1d8+8
-								Count: 1,
-								Sides: 8,
-								Flat:  8,
+							DamageRoll: dice.Expression{
+								Terms: []dice.Term{
+									{ // 1d8+8
+										Count: 1,
+										Sides: 8,
+										Flat:  8,
+									},
+								},
 							},
 						},
 					},
@@ -58,10 +62,14 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 					DamageDice: []combat.DamageExpression{
 						{
 							DamageTypes: []rules.DamageType{rules.Slash},
-							DamageRoll: dice.Term{ // 1d4+8
-								Count: 1,
-								Sides: 4,
-								Flat:  8,
+							DamageRoll: dice.Expression{
+								Terms: []dice.Term{
+									{ // 1d4+8
+										Count: 1,
+										Sides: 4,
+										Flat:  8,
+									},
+								},
 							},
 						},
 					},
@@ -98,10 +106,14 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 					DamageDice: []combat.DamageExpression{
 						{
 							DamageTypes: []rules.DamageType{rules.Slash},
-							DamageRoll: dice.Term{ // 1d8+10
-								Count: 1,
-								Sides: 8,
-								Flat:  10,
+							DamageRoll: dice.Expression{
+								Terms: []dice.Term{
+									{ // 1d8+10
+										Count: 1,
+										Sides: 8,
+										Flat:  10,
+									},
+								},
 							},
 						},
 					},
@@ -114,10 +126,14 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 					DamageDice: []combat.DamageExpression{
 						{
 							DamageTypes: []rules.DamageType{rules.Slash},
-							DamageRoll: dice.Term{ // 1d4+10
-								Count: 1,
-								Sides: 4,
-								Flat:  10,
+							DamageRoll: dice.Expression{
+								Terms: []dice.Term{
+									{ // 1d4+10
+										Count: 1,
+										Sides: 4,
+										Flat:  10,
+									},
+								},
 							},
 						},
 					},
@@ -153,10 +169,14 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 					DamageDice: []combat.DamageExpression{
 						{
 							DamageTypes: []rules.DamageType{rules.Pierce, rules.Magic},
-							DamageRoll: dice.Term{ // 1d4+14
-								Count: 1,
-								Sides: 4,
-								Flat:  14,
+							DamageRoll: dice.Expression{
+								Terms: []dice.Term{
+									{ // 1d4+14
+										Count: 1,
+										Sides: 4,
+										Flat:  14,
+									},
+								},
 							},
 						},
 					},
@@ -179,10 +199,14 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 					DamageDice: []combat.DamageExpression{
 						{
 							DamageTypes: []rules.DamageType{rules.Pierce},
-							DamageRoll: dice.Term{ // 1d4+14
-								Count: 1,
-								Sides: 4,
-								Flat:  14,
+							DamageRoll: dice.Expression{
+								Terms: []dice.Term{
+									{ // 1d4+14
+										Count: 1,
+										Sides: 4,
+										Flat:  14,
+									},
+								},
 							},
 						},
 					},
@@ -195,10 +219,14 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 					DamageDice: []combat.DamageExpression{
 						{
 							DamageTypes: []rules.DamageType{rules.Slash},
-							DamageRoll: dice.Term{ // 1d4+10
-								Count: 1,
-								Sides: 4,
-								Flat:  10,
+							DamageRoll: dice.Expression{
+								Terms: []dice.Term{
+									{ // 1d4+10
+										Count: 1,
+										Sides: 4,
+										Flat:  10,
+									},
+								},
 							},
 						},
 					},

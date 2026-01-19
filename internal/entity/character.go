@@ -47,8 +47,6 @@ func (c *Character) TakeDamage(ammount int) {
 		}
 	}
 
-	// TODO: Add Duro de Matar and Ferir stacks (as events?)
-
 	c.Runtime.HP -= ammount
 }
 
@@ -56,7 +54,7 @@ func (dr DamageReduction) IsBypassedBy(types []rules.DamageType) bool {
 	return slices.Contains(types, dr.BypassType)
 }
 
-func (c *Character) ApplyDR(damage []rules.DamageInstance) { // Immunities and aço-rubi
+func (c *Character) ApplyDR(damage []rules.DamageInstance) { // Immunities, ER and aço-rubi
 	for _, dr := range c.Runtime.DR {
 		totalDR := dr.Value
 		for i := range damage {

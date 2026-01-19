@@ -3,7 +3,6 @@ package combat
 import (
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/dice"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/entity"
-	logging "github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/logging"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/rules"
 )
 
@@ -15,13 +14,11 @@ type Combatant struct {
 
 type Resolver struct {
 	Dice dice.Roller
-	Log  *logging.Logger
 }
 
-func NewResolver(dice dice.Roller, log *logging.Logger) *Resolver {
+func NewResolver(dice dice.Roller) *Resolver {
 	return &Resolver{
 		Dice: dice,
-		Log:  log,
 	}
 }
 
@@ -70,7 +67,7 @@ func (r *Resolver) ResolveCrit(roll int, crit_range int, fortification int) bool
 			Sides: 100,
 			Flat:  0,
 		})
-		r.Log.Infof("Fortification roll: %d against %d", fort_roll, fortification)
+		log.Infof("Fortification roll: %d against %d", fort_roll, fortification)
 		if fort_roll > fortification {
 			return true
 		}
@@ -90,7 +87,7 @@ func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 		atkResult.TotalAtk = atkResult.AttackRoll + atk.AttackBonus
 		ac := target.Char.Runtime.AC
 
-		r.Log.Infof("Rolled a %d against %d AC", atkResult.TotalAtk, ac)
+		log.Infof("Rolled a %d against %d AC", atkResult.TotalAtk, ac)
 
 		atkResult.Hit = (atkResult.AttackRoll == 20) || (atkResult.TotalAtk >= ac)
 
@@ -104,7 +101,7 @@ func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 				for _, term := range dmgExp.DamageRoll.Terms {
 					damage += r.Dice.Roll(term)
 				}
-				r.Log.Debugf("Calculated damage for expression %d: %d", i, damage)
+				log.Debugf("Calculated damage for expression %d: %d", i, damage)
 				atkResult.Damage[i] = rules.DamageInstance{
 					Amount: damage,
 					Types:  dmgExp.DamageTypes,
@@ -114,7 +111,7 @@ func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 			atkResult.Crit = r.ResolveCrit(atkResult.AttackRoll, atk.CritRange, target.Char.Stats.Fort)
 			if atkResult.Crit {
 				for i, damage := range atkResult.Damage {
-					r.Log.Debugf("Critical hit! Multiplying damage instance %d by %d", i, atk.CritBonus)
+					log.Debugf("Critical hit! Multiplying damage instance %d by %d", i, atk.CritBonus)
 					atkResult.Damage[i] = rules.DamageInstance{
 						Amount: damage.Amount * atk.CritBonus,
 						Types:  damage.Types,
@@ -129,12 +126,12 @@ func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 					Damage:   atkResult.Damage,
 				})
 				if affected {
-					r.Log.Infof("Damage modifier applied!")
+					log.Infof("Damage modifier applied!")
 					extraDamage := rules.DamageInstance{
 						Amount: r.Dice.Roll(mod.GetTerm()),
 						Types:  []rules.DamageType{damageType},
 					}
-					r.Log.Infof("Extra damage instance: %+v", extraDamage)
+					log.Infof("Extra damage instance: %+v", extraDamage)
 					atkResult.Damage = append(atkResult.Damage, extraDamage)
 				}
 			}
@@ -146,11 +143,11 @@ func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 			atkResult.TotalDamage = rules.SumDamage(atkResult.Damage)
 
 			target.Char.TakeDamage(atkResult.TotalDamage)
-			r.Log.Infof("%s hits %s for %d damage!", attacker.Char.Name, target.Char.Name, atkResult.TotalDamage)
+			log.Infof("%s hits %s for %d damage!", attacker.Char.Name, target.Char.Name, atkResult.TotalDamage)
 		} else {
-			r.Log.Infof("%s misses %s.", attacker.Char.Name, target.Char.Name)
+			log.Infof("%s misses %s.", attacker.Char.Name, target.Char.Name)
 		}
-		r.Log.Infof("----- Attack ended -----")
+		log.Infof("----- Attack ended -----")
 	}
-	r.Log.Infof("----- Turn ended -----")
+	log.Infof("----- Turn ended -----")
 }

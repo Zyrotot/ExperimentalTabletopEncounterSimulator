@@ -8,3 +8,7 @@ type Runtime struct {
 	Stacks    map[string]int
 	IsFlanked bool
 }
+
+func (rt *Runtime) GetTotalHP() int {
+	return rt.HP + rt.TempHP
+}

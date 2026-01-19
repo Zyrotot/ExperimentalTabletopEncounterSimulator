@@ -34,14 +34,6 @@ func hasPositiveDamage(damageInstances []rules.DamageInstance) bool {
 	return false
 }
 
-func SumDamage(damageInstances []rules.DamageInstance) int {
-	total := 0
-	for _, v := range damageInstances {
-		total += v.Amount
-	}
-	return total
-}
-
 func (r *Resolver) OnDamageEffects(attacker, target *Combatant, damageInstances []rules.DamageInstance) {
 	ctx := DamageContext{
 		Attacker: attacker,
@@ -151,7 +143,7 @@ func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 
 			r.OnDamageEffects(attacker, target, atkResult.Damage)
 
-			atkResult.TotalDamage = SumDamage(atkResult.Damage)
+			atkResult.TotalDamage = rules.SumDamage(atkResult.Damage)
 
 			target.Char.TakeDamage(atkResult.TotalDamage)
 			r.Log.Infof("%s hits %s for %d damage!", attacker.Char.Name, target.Char.Name, atkResult.TotalDamage)

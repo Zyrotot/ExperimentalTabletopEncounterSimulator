@@ -54,10 +54,14 @@ func (dr DamageReduction) IsBypassedBy(types []rules.DamageType) bool {
 	return slices.Contains(types, dr.BypassType)
 }
 
-func (c *Character) ApplyDR(damage []rules.DamageInstance) { // Immunities, ER and aço-rubi
+func (c *Character) ApplyDR(damage []rules.DamageInstance) { // Immunities and aço-rubi
 	for _, dr := range c.Runtime.DR {
 		totalDR := dr.Value
 		for i := range damage {
+			if !damage[i].IsPhysical() {
+				log.Infof("Not physical, ignoring")
+				continue
+			}
 			if dr.IsBypassedBy(damage[i].Types) {
 				continue
 			}

@@ -181,7 +181,7 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 						},
 					},
 					DamageModifiers: []combat.DamageModifier{
-						combat.EvilVsGood{
+						combat.EvilWeapon{
 							BaseDamageModifier: combat.BaseDamageModifier{
 								Term: dice.Term{
 									Count: 2,

@@ -157,3 +157,7 @@ func (c *Character) Heal(amount int) {
 func (c *Character) GetTotalAC() int {
 	return c.Stats.AC + c.Runtime.ACBonus
 }
+
+func (c *Character) IsDead() bool {
+	return c.Runtime.HP <= 0
+}

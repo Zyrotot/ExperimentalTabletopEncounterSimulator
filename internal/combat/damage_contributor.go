@@ -11,7 +11,6 @@ type DamageContributor interface {
 }
 
 type EvilWeapon struct {
-	Term dice.Term
 }
 
 func (e EvilWeapon) Contribute(ctx *CombatContext) rules.DamageInstance {
@@ -20,18 +19,45 @@ func (e EvilWeapon) Contribute(ctx *CombatContext) rules.DamageInstance {
 	}
 
 	return rules.DamageInstance{
-		Amount: ctx.Roller.Roll(e.Term),
-		Types:  []rules.DamageType{rules.Evil},
+		Amount: ctx.Roller.Roll(dice.Term{
+			Count: 2,
+			Sides: 6,
+		}),
+		Types: []rules.DamageType{rules.Evil},
 	}
 }
 
 type FlamingWeapon struct {
-	Term dice.Term
 }
 
 func (f FlamingWeapon) Contribute(ctx *CombatContext) rules.DamageInstance {
 	return rules.DamageInstance{
-		Amount: ctx.Roller.Roll(f.Term),
+		Amount: ctx.Roller.Roll(dice.Term{
+			Count: 1,
+			Sides: 6,
+		}),
+		Types: []rules.DamageType{rules.Fire},
+	}
+}
+
+type FlamingExplosionWeapon struct {
+}
+
+func (fe FlamingExplosionWeapon) Contribute(ctx *CombatContext) rules.DamageInstance {
+	damageValue := ctx.Roller.Roll(dice.Term{
+		Count: 1,
+		Sides: 6,
+	})
+	if ctx.Attack.Crit {
+		dices := min(ctx.Attack.Attack.CritBonus-1, 3)
+		damageValue += ctx.Roller.Roll(dice.Term{
+			Count: dices,
+			Sides: 10,
+		})
+	}
+	return rules.DamageInstance{
+		Amount: damageValue,
 		Types:  []rules.DamageType{rules.Fire},
 	}
+
 }

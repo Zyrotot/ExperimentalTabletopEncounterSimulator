@@ -20,6 +20,7 @@ type Attack struct {
 }
 
 type AttackResult struct {
+	Attack      Attack
 	AttackRoll  int
 	TotalAtk    int
 	Hit         bool

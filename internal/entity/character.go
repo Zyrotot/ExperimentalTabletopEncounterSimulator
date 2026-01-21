@@ -105,8 +105,8 @@ func (c *Character) allER() []EnergyResistance {
 	)
 }
 
-func (c *Character) DamageModifiers() []rules.DamageModifier {
-	var mods []rules.DamageModifier
+func (c *Character) DamageMitigators() []rules.DamageMitigator {
+	var mods []rules.DamageMitigator
 
 	for _, wk := range c.allWeaknesses() {
 		mods = append(mods, wk)

@@ -9,6 +9,21 @@ type Encounter struct {
 	Round int
 }
 
+type TargetSelector interface {
+	Select(attacker *combat.Combatant, candidates []*combat.Combatant) *combat.Combatant
+}
+
+type FirstAliveSelector struct{}
+
+func (FirstAliveSelector) Select(_ *combat.Combatant, candidates []*combat.Combatant) *combat.Combatant {
+	for _, c := range candidates {
+		if !c.Char.IsDead() {
+			return c
+		}
+	}
+	return nil
+}
+
 type Engine interface {
 	Setup(encounter *Encounter)
 	Run(encounter *Encounter)
@@ -18,18 +33,9 @@ type Action interface {
 	Execute(r *combat.Resolver)
 }
 
-type AttackAction struct {
-	Attacker *combat.Combatant
-	Attack   combat.Attack
-	Target   *combat.Combatant
-}
-
-func (a AttackAction) Execute(r *combat.Resolver) {
-	r.ResolveAttack(a.Attacker, a.Target, a.Attack)
-}
-
 type AutoEngine struct {
-	Resolver *combat.Resolver
+	Resolver       *combat.Resolver
+	TargetSelector TargetSelector
 }
 
 func (ae *AutoEngine) Setup(enc *Encounter) {
@@ -48,16 +54,14 @@ func (ae *AutoEngine) Run(enc *Encounter) {
 				continue
 			}
 
-			ae.Resolver.ResolveTurnStart(ally)
-
-			target := ae.firstAlive(enc.Enemies)
-			if target == nil {
-				return
-			}
-			for _, atk := range ally.Attacks {
-				AttackAction{ally, atk, target}.Execute(ae.Resolver)
-			}
-			ae.resolvePending(ally, enc.Allies, enc.Enemies)
+			ae.Resolver.ExecuteTurn(
+				ally,
+				enc.Allies,
+				enc.Enemies,
+				func(c []*combat.Combatant) *combat.Combatant {
+					return ae.TargetSelector.Select(ally, c)
+				},
+			)
 		}
 
 		for _, enemy := range enc.Enemies {
@@ -65,17 +69,14 @@ func (ae *AutoEngine) Run(enc *Encounter) {
 				continue
 			}
 
-			ae.Resolver.ResolveTurnStart(enemy)
-
-			target := ae.firstAlive(enc.Allies)
-			if target == nil {
-				return
-			}
-			for _, atk := range enemy.Attacks {
-				// TODO: Change target if dead
-				AttackAction{enemy, atk, target}.Execute(ae.Resolver)
-			}
-			ae.resolvePending(enemy, enc.Enemies, enc.Allies)
+			ae.Resolver.ExecuteTurn(
+				enemy,
+				enc.Enemies,
+				enc.Allies,
+				func(c []*combat.Combatant) *combat.Combatant {
+					return ae.TargetSelector.Select(enemy, c)
+				},
+			)
 		}
 		log.Infof("-------- turn ended -----------")
 	}
@@ -88,28 +89,4 @@ func (ae *AutoEngine) anyAlive(combatants []*combat.Combatant) bool {
 		}
 	}
 	return false
-}
-
-func (ae *AutoEngine) firstAlive(combatants []*combat.Combatant) *combat.Combatant {
-	for _, char := range combatants {
-		if !char.Char.IsDead() {
-			return char
-		}
-	}
-	return nil
-}
-
-func (e *AutoEngine) resolvePending(actor *combat.Combatant, allies, enemies []*combat.Combatant) {
-	for len(actor.PendingActions) > 0 {
-		req := actor.PendingActions[0]
-		actor.PendingActions = actor.PendingActions[1:]
-
-		switch req := req.(type) {
-		case combat.ExtraAttackRequest:
-			target := e.firstAlive(enemies)
-			if target != nil {
-				AttackAction{req.Source, req.Attack, target}.Execute(e.Resolver)
-			}
-		}
-	}
 }

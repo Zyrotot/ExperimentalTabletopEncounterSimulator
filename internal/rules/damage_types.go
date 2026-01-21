@@ -108,7 +108,7 @@ func (d DamageInstance) IsModifier() bool {
 	return d.HasCategory(Modifier)
 }
 
-type DamageModifier interface {
+type DamageMitigator interface {
 	Apply(damage []DamageInstance)
 	Priority() int
 }

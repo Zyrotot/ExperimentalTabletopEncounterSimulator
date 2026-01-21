@@ -26,7 +26,8 @@ func main() {
 	engine.SetLogger(engineLog)
 
 	resolver := combat.NewResolver(dice.NewRandomRoller())
-	engine := &engine.AutoEngine{Resolver: resolver}
+	targetSelector := engine.FirstAliveSelector{}
+	engine := &engine.AutoEngine{Resolver: resolver, TargetSelector: targetSelector}
 
 	builder := &simulator.LinearEncounterBuilder{
 		PlayerFactory: func() *combat.Combatant {

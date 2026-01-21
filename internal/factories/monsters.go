@@ -167,7 +167,7 @@ func MonsterFactory(monsterType Monster) *combat.Combatant {
 							},
 						},
 					},
-					DamageContributors: []combat.DamageContributor{
+					DamageSources: []combat.DamageSource{
 						combat.EvilWeapon{},
 					},
 					AttackBonus: 26,

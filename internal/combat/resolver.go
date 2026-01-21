@@ -96,13 +96,13 @@ func (r *Resolver) ResolveCrit(roll int, crit_range int, fortification int) bool
 	return false
 }
 
-func (r *Resolver) ApplyDamageModifiers(target *Combatant, dmg []rules.DamageInstance) {
-	for _, mod := range target.Char.DamageModifiers() {
+func (r *Resolver) ApplyDamageMitigators(target *Combatant, dmg []rules.DamageInstance) {
+	for _, mod := range target.Char.DamageMitigators() {
 		mod.Apply(dmg)
 	}
 }
 
-func (r *Resolver) ResolveAttack(attacker, target *Combatant, atk Attack) {
+func (r *Resolver) ExecuteAttack(attacker, target *Combatant, atk Attack) {
 	atkResult := AttackResult{Attack: atk}
 	atkResult.AttackRoll = r.Dice.Roll(dice.Term{
 		Count: 1,
@@ -144,7 +144,7 @@ func (r *Resolver) ResolveAttack(attacker, target *Combatant, atk Attack) {
 			}
 		}
 
-		for _, mod := range atk.DamageContributors {
+		for _, mod := range atk.DamageSources {
 			extraDamage := mod.Contribute(&CombatContext{
 				Attacker: attacker,
 				Target:   target,
@@ -157,7 +157,7 @@ func (r *Resolver) ResolveAttack(attacker, target *Combatant, atk Attack) {
 			}
 		}
 
-		r.ApplyDamageModifiers(target, atkResult.Damage)
+		r.ApplyDamageMitigators(target, atkResult.Damage)
 
 		r.OnDamageEffects(attacker, target, atkResult.Damage)
 
@@ -182,9 +182,38 @@ func (r *Resolver) ResolveAttack(attacker, target *Combatant, atk Attack) {
 	log.Infof("----- Attack ended -----")
 }
 
-func (r *Resolver) ResolveTurnStart(combatant *Combatant) {
-	ctx := TurnContext{combatant}
-	for _, eff := range combatant.Effects {
+func (r *Resolver) StartTurn(c *Combatant) {
+	ctx := TurnContext{Combatant: c}
+	for _, eff := range c.Effects {
 		eff.On(EventTurnStart, &ctx)
+	}
+}
+
+func (r *Resolver) ExecuteTurn(actor *Combatant, allies []*Combatant, enemies []*Combatant, selectTarget func([]*Combatant) *Combatant) {
+	r.StartTurn(actor)
+
+	for _, atk := range actor.Attacks {
+		target := selectTarget(enemies)
+		if target == nil {
+			return
+		}
+		r.ExecuteAttack(actor, target, atk)
+	}
+
+	r.resolvePending(actor, allies, enemies, selectTarget)
+}
+
+func (r *Resolver) resolvePending(actor *Combatant, allies, enemies []*Combatant, selectTarget func([]*Combatant) *Combatant) {
+	for len(actor.PendingActions) > 0 {
+		req := actor.PendingActions[0]
+		actor.PendingActions = actor.PendingActions[1:]
+
+		switch req := req.(type) {
+		case ExtraAttackRequest:
+			target := selectTarget(enemies)
+			if target != nil {
+				r.ExecuteAttack(req.Source, target, req.Attack)
+			}
+		}
 	}
 }

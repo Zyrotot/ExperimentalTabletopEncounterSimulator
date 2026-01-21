@@ -36,13 +36,11 @@ func main() {
 		Stats: entity.Stats{
 			MaxHP: 205,
 			AC:    43,
-			DR:    []entity.DamageReduction{},
 			Fort:  100,
 		},
 		Runtime: entity.Runtime{
-			HP: 1,
+			HP: 205,
 			AC: 43,
-			DR: []entity.DamageReduction{},
 		},
 		Alignment: entity.Alignment{
 			Moral: entity.Good,

@@ -10,6 +10,8 @@ type Combatant struct {
 	Char    *entity.Character
 	Attacks []Attack
 	Effects []Effect
+
+	PendingActions []ActionRequest
 }
 
 type Resolver struct {
@@ -100,85 +102,82 @@ func (r *Resolver) ApplyDamageModifiers(target *Combatant, dmg []rules.DamageIns
 	}
 }
 
-func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
-	for _, atk := range attacker.Attacks {
-		atkResult := AttackResult{Attack: atk}
-		atkResult.AttackRoll = r.Dice.Roll(dice.Term{
-			Count: 1,
-			Sides: 20,
-			Flat:  0,
-		})
-		atkResult.TotalAtk = atkResult.AttackRoll + atk.AttackBonus
-		ac := target.Char.GetTotalAC()
+func (r *Resolver) ResolveAttack(attacker, target *Combatant, atk Attack) {
+	atkResult := AttackResult{Attack: atk}
+	atkResult.AttackRoll = r.Dice.Roll(dice.Term{
+		Count: 1,
+		Sides: 20,
+		Flat:  0,
+	})
+	atkResult.TotalAtk = atkResult.AttackRoll + atk.AttackBonus
+	ac := target.Char.GetTotalAC()
 
-		log.Infof("Rolled a %d against %d AC", atkResult.TotalAtk, ac)
+	log.Infof("Rolled a %d against %d AC", atkResult.TotalAtk, ac)
 
-		atkResult.Hit = (atkResult.AttackRoll == 20) || (atkResult.TotalAtk >= ac)
+	atkResult.Hit = (atkResult.AttackRoll == 20) || (atkResult.TotalAtk >= ac)
 
-		if atkResult.Hit {
-			r.OnHitEffects(attacker, target)
+	if atkResult.Hit {
+		r.OnHitEffects(attacker, target)
 
-			atkResult.Damage = make([]rules.DamageInstance, len(atk.DamageDice))
+		atkResult.Damage = make([]rules.DamageInstance, len(atk.DamageDice))
 
-			for i, dmgExp := range atk.DamageDice {
-				damage := 0
-				for _, term := range dmgExp.DamageRoll.Terms {
-					damage += r.Dice.Roll(term)
-				}
-				log.Debugf("Calculated damage for expression %d: %d", i, damage)
-				atkResult.Damage[i] = rules.DamageInstance{
-					Amount: damage,
-					Types:  dmgExp.DamageTypes,
-				}
+		for i, dmgExp := range atk.DamageDice {
+			damage := 0
+			for _, term := range dmgExp.DamageRoll.Terms {
+				damage += r.Dice.Roll(term)
 			}
-
-			atkResult.Crit = r.ResolveCrit(atkResult.AttackRoll, atk.CritRange, target.Char.Stats.Fort)
-			if atkResult.Crit {
-				for i, damage := range atkResult.Damage {
-					log.Debugf("Critical hit! Multiplying damage instance %d by %d", i, atk.CritBonus)
-					atkResult.Damage[i] = rules.DamageInstance{
-						Amount: damage.Amount * atk.CritBonus,
-						Types:  damage.Types,
-					}
-				}
+			log.Debugf("Calculated damage for expression %d: %d", i, damage)
+			atkResult.Damage[i] = rules.DamageInstance{
+				Amount: damage,
+				Types:  dmgExp.DamageTypes,
 			}
-
-			for _, mod := range atk.DamageContributors {
-				extraDamage := mod.Contribute(&CombatContext{
-					Attacker: attacker,
-					Target:   target,
-					Attack:   atkResult,
-					Roller:   r.Dice,
-				})
-				if extraDamage.Amount > 0 {
-					log.Infof("Extra damage instance: %+v", extraDamage)
-					atkResult.Damage = append(atkResult.Damage, extraDamage)
-				}
-			}
-
-			r.ApplyDamageModifiers(target, atkResult.Damage)
-
-			r.OnDamageEffects(attacker, target, atkResult.Damage)
-
-			atkResult.TotalDamage = rules.SumDamage(atkResult.Damage)
-
-			target.Char.TakeDamage(atkResult.TotalDamage)
-			log.Infof("%s hits %s for %d damage!", attacker.Char.Name, target.Char.Name, atkResult.TotalDamage)
-
-			killed := target.Char.IsDead()
-			if killed {
-				ctx := CombatContext{
-					Attacker: attacker,
-					Target:   target,
-				}
-				for _, eff := range attacker.Effects {
-					eff.On(EventKill, &ctx)
-				}
-			}
-		} else {
-			log.Infof("%s misses %s.", attacker.Char.Name, target.Char.Name)
 		}
-		log.Infof("----- Attack ended -----")
+
+		atkResult.Crit = r.ResolveCrit(atkResult.AttackRoll, atk.CritRange, target.Char.Stats.Fort)
+		if atkResult.Crit {
+			for i, damage := range atkResult.Damage {
+				log.Debugf("Critical hit! Multiplying damage instance %d by %d", i, atk.CritBonus)
+				atkResult.Damage[i] = rules.DamageInstance{
+					Amount: damage.Amount * atk.CritBonus,
+					Types:  damage.Types,
+				}
+			}
+		}
+
+		for _, mod := range atk.DamageContributors {
+			extraDamage := mod.Contribute(&CombatContext{
+				Attacker: attacker,
+				Target:   target,
+				Attack:   atkResult,
+				Roller:   r.Dice,
+			})
+			if extraDamage.Amount > 0 {
+				log.Infof("Extra damage instance: %+v", extraDamage)
+				atkResult.Damage = append(atkResult.Damage, extraDamage)
+			}
+		}
+
+		r.ApplyDamageModifiers(target, atkResult.Damage)
+
+		r.OnDamageEffects(attacker, target, atkResult.Damage)
+
+		atkResult.TotalDamage = rules.SumDamage(atkResult.Damage)
+
+		target.Char.TakeDamage(atkResult.TotalDamage)
+		log.Infof("%s hits %s for %d damage!", attacker.Char.Name, target.Char.Name, atkResult.TotalDamage)
+
+		killed := target.Char.IsDead()
+		if killed {
+			ctx := CombatContext{
+				Attacker: attacker,
+				Target:   target,
+			}
+			for _, eff := range attacker.Effects {
+				eff.On(EventKill, &ctx)
+			}
+		}
+	} else {
+		log.Infof("%s misses %s.", attacker.Char.Name, target.Char.Name)
 	}
-	log.Infof("----- Turn ended -----")
+	log.Infof("----- Attack ended -----")
 }

@@ -28,7 +28,6 @@ type Character struct {
 	Stats     Stats
 	Runtime   Runtime
 	Alignment Alignment
-	IsNPC     bool
 }
 
 func (c *Character) AddTempHP(ammount int) {

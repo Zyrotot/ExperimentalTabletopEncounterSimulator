@@ -129,10 +129,17 @@ func (cl *Cleave) On(event Event, ctx any) {
 		return
 	}
 
-	// dctx, ok := ctx.(*CombatContext)
-	// if !ok {
-	// 	return
-	// }
+	cctx, ok := ctx.(*CombatContext)
+	if !ok {
+		return
+	}
 
-	// TODO: Trigger another attack
+	cctx.Attacker.PendingActions = append(
+		cctx.Attacker.PendingActions,
+		ExtraAttackRequest{
+			Source: cctx.Attacker,
+			Attack: cctx.Attack.Attack,
+			Reason: "Cleave",
+		},
+	)
 }

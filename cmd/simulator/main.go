@@ -1,70 +1,50 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/combat"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/dice"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/engine"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/entity"
+	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/factories"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/logging"
-	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/monsters"
-	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/rules"
+	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/simulator"
 )
 
 func main() {
-	character := combat.Combatant{}
-	attack := combat.Attack{
-		Name: "SwordAttack1",
-		DamageDice: []combat.DamageExpression{
-			{
-				DamageTypes: []rules.DamageType{rules.Slash, rules.Magic},
-				DamageRoll: dice.Expression{
-					Terms: []dice.Term{
-						{ // 5d6+36
-							Count: 5,
-							Sides: 6,
-							Flat:  36,
-						},
-					},
-				},
-			},
-		},
-		AttackBonus: 21,
-		CritRange:   19,
-		CritBonus:   2,
-	}
-	character.Char = &entity.Character{
-		Name: "Bob",
-		Stats: entity.Stats{
-			MaxHP: 205,
-			AC:    43,
-			Fort:  100,
-		},
-		Alignment: entity.Alignment{
-			Moral: entity.Good,
-			Ethic: entity.Lawful,
-		},
-	}
-	character.Effects = []combat.Effect{&combat.Cleave{}}
-	character.Attacks = []combat.Attack{attack, attack}
-
-	geraktril := monsters.MonsterFactory(monsters.Geraktril)
-	uktril := monsters.MonsterFactory(monsters.Uktril)
-
 	combatLog := logging.New("combat", logging.DEBUG)
 	diceLog := logging.New("dice", logging.DEBUG)
 	entityLog := logging.New("entity", logging.DEBUG)
-	monstersLog := logging.New("monsters", logging.DEBUG)
+	factoriesLog := logging.New("factories", logging.DEBUG)
 
 	combat.SetLogger(combatLog)
 	dice.SetLogger(diceLog)
 	entity.SetLogger(entityLog)
-	monsters.SetLogger(monstersLog)
+	factories.SetLogger(factoriesLog)
 
 	resolver := combat.NewResolver(dice.NewRandomRoller())
-	auto_engine := engine.AutoEngine{Resolver: resolver}
+	engine := &engine.AutoEngine{Resolver: resolver}
 
-	encounter := engine.Encounter{Allies: []*combat.Combatant{&character}, Enemies: []*combat.Combatant{geraktril, uktril}}
+	builder := &simulator.LinearEncounterBuilder{
+		PlayerFactory: func() *combat.Combatant {
+			return factories.PlayerFactory()
+		},
+		EnemyFactory: func() *combat.Combatant {
+			return factories.MonsterFactory(factories.Uktril)
+		},
+	}
 
-	auto_engine.Setup(&encounter)
-	auto_engine.Run(&encounter)
+	sim := &simulator.EndlessSimulator{
+		Engine:  engine,
+		Builder: builder,
+	}
+
+	result := sim.Run()
+
+	fmt.Printf(
+		"Encounters won: %d\nEnemies defeated: %d\n",
+		result.EncountersWon,
+		result.EnemiesDefeated,
+	)
 }

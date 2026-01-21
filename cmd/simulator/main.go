@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/combat"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/dice"
+	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/engine"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/entity"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/logging"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/monsters"
@@ -42,11 +43,12 @@ func main() {
 			Moral: entity.Good,
 			Ethic: entity.Lawful,
 		},
-		IsNPC: false,
 	}
+	character.Effects = []combat.Effect{&combat.Cleave{}}
 	character.Attacks = []combat.Attack{attack, attack}
 
-	base_enemie := monsters.MonsterFactory(monsters.Geraktril)
+	geraktril := monsters.MonsterFactory(monsters.Geraktril)
+	uktril := monsters.MonsterFactory(monsters.Uktril)
 
 	combatLog := logging.New("combat", logging.DEBUG)
 	diceLog := logging.New("dice", logging.DEBUG)
@@ -59,7 +61,10 @@ func main() {
 	monsters.SetLogger(monstersLog)
 
 	resolver := combat.NewResolver(dice.NewRandomRoller())
+	auto_engine := engine.AutoEngine{Resolver: resolver}
 
-	resolver.ResolveAttack(&character, base_enemie)
-	resolver.ResolveAttack(base_enemie, &character)
+	encounter := engine.Encounter{Allies: []*combat.Combatant{&character}, Enemies: []*combat.Combatant{geraktril, uktril}}
+
+	auto_engine.Setup(&encounter)
+	auto_engine.Run(&encounter)
 }

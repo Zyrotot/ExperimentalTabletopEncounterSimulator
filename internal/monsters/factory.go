@@ -30,7 +30,6 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 					Moral: entity.Evil,
 					Ethic: entity.Chaotic,
 				},
-				IsNPC: true,
 			},
 			Attacks: []combat.Attack{
 				{
@@ -90,7 +89,6 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 					Moral: entity.Evil,
 					Ethic: entity.Chaotic,
 				},
-				IsNPC: true,
 			},
 			Attacks: []combat.Attack{
 				{
@@ -149,7 +147,6 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 					Moral: entity.Evil,
 					Ethic: entity.Chaotic,
 				},
-				IsNPC: true,
 			},
 			Attacks: []combat.Attack{
 				{

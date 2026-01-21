@@ -60,6 +60,24 @@ func (r *Resolver) OnHitEffects(attacker, target *Combatant) {
 	}
 }
 
+func (r *Resolver) Heal(source, target *Combatant, amount int) {
+	if amount <= 0 {
+		return
+	}
+
+	target.Char.Heal(amount)
+
+	ctx := HealContext{
+		Source: source,
+		Target: target,
+		Amount: amount,
+	}
+
+	for _, eff := range target.Effects {
+		eff.On(EventHeal, &ctx)
+	}
+}
+
 func (r *Resolver) ResolveCrit(roll int, crit_range int, fortification int) bool {
 	if roll >= crit_range {
 		fort_roll := r.Dice.Roll(dice.Term{

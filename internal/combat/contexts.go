@@ -15,6 +15,12 @@ type DamageContext struct {
 	Damage   []rules.DamageInstance
 }
 
+type HealContext struct {
+	Source *Combatant
+	Target *Combatant
+	Amount int
+}
+
 type HitContext struct {
 	Attacker *Combatant
 	Target   *Combatant

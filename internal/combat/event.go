@@ -8,5 +8,6 @@ const (
 	EventTakeHit    Event = "take_hit"
 	EventDealDamage Event = "deal_damage"
 	EventTakeDamage Event = "take_damage"
+	EventHeal       Event = "heal"
 	EventTurnStart  Event = "turn_start"
 )

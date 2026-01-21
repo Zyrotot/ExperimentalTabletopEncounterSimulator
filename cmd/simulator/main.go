@@ -35,13 +35,13 @@ func main() {
 		Name: "Bob",
 		Stats: entity.Stats{
 			MaxHP: 205,
-			AC:    10,
+			AC:    43,
 			DR:    []entity.DamageReduction{},
 			Fort:  100,
 		},
 		Runtime: entity.Runtime{
 			HP: 1,
-			AC: 10,
+			AC: 43,
 			DR: []entity.DamageReduction{},
 		},
 		Alignment: entity.Alignment{
@@ -51,7 +51,6 @@ func main() {
 		IsNPC: false,
 	}
 	character.Attacks = []combat.Attack{attack, attack}
-	character.Effects = []combat.Effect{&combat.DuroDeMatar{Stacks: 1}}
 
 	base_enemie := monsters.MonsterFactory(monsters.Geraktril)
 

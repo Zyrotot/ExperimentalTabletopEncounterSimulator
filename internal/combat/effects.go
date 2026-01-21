@@ -77,19 +77,26 @@ func (ddm *DuroDeMatar) On(event Event, ctx any) {
 type RigidezRaivosa struct{}
 
 func (rr *RigidezRaivosa) On(event Event, ctx any) {
-	if event != EventTakeDamage {
-		return
-	}
+	switch event {
 
-	dctx, ok := ctx.(*DamageContext)
-	if !ok {
-		return
-	}
+	case EventTakeDamage:
+		dctx, ok := ctx.(*DamageContext)
+		if !ok {
+			return
+		}
 
-	dr := entity.DamageReduction{
-		Value:      1,
-		BypassType: "",
-	}
+		dr := entity.DamageReduction{
+			Value:      1,
+			BypassType: "",
+			Source:     "RigidezRaivosa",
+		}
+		dctx.Target.Char.AddDR(dr)
 
-	dctx.Target.Char.AddDR(dr)
+	case EventHeal:
+		hctx, ok := ctx.(*HealContext)
+		if !ok {
+			return
+		}
+		hctx.Target.Char.RemoveDRBySource("RigidezRaivosa")
+	}
 }

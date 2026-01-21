@@ -114,13 +114,23 @@ func (c *Character) ApplyDR(damage []rules.DamageInstance) {
 
 func (c *Character) AddDR(newDR DamageReduction) {
 	for i, existing := range c.Runtime.DR {
-		if existing.BypassType == newDR.BypassType {
+		if existing.BypassType == newDR.BypassType &&
+			existing.Source == newDR.Source {
 			c.Runtime.DR[i].Value += newDR.Value
 			return
 		}
 	}
-
 	c.Runtime.DR = append(c.Runtime.DR, newDR)
+}
+
+func (c *Character) RemoveDRBySource(source string) {
+	filtered := c.Runtime.DR[:0]
+	for _, dr := range c.Runtime.DR {
+		if dr.Source != source {
+			filtered = append(filtered, dr)
+		}
+	}
+	c.Runtime.DR = filtered
 }
 
 func (er EnergyResistance) Affects(d rules.DamageInstance) bool {
@@ -156,4 +166,8 @@ func (c *Character) ApplyER(damage []rules.DamageInstance) {
 			remaining -= reduced
 		}
 	}
+}
+
+func (c *Character) Heal(amount int) {
+	c.Runtime.HP = min(c.Runtime.HP+amount, c.Stats.MaxHP)
 }

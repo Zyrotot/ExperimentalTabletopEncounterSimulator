@@ -100,3 +100,24 @@ func (rr *RigidezRaivosa) On(event Event, ctx any) {
 		hctx.Target.Char.RemoveDRBySource("RigidezRaivosa")
 	}
 }
+
+type Erosion struct{}
+
+func (er *Erosion) On(event Event, ctx any) {
+	if event != EventDealHit {
+		return
+	}
+
+	dctx, ok := ctx.(*HitContext)
+	if !ok {
+		return
+	}
+
+	dctx.Target.Char.Runtime.DRSuppressed = append(
+		dctx.Target.Char.Runtime.DRSuppressed,
+		entity.DRSuppression{
+			Source: "Erosion",
+			Value:  1,
+		},
+	)
+}

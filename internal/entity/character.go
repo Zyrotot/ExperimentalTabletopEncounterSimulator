@@ -50,20 +50,76 @@ func (c *Character) TakeDamage(ammount int) {
 	c.Runtime.HP -= ammount
 }
 
+func (c *Character) allWeaknesses() []Weakness {
+	return append(
+		append([]Weakness{}, c.Stats.Weaknesses...),
+		c.Runtime.AddedWeaknesses...,
+	)
+}
+
+func (c *Character) allImmunities() []Immunity {
+	return append(
+		append([]Immunity{}, c.Stats.Immunities...),
+		c.Runtime.AddedImmunities...,
+	)
+}
+
+func (c *Character) allDR() []DamageReduction {
+	return append(
+		append([]DamageReduction{}, c.Stats.DR...),
+		c.Runtime.AddedDR...,
+	)
+}
+
+func (c *Character) effectiveDR() []DamageReduction {
+	drs := c.allDR()
+
+	remainingSuppression := 0
+	for _, sup := range c.Runtime.DRSuppressed {
+		remainingSuppression += sup.Value
+	}
+
+	for i := range drs {
+		if remainingSuppression <= 0 {
+			break
+		}
+
+		reduced := min(drs[i].Value, remainingSuppression)
+		drs[i].Value -= reduced
+		remainingSuppression -= reduced
+	}
+
+	out := drs[:0]
+	for _, dr := range drs {
+		if dr.Value > 0 {
+			out = append(out, dr)
+		}
+	}
+
+	return out
+}
+
+func (c *Character) allER() []EnergyResistance {
+	return append(
+		append([]EnergyResistance{}, c.Stats.ER...),
+		c.Runtime.AddedER...,
+	)
+}
+
 func (c *Character) DamageModifiers() []rules.DamageModifier {
 	var mods []rules.DamageModifier
 
-	for _, wk := range c.Runtime.Weaknesses {
+	for _, wk := range c.allWeaknesses() {
 		mods = append(mods, wk)
 	}
-	for _, im := range c.Runtime.Immunities {
+	for _, im := range c.allImmunities() {
 		mods = append(mods, im)
 	}
-	for _, dr := range c.Runtime.DR {
-		mods = append(mods, dr)
-	}
-	for _, er := range c.Runtime.ER {
+	for _, er := range c.allER() {
 		mods = append(mods, er)
+	}
+	for _, dr := range c.effectiveDR() {
+		mods = append(mods, dr)
 	}
 
 	sort.Slice(mods, func(i, j int) bool {
@@ -74,26 +130,30 @@ func (c *Character) DamageModifiers() []rules.DamageModifier {
 }
 
 func (c *Character) AddDR(newDR DamageReduction) {
-	for i, existing := range c.Runtime.DR {
+	for i, existing := range c.allDR() {
 		if existing.BypassType == newDR.BypassType &&
 			existing.Source == newDR.Source {
-			c.Runtime.DR[i].Value += newDR.Value
+			c.Runtime.AddedDR[i].Value += newDR.Value
 			return
 		}
 	}
-	c.Runtime.DR = append(c.Runtime.DR, newDR)
+	c.Runtime.AddedDR = append(c.Runtime.AddedDR, newDR)
 }
 
 func (c *Character) RemoveDRBySource(source string) {
-	filtered := c.Runtime.DR[:0]
-	for _, dr := range c.Runtime.DR {
+	filtered := c.Runtime.AddedDR[:0]
+	for _, dr := range c.Runtime.AddedDR {
 		if dr.Source != source {
 			filtered = append(filtered, dr)
 		}
 	}
-	c.Runtime.DR = filtered
+	c.Runtime.AddedDR = filtered
 }
 
 func (c *Character) Heal(amount int) {
 	c.Runtime.HP = min(c.Runtime.HP+amount, c.Stats.MaxHP)
+}
+
+func (c *Character) GetTotalAC() int {
+	return c.Stats.AC + c.Runtime.ACBonus
 }

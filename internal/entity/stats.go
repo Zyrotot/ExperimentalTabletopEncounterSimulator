@@ -21,12 +21,19 @@ type DamageReduction struct {
 	Source     string
 }
 
+type DRSuppression struct {
+	Source string
+	Value  int
+}
+
 type Stats struct {
-	MaxHP      int
-	AC         int
+	MaxHP int
+	AC    int
+
 	Immunities []Immunity
 	Weaknesses []Weakness
 	DR         []DamageReduction
 	ER         []EnergyResistance
-	Fort       int
+
+	Fort int
 }

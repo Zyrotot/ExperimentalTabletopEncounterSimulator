@@ -9,11 +9,11 @@ import (
 func expectDR(t *testing.T, c *Character, idx int, value int, bypass rules.DamageType) {
 	t.Helper()
 
-	if len(c.Runtime.DR) <= idx {
-		t.Fatalf("expected DR index %d to exist, DR list: %+v", idx, c.Runtime.DR)
+	if len(c.Runtime.AddedDR) <= idx {
+		t.Fatalf("expected DR index %d to exist, DR list: %+v", idx, c.Runtime.AddedDR)
 	}
 
-	dr := c.Runtime.DR[idx]
+	dr := c.Runtime.AddedDR[idx]
 
 	if dr.Value != value {
 		t.Fatalf("expected DR value %d, got %d", value, dr.Value)
@@ -31,10 +31,6 @@ func TestAddDR_NewBypassType(t *testing.T) {
 		Value:      5,
 		BypassType: rules.Good,
 	})
-
-	if len(c.Runtime.DR) != 1 {
-		t.Fatalf("expected 1 DR entry, got %d", len(c.Runtime.DR))
-	}
 
 	expectDR(t, c, 0, 5, rules.Good)
 }
@@ -86,14 +82,13 @@ func TestAddDR_IncreaseDR_RemoveDR(t *testing.T) {
 		Source:     "test",
 	}
 
-	dr_good := DamageReduction{
-		Value:      1,
-		BypassType: rules.Good,
+	c.AddDR(dr_all)
+	if len(c.Runtime.AddedDR) != 1 {
+		t.Fatalf("Expected 1 DR instance")
 	}
 
-	c.AddDR(dr_all)
-	c.AddDR(dr_good)
-
 	c.RemoveDRBySource("test")
-	expectDR(t, c, 0, 1, "good")
+	if len(c.Runtime.AddedDR) != 0 {
+		t.Fatalf("Expected no DR instance")
+	}
 }

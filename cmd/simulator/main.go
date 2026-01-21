@@ -38,10 +38,6 @@ func main() {
 			AC:    43,
 			Fort:  100,
 		},
-		Runtime: entity.Runtime{
-			HP: 205,
-			AC: 43,
-		},
 		Alignment: entity.Alignment{
 			Moral: entity.Good,
 			Ethic: entity.Lawful,

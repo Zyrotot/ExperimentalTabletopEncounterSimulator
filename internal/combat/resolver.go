@@ -55,7 +55,7 @@ func (r *Resolver) OnHitEffects(attacker, target *Combatant) {
 		eff.On(EventTakeHit, &ctx)
 	}
 
-	for _, eff := range target.Effects {
+	for _, eff := range attacker.Effects {
 		eff.On(EventDealHit, &ctx)
 	}
 }
@@ -109,7 +109,7 @@ func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 			Flat:  0,
 		})
 		atkResult.TotalAtk = atkResult.AttackRoll + atk.AttackBonus
-		ac := target.Char.Runtime.AC
+		ac := target.Char.GetTotalAC()
 
 		log.Infof("Rolled a %d against %d AC", atkResult.TotalAtk, ac)
 

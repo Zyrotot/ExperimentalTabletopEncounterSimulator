@@ -94,6 +94,12 @@ func (r *Resolver) ResolveCrit(roll int, crit_range int, fortification int) bool
 	return false
 }
 
+func (r *Resolver) ApplyDamageModifiers(target *Combatant, dmg []rules.DamageInstance) {
+	for _, mod := range target.Char.DamageModifiers() {
+		mod.Apply(dmg)
+	}
+}
+
 func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 	for _, atk := range attacker.Attacks {
 		atkResult := AttackResult{}
@@ -137,24 +143,19 @@ func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 				}
 			}
 
-			for _, mod := range atk.DamageModifiers {
-				affected, damageType := mod.ModifyDamage(&DamageContext{
+			for _, mod := range atk.DamageContributors {
+				extraDamage := mod.Contribute(&CombatContext{
 					Attacker: attacker,
 					Target:   target,
-					Damage:   atkResult.Damage,
+					Roller:   r.Dice,
 				})
-				if affected {
-					log.Infof("Damage modifier applied!")
-					extraDamage := rules.DamageInstance{
-						Amount: r.Dice.Roll(mod.GetTerm()),
-						Types:  []rules.DamageType{damageType},
-					}
+				if extraDamage.Amount > 0 {
 					log.Infof("Extra damage instance: %+v", extraDamage)
 					atkResult.Damage = append(atkResult.Damage, extraDamage)
 				}
 			}
 
-			target.Char.ApplyResistances(atkResult.Damage)
+			r.ApplyDamageModifiers(target, atkResult.Damage)
 
 			r.OnDamageEffects(attacker, target, atkResult.Damage)
 

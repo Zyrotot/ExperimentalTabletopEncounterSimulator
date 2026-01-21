@@ -11,12 +11,12 @@ type DamageExpression struct {
 }
 
 type Attack struct {
-	Name            string
-	DamageDice      []DamageExpression
-	DamageModifiers []DamageModifier
-	AttackBonus     int
-	CritRange       int
-	CritBonus       int
+	Name               string
+	DamageDice         []DamageExpression
+	DamageContributors []DamageContributor
+	AttackBonus        int
+	CritRange          int
+	CritBonus          int
 }
 
 type AttackResult struct {

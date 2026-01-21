@@ -2,26 +2,23 @@ package entity
 
 import "github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/rules"
 
+type Weakness struct {
+	Value  int
+	Filter DamageFilter
+}
 type Immunity struct {
-	Type     rules.DamageType
-	Category rules.DamageCategory
+	Filter DamageFilter
 }
 
-type Weakness struct {
-	Value    int
-	Type     rules.DamageType
-	Category rules.DamageCategory
+type EnergyResistance struct {
+	Value  int
+	Filter DamageFilter
 }
 
 type DamageReduction struct {
 	Value      int
 	BypassType rules.DamageType
 	Source     string
-}
-
-type EnergyResistance struct {
-	Value        int
-	AffectedType rules.DamageType
 }
 
 type Stats struct {

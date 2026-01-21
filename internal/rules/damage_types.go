@@ -107,3 +107,8 @@ func (d DamageInstance) IsEnergy() bool {
 func (d DamageInstance) IsModifier() bool {
 	return d.HasCategory(Modifier)
 }
+
+type DamageModifier interface {
+	Apply(damage []DamageInstance)
+	Priority() int
+}

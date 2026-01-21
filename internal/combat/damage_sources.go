@@ -6,7 +6,7 @@ import (
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/rules"
 )
 
-type DamageContributor interface {
+type DamageSource interface {
 	Contribute(ctx *CombatContext) rules.DamageInstance
 }
 

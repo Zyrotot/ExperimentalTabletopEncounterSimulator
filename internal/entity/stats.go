@@ -10,6 +10,7 @@ type Immunity struct {
 type DamageReduction struct {
 	Value      int
 	BypassType rules.DamageType
+	Source     string
 }
 
 type EnergyResistance struct {

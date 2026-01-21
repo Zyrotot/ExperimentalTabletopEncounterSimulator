@@ -169,12 +169,7 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 						},
 					},
 					DamageContributors: []combat.DamageContributor{
-						combat.EvilWeapon{
-							Term: dice.Term{
-								Count: 2,
-								Sides: 6,
-							},
-						},
+						combat.EvilWeapon{},
 					},
 					AttackBonus: 26,
 					CritRange:   19,

@@ -21,6 +21,7 @@ type DamageContext struct {
 type CombatContext struct {
 	Attacker *Combatant
 	Target   *Combatant
+	Attack   AttackResult
 	Roller   dice.Roller
 }
 

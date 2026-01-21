@@ -102,7 +102,7 @@ func (r *Resolver) ApplyDamageModifiers(target *Combatant, dmg []rules.DamageIns
 
 func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 	for _, atk := range attacker.Attacks {
-		atkResult := AttackResult{}
+		atkResult := AttackResult{Attack: atk}
 		atkResult.AttackRoll = r.Dice.Roll(dice.Term{
 			Count: 1,
 			Sides: 20,
@@ -147,6 +147,7 @@ func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 				extraDamage := mod.Contribute(&CombatContext{
 					Attacker: attacker,
 					Target:   target,
+					Attack:   atkResult,
 					Roller:   r.Dice,
 				})
 				if extraDamage.Amount > 0 {
@@ -163,6 +164,17 @@ func (r *Resolver) ResolveAttack(attacker, target *Combatant) {
 
 			target.Char.TakeDamage(atkResult.TotalDamage)
 			log.Infof("%s hits %s for %d damage!", attacker.Char.Name, target.Char.Name, atkResult.TotalDamage)
+
+			killed := target.Char.IsDead()
+			if killed {
+				ctx := CombatContext{
+					Attacker: attacker,
+					Target:   target,
+				}
+				for _, eff := range attacker.Effects {
+					eff.On(EventKill, &ctx)
+				}
+			}
 		} else {
 			log.Infof("%s misses %s.", attacker.Char.Name, target.Char.Name)
 		}

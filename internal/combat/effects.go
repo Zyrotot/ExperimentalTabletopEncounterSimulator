@@ -121,3 +121,18 @@ func (er *Erosion) On(event Event, ctx any) {
 		},
 	)
 }
+
+type Cleave struct{}
+
+func (cl *Cleave) On(event Event, ctx any) {
+	if event != EventKill {
+		return
+	}
+
+	// dctx, ok := ctx.(*CombatContext)
+	// if !ok {
+	// 	return
+	// }
+
+	// TODO: Trigger another attack
+}

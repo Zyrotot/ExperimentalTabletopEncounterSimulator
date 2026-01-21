@@ -3,15 +3,19 @@ package entity
 import "github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/rules"
 
 type Runtime struct {
-	HP         int
-	TempHP     int
-	Immunities []Immunity
-	Weaknesses []Weakness
-	DR         []DamageReduction
-	ER         []EnergyResistance
-	AC         int
-	Stacks     map[string]int
-	IsFlanked  bool
+	HP     int
+	TempHP int
+
+	ACBonus int
+
+	AddedImmunities []Immunity
+	AddedWeaknesses []Weakness
+	AddedDR         []DamageReduction
+	AddedER         []EnergyResistance
+
+	DRSuppressed []DRSuppression
+
+	IsFlanked bool
 }
 
 func (rt *Runtime) GetTotalHP() int {
@@ -57,20 +61,6 @@ func (im Immunity) Apply(damage []rules.DamageInstance) {
 	}
 }
 
-func (dr DamageReduction) IsBypassedBy(d rules.DamageInstance) bool {
-	if !d.IsPhysical() {
-		log.Infof("Not physical, ignoring")
-		return true
-	}
-	for _, t := range d.Types {
-		if t == dr.BypassType {
-			log.Infof("Has bypass type, ignoring")
-			return true
-		}
-	}
-	return false
-}
-
 func (er EnergyResistance) Priority() int { return 30 }
 
 func (er EnergyResistance) Apply(damage []rules.DamageInstance) {
@@ -91,6 +81,20 @@ func (er EnergyResistance) Apply(damage []rules.DamageInstance) {
 		damage[i].Amount -= reduced
 		remaining -= reduced
 	}
+}
+
+func (dr DamageReduction) IsBypassedBy(d rules.DamageInstance) bool {
+	if !d.IsPhysical() {
+		log.Infof("Not physical, ignoring")
+		return true
+	}
+	for _, t := range d.Types {
+		if t == dr.BypassType {
+			log.Infof("Has bypass type, ignoring")
+			return true
+		}
+	}
+	return false
 }
 
 func (dr DamageReduction) Priority() int { return 40 }

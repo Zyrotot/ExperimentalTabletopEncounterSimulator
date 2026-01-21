@@ -26,12 +26,6 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 					DR:         []entity.DamageReduction{{Value: 5, BypassType: rules.Magic}}, // DR 5/magic
 					Fort:       100,
 				},
-				Runtime: entity.Runtime{
-					HP:         60,
-					AC:         22,
-					Immunities: []entity.Immunity{{Filter: entity.DamageFilter{Category: rules.Energy}}},
-					DR:         []entity.DamageReduction{{Value: 5, BypassType: rules.Magic}}, // DR 5/magic
-				},
 				Alignment: entity.Alignment{
 					Moral: entity.Evil,
 					Ethic: entity.Chaotic,
@@ -92,12 +86,6 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 					DR:         []entity.DamageReduction{{Value: 10, BypassType: rules.Magic}}, // DR 10/magic
 					Fort:       100,
 				},
-				Runtime: entity.Runtime{
-					HP:         99,
-					AC:         25,
-					Immunities: []entity.Immunity{{Filter: entity.DamageFilter{Category: rules.Energy}}},
-					DR:         []entity.DamageReduction{{Value: 10, BypassType: rules.Magic}}, // DR 10/magic
-				},
 				Alignment: entity.Alignment{
 					Moral: entity.Evil,
 					Ethic: entity.Chaotic,
@@ -156,12 +144,6 @@ func MonsterFactory(monsterType int) *combat.Combatant {
 					Immunities: []entity.Immunity{{Filter: entity.DamageFilter{Category: rules.Energy}}},
 					DR:         []entity.DamageReduction{{Value: 10, BypassType: rules.Magic}}, // DR 10/magic
 					Fort:       100,
-				},
-				Runtime: entity.Runtime{
-					HP:         143,
-					AC:         30,
-					Immunities: []entity.Immunity{{Filter: entity.DamageFilter{Category: rules.Energy}}},
-					DR:         []entity.DamageReduction{{Value: 10, BypassType: rules.Magic}}, // DR 10/magic
 				},
 				Alignment: entity.Alignment{
 					Moral: entity.Evil,

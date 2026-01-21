@@ -181,3 +181,10 @@ func (r *Resolver) ResolveAttack(attacker, target *Combatant, atk Attack) {
 	}
 	log.Infof("----- Attack ended -----")
 }
+
+func (r *Resolver) ResolveTurnStart(combatant *Combatant) {
+	ctx := TurnContext{combatant}
+	for _, eff := range combatant.Effects {
+		eff.On(EventTurnStart, &ctx)
+	}
+}

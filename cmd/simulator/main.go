@@ -17,11 +17,13 @@ func main() {
 	diceLog := logging.New("dice", logging.DEBUG)
 	entityLog := logging.New("entity", logging.DEBUG)
 	factoriesLog := logging.New("factories", logging.DEBUG)
+	engineLog := logging.New("engine", logging.DEBUG)
 
 	combat.SetLogger(combatLog)
 	dice.SetLogger(diceLog)
 	entity.SetLogger(entityLog)
 	factories.SetLogger(factoriesLog)
+	engine.SetLogger(engineLog)
 
 	resolver := combat.NewResolver(dice.NewRandomRoller())
 	engine := &engine.AutoEngine{Resolver: resolver}

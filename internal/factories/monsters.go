@@ -1,4 +1,4 @@
-package monsters
+package factories
 
 import (
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/combat"
@@ -7,13 +7,15 @@ import (
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/rules"
 )
 
+type Monster int
+
 const (
-	Uktril    int = 1
-	Geraktril int = 2
-	Reishid   int = 3
+	Uktril    Monster = 1
+	Geraktril Monster = 2
+	Reishid   Monster = 3
 )
 
-func MonsterFactory(monsterType int) *combat.Combatant {
+func MonsterFactory(monsterType Monster) *combat.Combatant {
 	switch monsterType {
 	case Uktril:
 		return &combat.Combatant{

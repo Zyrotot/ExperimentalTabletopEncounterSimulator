@@ -1,4 +1,4 @@
-package monsters
+package factories
 
 import "github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/logging"
 

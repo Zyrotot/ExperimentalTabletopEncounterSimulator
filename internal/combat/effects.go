@@ -134,6 +134,8 @@ func (cl *Cleave) On(event Event, ctx any) {
 		return
 	}
 
+	log.Infof("Extra attack from Cleave!")
+
 	cctx.Attacker.PendingActions = append(
 		cctx.Attacker.PendingActions,
 		ExtraAttackRequest{

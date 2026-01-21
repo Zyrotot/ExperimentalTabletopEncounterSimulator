@@ -10,6 +10,7 @@ type Encounter struct {
 }
 
 type Engine interface {
+	Setup(encounter *Encounter)
 	Run(encounter *Encounter)
 }
 

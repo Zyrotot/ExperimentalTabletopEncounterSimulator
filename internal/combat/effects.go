@@ -122,26 +122,32 @@ func (er *Erosion) On(event Event, ctx any) {
 	)
 }
 
-type Cleave struct{}
+type Cleave struct {
+	used bool
+}
 
 func (cl *Cleave) On(event Event, ctx any) {
-	if event != EventKill {
-		return
+	switch event {
+	case EventTurnStart:
+		cl.used = false
+	case EventKill:
+		if cl.used {
+			return
+		}
+		cctx, ok := ctx.(*CombatContext)
+		if !ok {
+			return
+		}
+
+		log.Infof("%s triggers Cleave!", cctx.Attacker.Char.Name)
+
+		cctx.Attacker.PendingActions = append(
+			cctx.Attacker.PendingActions,
+			ExtraAttackRequest{
+				Source: cctx.Attacker,
+				Attack: cctx.Attack.Attack,
+				Reason: "Cleave",
+			},
+		)
 	}
-
-	cctx, ok := ctx.(*CombatContext)
-	if !ok {
-		return
-	}
-
-	log.Infof("Extra attack from Cleave!")
-
-	cctx.Attacker.PendingActions = append(
-		cctx.Attacker.PendingActions,
-		ExtraAttackRequest{
-			Source: cctx.Attacker,
-			Attack: cctx.Attack.Attack,
-			Reason: "Cleave",
-		},
-	)
 }

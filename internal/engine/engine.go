@@ -47,6 +47,9 @@ func (ae *AutoEngine) Run(enc *Encounter) {
 			if ally.Char.IsDead() {
 				continue
 			}
+
+			ae.Resolver.ResolveTurnStart(ally)
+
 			target := ae.firstAlive(enc.Enemies)
 			if target == nil {
 				return
@@ -61,15 +64,20 @@ func (ae *AutoEngine) Run(enc *Encounter) {
 			if enemy.Char.IsDead() {
 				continue
 			}
+
+			ae.Resolver.ResolveTurnStart(enemy)
+
 			target := ae.firstAlive(enc.Allies)
 			if target == nil {
 				return
 			}
 			for _, atk := range enemy.Attacks {
+				// TODO: Change target if dead
 				AttackAction{enemy, atk, target}.Execute(ae.Resolver)
 			}
 			ae.resolvePending(enemy, enc.Enemies, enc.Allies)
 		}
+		log.Infof("-------- turn ended -----------")
 	}
 }
 

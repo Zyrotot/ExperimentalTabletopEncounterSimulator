@@ -4,6 +4,7 @@ type Runtime struct {
 	HP         int
 	TempHP     int
 	Immunities []Immunity
+	Weaknesses []Weakness
 	DR         []DamageReduction
 	ER         []EnergyResistance
 	AC         int

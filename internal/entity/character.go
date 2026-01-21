@@ -49,9 +49,33 @@ func (c *Character) TakeDamage(ammount int) {
 }
 
 func (c *Character) ApplyResistances(damage []rules.DamageInstance) {
+	c.ApplyWeaknesses(damage)
+
 	c.ApplyImmunities(damage)
 	c.ApplyDR(damage)
 	c.ApplyER(damage)
+}
+
+func (wk Weakness) Affects(d rules.DamageInstance) bool {
+	if wk.Type != "" && d.HasType(wk.Type) {
+		return true
+	}
+	if wk.Category != 0 && d.HasCategory(wk.Category) {
+		return true
+	}
+	return false
+}
+
+func (c *Character) ApplyWeaknesses(damage []rules.DamageInstance) {
+	for i := range damage {
+		for _, wk := range c.Runtime.Weaknesses {
+			if wk.Affects(damage[i]) {
+				log.Infof("Weakness of %d applied", wk.Value)
+				damage[i].Amount += wk.Value
+				break
+			}
+		}
+	}
 }
 
 func (im Immunity) Affects(d rules.DamageInstance) bool {

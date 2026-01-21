@@ -1,6 +1,9 @@
 package combat
 
-import "github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/rules"
+import (
+	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/dice"
+	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/rules"
+)
 
 type AttackContext struct {
 	Attacker *Combatant
@@ -13,6 +16,12 @@ type DamageContext struct {
 	Attacker *Combatant
 	Target   *Combatant
 	Damage   []rules.DamageInstance
+}
+
+type CombatContext struct {
+	Attacker *Combatant
+	Target   *Combatant
+	Roller   dice.Roller
 }
 
 type HealContext struct {

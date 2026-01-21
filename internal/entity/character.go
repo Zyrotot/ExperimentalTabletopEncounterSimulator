@@ -1,6 +1,8 @@
 package entity
 
 import (
+	"sort"
+
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/rules"
 )
 
@@ -48,92 +50,27 @@ func (c *Character) TakeDamage(ammount int) {
 	c.Runtime.HP -= ammount
 }
 
-func (c *Character) ApplyResistances(damage []rules.DamageInstance) {
-	c.ApplyWeaknesses(damage)
+func (c *Character) DamageModifiers() []rules.DamageModifier {
+	var mods []rules.DamageModifier
 
-	c.ApplyImmunities(damage)
-	c.ApplyDR(damage)
-	c.ApplyER(damage)
-}
-
-func (wk Weakness) Affects(d rules.DamageInstance) bool {
-	if wk.Type != "" && d.HasType(wk.Type) {
-		return true
+	for _, wk := range c.Runtime.Weaknesses {
+		mods = append(mods, wk)
 	}
-	if wk.Category != 0 && d.HasCategory(wk.Category) {
-		return true
+	for _, im := range c.Runtime.Immunities {
+		mods = append(mods, im)
 	}
-	return false
-}
-
-func (c *Character) ApplyWeaknesses(damage []rules.DamageInstance) {
-	for i := range damage {
-		for _, wk := range c.Runtime.Weaknesses {
-			if wk.Affects(damage[i]) {
-				log.Infof("Weakness of %d applied", wk.Value)
-				damage[i].Amount += wk.Value
-				break
-			}
-		}
-	}
-}
-
-func (im Immunity) Affects(d rules.DamageInstance) bool {
-	if im.Type != "" && d.HasType(im.Type) {
-		return true
-	}
-	if im.Category != 0 && d.HasCategory(im.Category) {
-		return true
-	}
-	return false
-}
-
-func (c *Character) ApplyImmunities(damage []rules.DamageInstance) {
-	for i := range damage {
-		for _, im := range c.Runtime.Immunities {
-			if im.Affects(damage[i]) {
-				log.Infof("Immunity applied")
-				damage[i].Amount = 0
-				break
-			}
-		}
-	}
-}
-
-func (dr DamageReduction) IsBypassedBy(d rules.DamageInstance) bool {
-	if !d.IsPhysical() {
-		log.Infof("Not physical, ignoring")
-		return true
-	}
-	for _, t := range d.Types {
-		if t == dr.BypassType {
-			log.Infof("Has bypass type, ignoring")
-			return true
-		}
-	}
-	return false
-}
-
-func (c *Character) ApplyDR(damage []rules.DamageInstance) {
 	for _, dr := range c.Runtime.DR {
-		remaining := dr.Value
-
-		for i := range damage {
-			if remaining <= 0 {
-				break
-			}
-
-			if dr.IsBypassedBy(damage[i]) {
-				continue
-			}
-
-			reduced := min(damage[i].Amount, remaining)
-			log.Infof("DR - Reduced by %d", reduced)
-
-			damage[i].Amount -= reduced
-			remaining -= reduced
-		}
+		mods = append(mods, dr)
 	}
+	for _, er := range c.Runtime.ER {
+		mods = append(mods, er)
+	}
+
+	sort.Slice(mods, func(i, j int) bool {
+		return mods[i].Priority() < mods[j].Priority()
+	})
+
+	return mods
 }
 
 func (c *Character) AddDR(newDR DamageReduction) {
@@ -155,41 +92,6 @@ func (c *Character) RemoveDRBySource(source string) {
 		}
 	}
 	c.Runtime.DR = filtered
-}
-
-func (er EnergyResistance) Affects(d rules.DamageInstance) bool {
-	if !d.IsEnergy() {
-		log.Infof("Not energy, ignoring")
-		return false
-	}
-
-	if er.AffectedType == "" {
-		return true
-	}
-
-	return d.HasType(er.AffectedType)
-}
-
-func (c *Character) ApplyER(damage []rules.DamageInstance) {
-	for _, er := range c.Runtime.ER {
-		remaining := er.Value
-
-		for i := range damage {
-			if remaining <= 0 {
-				break
-			}
-
-			if !er.Affects(damage[i]) {
-				continue
-			}
-
-			reduced := min(damage[i].Amount, remaining)
-			log.Infof("ER - Reduced by %d", reduced)
-
-			damage[i].Amount -= reduced
-			remaining -= reduced
-		}
-	}
 }
 
 func (c *Character) Heal(amount int) {

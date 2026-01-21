@@ -77,12 +77,13 @@ func TestAddDR_IncreaseDR_AndNew(t *testing.T) {
 	expectDR(t, c, 0, 2, "")
 }
 
-func TestApplyDR(t *testing.T) {
+func TestAddDR_IncreaseDR_RemoveDR(t *testing.T) {
 	c := &Character{}
 
 	dr_all := DamageReduction{
 		Value:      1,
 		BypassType: "",
+		Source:     "test",
 	}
 
 	dr_good := DamageReduction{
@@ -93,24 +94,6 @@ func TestApplyDR(t *testing.T) {
 	c.AddDR(dr_all)
 	c.AddDR(dr_good)
 
-	damage := []rules.DamageInstance{
-		{
-			Amount: 5,
-			Types:  []rules.DamageType{rules.Slash},
-		},
-		{
-			Amount: 5,
-			Types:  []rules.DamageType{rules.Good},
-		},
-	}
-
-	c.ApplyDR(damage)
-
-	if damage[0].Amount != 3 {
-		t.Fatalf("expected first damage instance to be reduced to 3, got %d", damage[0].Amount)
-	}
-
-	if damage[1].Amount != 4 {
-		t.Fatalf("expected second damage instance to remain 5, got %d", damage[1].Amount)
-	}
+	c.RemoveDRBySource("test")
+	expectDR(t, c, 0, 1, "good")
 }

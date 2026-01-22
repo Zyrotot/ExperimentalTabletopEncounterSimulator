@@ -1,5 +1,5 @@
 APP := simulator
-CMD := ./cmd/simulator
+CMD := .
 
 run:
 	go run $(CMD)

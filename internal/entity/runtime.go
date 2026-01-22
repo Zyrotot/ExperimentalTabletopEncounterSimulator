@@ -15,7 +15,8 @@ type Runtime struct {
 
 	DRSuppressed []DRSuppression
 
-	IsFlanked bool
+	EngagedCount int
+	IsFlanked    bool
 }
 
 func (rt *Runtime) GetTotalHP() int {

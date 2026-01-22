@@ -38,7 +38,7 @@ func NewFixedRoller(value int, log *logging.Logger) *FixedRoller {
 }
 
 func (r *RandomRoller) Roll(term Term) int {
-	log.Infof("Rolling %d dice of %d sides with a bonus of %d", term.Count, term.Sides, term.Flat)
+	log.Debugf("Rolling %d dice of %d sides with a bonus of %d", term.Count, term.Sides, term.Flat)
 
 	total := term.Flat
 	for range term.Count {

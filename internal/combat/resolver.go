@@ -103,6 +103,7 @@ func (r *Resolver) ApplyDamageMitigators(target *Combatant, dmg []rules.DamageIn
 }
 
 func (r *Resolver) ExecuteAttack(attacker, target *Combatant, atk Attack) {
+	log.Infof("%s attacks %s", attacker.Char.Name, target.Char.Name)
 	atkResult := AttackResult{Attack: atk}
 	atkResult.AttackRoll = r.Dice.Roll(dice.Term{
 		Count: 1,
@@ -175,6 +176,7 @@ func (r *Resolver) ExecuteAttack(attacker, target *Combatant, atk Attack) {
 			for _, eff := range attacker.Effects {
 				eff.On(EventKill, &ctx)
 			}
+			log.Infof("%s is defeated!", target.Char.Name)
 		}
 	} else {
 		log.Infof("%s misses %s.", attacker.Char.Name, target.Char.Name)
@@ -189,11 +191,18 @@ func (r *Resolver) StartTurn(c *Combatant) {
 	}
 }
 
-func (r *Resolver) ExecuteTurn(actor *Combatant, allies []*Combatant, enemies []*Combatant, selectTarget func([]*Combatant) *Combatant) {
+func (r *Resolver) ExecuteTurn(actor *Combatant, allies []*Combatant, enemies []*Combatant, selectTarget func(*Combatant, []*Combatant) *Combatant,
+) {
+	log.Infof("%s's turn", actor.Char.Name)
 	r.StartTurn(actor)
-
+	var target *Combatant
 	for _, atk := range actor.Attacks {
-		target := selectTarget(enemies)
+		if target == nil {
+			target = selectTarget(actor, enemies)
+		} else if target.Char.IsDead() {
+			target = selectTarget(actor, enemies)
+		}
+
 		if target == nil {
 			return
 		}
@@ -203,14 +212,14 @@ func (r *Resolver) ExecuteTurn(actor *Combatant, allies []*Combatant, enemies []
 	r.resolvePending(actor, allies, enemies, selectTarget)
 }
 
-func (r *Resolver) resolvePending(actor *Combatant, allies, enemies []*Combatant, selectTarget func([]*Combatant) *Combatant) {
+func (r *Resolver) resolvePending(actor *Combatant, allies, enemies []*Combatant, selectTarget func(*Combatant, []*Combatant) *Combatant) {
 	for len(actor.PendingActions) > 0 {
 		req := actor.PendingActions[0]
 		actor.PendingActions = actor.PendingActions[1:]
 
 		switch req := req.(type) {
 		case ExtraAttackRequest:
-			target := selectTarget(enemies)
+			target := selectTarget(actor, enemies)
 			if target != nil {
 				r.ExecuteAttack(req.Source, target, req.Attack)
 			}

@@ -1,8 +1,12 @@
 package engine
 
-import "github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/combat"
+import (
+	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/arena"
+	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/combat"
+)
 
 type Encounter struct {
+	Arena   arena.Arena
 	Allies  []*combat.Combatant
 	Enemies []*combat.Combatant
 
@@ -13,11 +17,14 @@ type TargetSelector interface {
 	Select(attacker *combat.Combatant, candidates []*combat.Combatant) *combat.Combatant
 }
 
-type FirstAliveSelector struct{}
+type FirstAliveSelector struct {
+	Tracker *arena.EngagementTracker
+}
 
-func (FirstAliveSelector) Select(_ *combat.Combatant, candidates []*combat.Combatant) *combat.Combatant {
+func (fs *FirstAliveSelector) Select(source *combat.Combatant, candidates []*combat.Combatant) *combat.Combatant {
 	for _, c := range candidates {
-		if !c.Char.IsDead() {
+		if !c.Char.IsDead() && fs.Tracker.CanEngage(source, c) {
+			fs.Tracker.Engage(source, c)
 			return c
 		}
 	}
@@ -39,6 +46,12 @@ type AutoEngine struct {
 }
 
 func (ae *AutoEngine) Setup(enc *Encounter) {
+	if s, ok := ae.TargetSelector.(*FirstAliveSelector); ok { // TODO: Improve this
+		s.Tracker = arena.NewEngagementTracker(enc.Arena)
+	} else {
+		panic("TargetSelector does not support engagement tracking")
+	}
+
 	for _, ally := range enc.Allies {
 		ally.Char.Runtime.HP = ally.Char.Stats.MaxHP
 	}
@@ -48,7 +61,14 @@ func (ae *AutoEngine) Setup(enc *Encounter) {
 }
 
 func (ae *AutoEngine) Run(enc *Encounter) {
+	log.Infof("Encounter started with %d allies and %d enemies", len(enc.Allies), len(enc.Enemies))
+	ae.Setup(enc)
 	for ae.anyAlive(enc.Allies) && ae.anyAlive(enc.Enemies) {
+		log.Infof("----- Turn started -----")
+		if s, ok := ae.TargetSelector.(*FirstAliveSelector); ok { // TODO: Improve this
+			s.Tracker.ResetTurn()
+		}
+
 		for _, ally := range enc.Allies {
 			if ally.Char.IsDead() {
 				continue
@@ -58,7 +78,7 @@ func (ae *AutoEngine) Run(enc *Encounter) {
 				ally,
 				enc.Allies,
 				enc.Enemies,
-				func(c []*combat.Combatant) *combat.Combatant {
+				func(source *combat.Combatant, c []*combat.Combatant) *combat.Combatant {
 					return ae.TargetSelector.Select(ally, c)
 				},
 			)
@@ -73,13 +93,14 @@ func (ae *AutoEngine) Run(enc *Encounter) {
 				enemy,
 				enc.Enemies,
 				enc.Allies,
-				func(c []*combat.Combatant) *combat.Combatant {
+				func(source *combat.Combatant, c []*combat.Combatant) *combat.Combatant {
 					return ae.TargetSelector.Select(enemy, c)
 				},
 			)
 		}
-		log.Infof("-------- turn ended -----------")
+		log.Infof("----- Turn ended -----")
 	}
+	log.Infof("Encounter ended")
 }
 
 func (ae *AutoEngine) anyAlive(combatants []*combat.Combatant) bool {

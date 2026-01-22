@@ -1,6 +1,7 @@
 package simulator
 
 import (
+	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/arena"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/combat"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/engine"
 )
@@ -22,6 +23,8 @@ type EncounterBuilder interface {
 type LinearEncounterBuilder struct {
 	PlayerFactory func() *combat.Combatant
 	EnemyFactory  func() *combat.Combatant
+
+	Arena arena.Arena
 }
 
 func (b *LinearEncounterBuilder) Build(n int) *engine.Encounter {
@@ -34,6 +37,8 @@ func (b *LinearEncounterBuilder) Build(n int) *engine.Encounter {
 	for range n {
 		enc.Enemies = append(enc.Enemies, b.EnemyFactory())
 	}
+
+	enc.Arena = b.Arena
 
 	return enc
 }
@@ -58,15 +63,17 @@ func (s *EndlessSimulator) Run() Result {
 	encounterNumber := 1
 
 	for {
+		log.Infof("Starting encounter %d", encounterNumber)
 		enc := s.Builder.Build(encounterNumber)
 
-		s.Engine.Setup(enc)
 		s.Engine.Run(enc)
 
 		if !anyAlive(enc.Allies) {
+			log.Infof("Player defeated in encounter %d", encounterNumber)
 			break
 		}
 
+		log.Infof("Encounter %d completed", encounterNumber)
 		result.EncountersWon++
 		result.EnemiesDefeated += len(enc.Enemies)
 		encounterNumber++

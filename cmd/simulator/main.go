@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/arena"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/combat"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/dice"
 	"github.com/Zyrotot/ExperimentalTabletopEncounterSimulator/internal/engine"
@@ -13,20 +14,22 @@ import (
 )
 
 func main() {
-	combatLog := logging.New("combat", logging.DEBUG)
+	combatLog := logging.New("combat", logging.INFO)
 	diceLog := logging.New("dice", logging.DEBUG)
-	entityLog := logging.New("entity", logging.DEBUG)
+	entityLog := logging.New("entity", logging.INFO)
 	factoriesLog := logging.New("factories", logging.DEBUG)
-	engineLog := logging.New("engine", logging.DEBUG)
+	engineLog := logging.New("engine", logging.INFO)
+	simulatorLog := logging.New("simulator", logging.INFO)
 
 	combat.SetLogger(combatLog)
 	dice.SetLogger(diceLog)
 	entity.SetLogger(entityLog)
 	factories.SetLogger(factoriesLog)
 	engine.SetLogger(engineLog)
+	simulator.SetLogger(simulatorLog)
 
 	resolver := combat.NewResolver(dice.NewRandomRoller())
-	targetSelector := engine.FirstAliveSelector{}
+	targetSelector := &engine.FirstAliveSelector{}
 	engine := &engine.AutoEngine{Resolver: resolver, TargetSelector: targetSelector}
 
 	builder := &simulator.LinearEncounterBuilder{
@@ -36,6 +39,7 @@ func main() {
 		EnemyFactory: func() *combat.Combatant {
 			return factories.MonsterFactory(factories.Uktril)
 		},
+		Arena: arena.OpenField{},
 	}
 
 	sim := &simulator.EndlessSimulator{

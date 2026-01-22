@@ -15,9 +15,9 @@ import (
 
 func main() {
 	combatLog := logging.New("combat", logging.INFO)
-	diceLog := logging.New("dice", logging.DEBUG)
+	diceLog := logging.New("dice", logging.INFO)
 	entityLog := logging.New("entity", logging.INFO)
-	factoriesLog := logging.New("factories", logging.DEBUG)
+	factoriesLog := logging.New("factories", logging.INFO)
 	engineLog := logging.New("engine", logging.INFO)
 	simulatorLog := logging.New("simulator", logging.INFO)
 

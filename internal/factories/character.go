@@ -10,10 +10,10 @@ import (
 func PlayerFactory() *combat.Combatant {
 	character := combat.Combatant{}
 	attack := combat.Attack{
-		Name: "SwordAttack1",
+		Name: "SwordAttack",
 		DamageDice: []combat.DamageExpression{
 			{
-				DamageTypes: []rules.DamageType{rules.Slash, rules.Magic},
+				DamageTypes: []rules.DamageType{rules.Slash},
 				DamageRoll: dice.Expression{
 					Terms: []dice.Term{
 						{ // 5d6+36

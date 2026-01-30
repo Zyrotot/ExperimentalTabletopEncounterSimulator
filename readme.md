@@ -27,6 +27,15 @@ sudo apt install -y \
   libgtest-dev \
   nlohmann-json3-dev
 ```
+For development also install:
+
+```bash
+sudo apt install -y \
+  lcov \
+  gcovr \
+  clang \
+  clangd
+```
 
 
 ## Quick Start

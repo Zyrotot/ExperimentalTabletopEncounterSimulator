@@ -1,4 +1,6 @@
 *.log
+*.info
+
 bin/
-build/
-.cache
+build*/
+.cache/

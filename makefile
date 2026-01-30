@@ -17,3 +17,12 @@ test: configure
 
 clean:
 	rm -rf $(BUILD_DIR)
+
+coverage:
+	rm -rf build-coverage coverage.info coverage-report
+	cmake -S . -B build-coverage -G $(GEN) -DENABLE_COVERAGE=ON
+	cmake --build build-coverage
+	ctest --test-dir build-coverage
+	lcov --capture --directory build-coverage --output-file coverage.info
+	lcov --remove coverage.info '/usr/*' '*/tests/*' --output-file coverage.info
+	genhtml coverage.info --output-directory coverage-report

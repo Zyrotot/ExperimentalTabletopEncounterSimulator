@@ -1,12 +1,35 @@
 # Experimental TableTop Encounter Simulator
 
-A small simulator for testing combat balance (originally for TormentaRPG). It runs encounter simulations between characters and monsters using simple d20-style mechanics. The code is written in Go and organized under the `internal/` package.
+A small simulator for testing combat balance (originally for TormentaRPG). It runs encounter simulations between characters and monsters using simple d20-style mechanics. The code is written in C++ and organized under the `src/` folder.
+
+## Setup & Build
+
+### Requirements
+
+- Linux (Debian / Ubuntu)
+- C++20 compatible compiler  
+  - GCC ≥ 10 **or** Clang ≥ 12
+- CMake ≥ 3.16
+- Ninja
+- GoogleTest
+- nlohmann/json
+
+---
+
+### Install dependencies (Debian / Ubuntu)
+
+```bash
+sudo apt update
+sudo apt install -y \
+  build-essential \
+  cmake \
+  ninja-build \
+  libgtest-dev \
+  nlohmann-json3-dev
+```
+
 
 ## Quick Start
-
-Requirements:
-
-- Go (1.18+ recommended)
 
 Run the simulator:
 

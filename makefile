@@ -1,17 +1,19 @@
-APP := simulator
-CMD := .
+APP := ETTES
+BUILD_DIR := build
+GEN := Ninja
 
-run:
-	go run $(CMD)
+configure:
+	cmake -S . -B $(BUILD_DIR) -G $(GEN)
 
-build:
-	go build -o bin/$(APP) $(CMD)
+build: configure
+	cmake --build $(BUILD_DIR)
 
-test:
-	go test ./...
+run: build
+	./$(BUILD_DIR)/$(APP)
 
-lint:
-	golangci-lint run
+test: configure
+	cmake --build $(BUILD_DIR)
+	ctest --test-dir $(BUILD_DIR)
 
 clean:
-	rm -rf bin
+	rm -rf $(BUILD_DIR)

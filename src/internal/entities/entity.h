@@ -1,0 +1,29 @@
+// -----------------------------------------------------------------------------
+// | @file      entity.h
+// | @author    Zyrotot
+// | @project   ETTES (2026)
+// ------------------------------------------------------------------------------
+
+#ifndef SRC_INTERNAL_ENTITIES_ENTITY_H
+#define SRC_INTERNAL_ENTITIES_ENTITY_H
+
+#include "internal/entities/stats.h"
+#include "internal/rules/alignment.h"
+
+namespace internal {
+namespace entities {
+
+class Entity {
+public:
+  Entity();
+  virtual ~Entity();
+
+protected:
+  rules::Alignment alignment;
+  Stats stats;
+};
+
+} // namespace entities
+} // namespace internal
+
+#endif // SRC_INTERNAL_ENTITIES_ENTITY_H

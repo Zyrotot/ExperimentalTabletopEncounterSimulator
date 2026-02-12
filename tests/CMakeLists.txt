@@ -1,4 +1,3 @@
-find_package(GTest REQUIRED)
 include(GoogleTest)
 
 file(GLOB_RECURSE TEST_SOURCES

@@ -4,8 +4,8 @@
 // | @project   ETTES (2026)
 // ------------------------------------------------------------------------------
 
-#ifndef SRC_INTERNAL_ENTITIES_STATS_H
-#define SRC_INTERNAL_ENTITIES_STATS_H
+#ifndef SRC_INTERNAL_ENTITIES_STATS_H_
+#define SRC_INTERNAL_ENTITIES_STATS_H_
 
 namespace internal {
 namespace entities {
@@ -16,7 +16,7 @@ struct Stats {
   int fortification_;
 };
 
-} // namespace entities
-} // namespace internal
+}  // namespace entities
+}  // namespace internal
 
-#endif // SRC_INTERNAL_ENTITIES_STATS_H
+#endif  // SRC_INTERNAL_ENTITIES_STATS_H_

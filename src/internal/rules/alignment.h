@@ -4,8 +4,8 @@
 // | @project   ETTES (2026)
 // ------------------------------------------------------------------------------
 
-#ifndef SRC_INTERNAL_RULES_ALIGNMENT_H
-#define SRC_INTERNAL_RULES_ALIGNMENT_H
+#ifndef SRC_INTERNAL_RULES_ALIGNMENT_H_
+#define SRC_INTERNAL_RULES_ALIGNMENT_H_
 
 namespace internal {
 namespace rules {
@@ -22,7 +22,7 @@ enum class Alignment {
     ChaoticEvil,
 };
 
-} // namespace rules
-} // namespace internal
+}  // namespace rules
+}  // namespace internal
 
-#endif // SRC_INTERNAL_RULES_ALIGNMENT_H
+#endif  // SRC_INTERNAL_RULES_ALIGNMENT_H_

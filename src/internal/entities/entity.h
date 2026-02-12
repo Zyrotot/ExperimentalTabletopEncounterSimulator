@@ -4,8 +4,8 @@
 // | @project   ETTES (2026)
 // ------------------------------------------------------------------------------
 
-#ifndef SRC_INTERNAL_ENTITIES_ENTITY_H
-#define SRC_INTERNAL_ENTITIES_ENTITY_H
+#ifndef SRC_INTERNAL_ENTITIES_ENTITY_H_
+#define SRC_INTERNAL_ENTITIES_ENTITY_H_
 
 #include "internal/entities/stats.h"
 #include "internal/rules/alignment.h"
@@ -23,7 +23,7 @@ protected:
   Stats stats;
 };
 
-} // namespace entities
-} // namespace internal
+}  // namespace entities
+}  // namespace internal
 
-#endif // SRC_INTERNAL_ENTITIES_ENTITY_H
+#endif  // SRC_INTERNAL_ENTITIES_ENTITY_H_

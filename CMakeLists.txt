@@ -23,8 +23,7 @@ if (ENABLE_COVERAGE)
     endif()
 endif()
 
-
-find_package(nlohmann_json REQUIRED)
+add_subdirectory(external/json)
 
 add_executable(ETTES
     src/main.cpp
@@ -43,5 +42,10 @@ target_compile_options(ETTES PRIVATE
 
 target_link_libraries(ETTES PRIVATE nlohmann_json::nlohmann_json)
 
-enable_testing()
-add_subdirectory(tests)
+option(BUILD_TESTS "Build tests" ON)
+
+if (BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(external/googletest)
+    add_subdirectory(tests)
+endif()

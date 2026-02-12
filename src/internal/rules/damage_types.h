@@ -4,37 +4,51 @@
 // | @project   ETTES (2026)
 // ------------------------------------------------------------------------------
 
-#ifndef SRC_INTERNAL_RULES_DAMAGE_TYPES_H
-#define SRC_INTERNAL_RULES_DAMAGE_TYPES_H
+#ifndef SRC_INTERNAL_RULES_DAMAGE_TYPES_H_
+#define SRC_INTERNAL_RULES_DAMAGE_TYPES_H_
+
+#include <cstdint>
 
 namespace internal {
 namespace rules {
 
-enum class DamageType {
-  // Physical damage types
-  Slash,
-  Pierce,
-  Blunt,
+enum class DamageType : uint16_t {
+  None = 0,
 
-  // Elemental damage types
-  Fire,
-  Cold,
-  Acid,
-  Electric,
+  // Physical damage
+  Slash = 1 << 0,
+  Pierce = 1 << 1,
+  Blunt = 1 << 2,
 
-  // Modifier damage types
-  Magic,
-  Silver,
-  Evil,
-  Good,
-  Chaotic,
-  Lawful,
+  // Energy damage
+  Fire = 1 << 3,
+  Cold = 1 << 4,
+  Acid = 1 << 5,
+  Electric = 1 << 6,
+  Positive = 1 << 7,
+  Negative = 1 << 8,
+};
+
+enum class DamageTag : uint16_t {
+  // Enchantment
+  Magic = 1 << 1,
+
+  // Alignment
+  Evil = 1 << 2,
+  Good = 1 << 3,
+  Chaotic = 1 << 4,
+  Lawful = 1 << 5,
+
+  // Material
+  Silver = 1 << 6,
+  Adamantium = 1 << 7,
+  RubySteel = 1 << 8,
 };
 
 enum class DamageCategory {
+  None,
   Physical,
-  Elemental,
-  Modifier,
+  Energy,
 };
 
 inline DamageCategory getDamageCategory(DamageType type) {
@@ -47,18 +61,14 @@ inline DamageCategory getDamageCategory(DamageType type) {
   case DamageType::Cold:
   case DamageType::Acid:
   case DamageType::Electric:
-    return DamageCategory::Elemental;
-  case DamageType::Magic:
-  case DamageType::Silver:
-  case DamageType::Evil:
-  case DamageType::Good:
-  case DamageType::Chaotic:
-  case DamageType::Lawful:
-    return DamageCategory::Modifier;
+    return DamageCategory::Energy;
+  case DamageType::None:
+  default:
+    return DamageCategory::None;
   }
 }
 
-} // namespace rules
-} // namespace internal
+}  // namespace rules
+}  // namespace internal
 
-#endif // SRC_INTERNAL_RULES_DAMAGE_TYPES_H
+#endif  // SRC_INTERNAL_RULES_DAMAGE_TYPES_H_

@@ -15,5 +15,5 @@ Entity::Entity() {
 Entity::~Entity() {
 }
 
-} // namespace entities
-} // namespace internal
+}  // namespace entities
+}  // namespace internal

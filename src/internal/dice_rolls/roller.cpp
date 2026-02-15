@@ -11,9 +11,9 @@
 namespace internal {
 namespace dice_rolls {
 
-Roller::Roller() : Roller(std::make_unique<StdMt19937Engine>()) {}
+Roller::Roller() : Roller(std::make_shared<StdMt19937Engine>()) {}
 
-Roller::Roller(std::unique_ptr<IRandomEngine> engine)
+Roller::Roller(std::shared_ptr<IRandomEngine> engine)
     : engine_(std::move(engine)) {}
 
 Roller::~Roller() = default;

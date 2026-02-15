@@ -4,3 +4,4 @@
 bin/
 build*/
 .cache/
+coverage-report/

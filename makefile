@@ -17,9 +17,8 @@ build-tests: configure-tests
 run: build
 	./$(BUILD_DIR)/$(APP)
 
-test: configure
-	cmake --build $(BUILD_DIR)
-	ctest --test-dir $(BUILD_DIR)
+test: build-tests
+	./$(BUILD_DIR)/tests/ETTES_Tests
 
 clean:
 	rm -rf $(BUILD_DIR)

@@ -2,7 +2,7 @@
 // | @file      entity.h
 // | @author    Zyrotot
 // | @project   ETTES (2026)
-// ------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #ifndef SRC_INTERNAL_ENTITIES_ENTITY_H_
 #define SRC_INTERNAL_ENTITIES_ENTITY_H_
@@ -14,13 +14,14 @@ namespace internal {
 namespace entities {
 
 class Entity {
-public:
+ public:
   Entity();
   virtual ~Entity();
 
-protected:
+ protected:
   rules::Alignment alignment;
-  Stats stats;
+  Stats starting_stats;
+  Stats current_stats;
 };
 
 }  // namespace entities

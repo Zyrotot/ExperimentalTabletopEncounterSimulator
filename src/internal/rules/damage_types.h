@@ -2,7 +2,7 @@
 // | @file      damage_types.h
 // | @author    Zyrotot
 // | @project   ETTES (2026)
-// ------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #ifndef SRC_INTERNAL_RULES_DAMAGE_TYPES_H_
 #define SRC_INTERNAL_RULES_DAMAGE_TYPES_H_
@@ -29,20 +29,22 @@ enum class DamageType : uint16_t {
   Negative = 1 << 8,
 };
 
-enum class DamageTag : uint16_t {
+enum class DamageModifier : uint16_t {
+  None = 0,
+
   // Enchantment
-  Magic = 1 << 1,
+  Magic = 1 << 0,
 
   // Alignment
-  Evil = 1 << 2,
-  Good = 1 << 3,
-  Chaotic = 1 << 4,
-  Lawful = 1 << 5,
+  Evil = 1 << 1,
+  Good = 1 << 2,
+  Chaotic = 1 << 3,
+  Lawful = 1 << 4,
 
   // Material
-  Silver = 1 << 6,
-  Adamantium = 1 << 7,
-  RubySteel = 1 << 8,
+  Silver = 1 << 5,
+  Adamantium = 1 << 6,
+  RubySteel = 1 << 7,
 };
 
 enum class DamageCategory {
@@ -53,18 +55,18 @@ enum class DamageCategory {
 
 inline DamageCategory getDamageCategory(DamageType type) {
   switch (type) {
-  case DamageType::Slash:
-  case DamageType::Pierce:
-  case DamageType::Blunt:
-    return DamageCategory::Physical;
-  case DamageType::Fire:
-  case DamageType::Cold:
-  case DamageType::Acid:
-  case DamageType::Electric:
-    return DamageCategory::Energy;
-  case DamageType::None:
-  default:
-    return DamageCategory::None;
+    case DamageType::Slash:
+    case DamageType::Pierce:
+    case DamageType::Blunt:
+      return DamageCategory::Physical;
+    case DamageType::Fire:
+    case DamageType::Cold:
+    case DamageType::Acid:
+    case DamageType::Electric:
+      return DamageCategory::Energy;
+    case DamageType::None:
+    default:
+      return DamageCategory::None;
   }
 }
 

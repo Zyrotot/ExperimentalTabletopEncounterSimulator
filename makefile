@@ -8,7 +8,7 @@ configure:
 configure-tests:
 	cmake -S . -B $(BUILD_DIR) -G $(GEN) -DBUILD_TESTS=ON
 
-build-app: configure
+build: configure
 	cmake --build $(BUILD_DIR) --target $(APP)
 
 build-tests: configure-tests

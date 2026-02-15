@@ -36,10 +36,10 @@ class Roller {
   int Roll(const Term& term);
 
  protected:
-  explicit Roller(std::unique_ptr<IRandomEngine> engine);
+  explicit Roller(std::shared_ptr<IRandomEngine> engine);
 
  private:
-  std::unique_ptr<IRandomEngine> engine_;
+  std::shared_ptr<IRandomEngine> engine_;
 };
 
 }  // namespace dice_rolls

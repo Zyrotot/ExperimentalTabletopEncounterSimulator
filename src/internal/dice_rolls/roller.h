@@ -24,10 +24,6 @@ struct Term {
   int bonus;
 };
 
-struct Expression {
-  std::vector<Term> terms;
-};
-
 class Roller {
  public:
   Roller();

@@ -7,6 +7,7 @@
 #ifndef SRC_INTERNAL_COMBAT_ATTACK_H_
 #define SRC_INTERNAL_COMBAT_ATTACK_H_
 
+#include <memory>
 #include <vector>
 
 #include "internal/items/weapon.h"
@@ -16,7 +17,9 @@ namespace combat {
 
 using items::Weapon;
 
-struct Attack {
+struct AttackMove {
+  std::shared_ptr<Weapon> weapon;
+
   int attack_modifier;
   int damage_modifier;
 
@@ -24,8 +27,9 @@ struct Attack {
   int crit_multiplier_bonus;
 };
 
-struct AttackMove {
-  std::vector<Attack> attacks;
+struct AttackSequence {
+  std::vector<AttackMove> attacks;
+
   int attack_modifier;
   int damage_modifier;
 };

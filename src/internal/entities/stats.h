@@ -19,25 +19,32 @@ using rules::EnergyResistance;
 using rules::Immunity;
 using rules::Weakness;
 
-struct BaseStats {
-  int hp_;
-  int armour_class_;
-  int fortification_;
+struct AttackBonuses {
+  int attack_bonus;
+  int damage_bonus;
+};
 
-  std::vector<DamageReduction> damage_reductions_;
-  std::vector<EnergyResistance> energy_resistances_;
-  std::vector<Immunity> immunities_;
-  std::vector<Weakness> weaknesses_;
+struct BaseStats {
+  int hp;
+  int armour_class;
+  int fortification;
+
+  AttackBonuses attack_bonuses;
+
+  std::vector<DamageReduction> damage_reductions;
+  std::vector<EnergyResistance> energy_resistances;
+  Immunity immunity;
+  std::vector<Weakness> weaknesses;
 };
 
 struct BonusStats {
-  int temporary_hp_;
-  int ac_bonus_;
+  int temporary_hp;
+  int ac_bonus;
 };
 
 struct Stats {
-  BaseStats base_stats_;
-  BonusStats bonus_stats_;
+  BaseStats base_stats;
+  BonusStats bonus_stats;
 };
 
 }  // namespace entities

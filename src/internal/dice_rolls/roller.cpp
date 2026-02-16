@@ -20,8 +20,10 @@ Roller::~Roller() = default;
 
 int Roller::Roll(const Term& term) {
   int total = 0;
-  for (const auto& dice : term.dices) {
-    total += engine_->GetRand(dice.sides);
+  for (const auto& dice : term.dice_groups) {
+    for (int i = 0; i < dice.count; ++i) {
+      total += engine_->GetRand(dice.sides);
+    }
   }
 
   return total + term.bonus;

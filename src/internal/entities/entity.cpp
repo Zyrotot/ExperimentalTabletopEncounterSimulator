@@ -9,7 +9,13 @@
 namespace internal {
 namespace entities {
 
-Entity::Entity() {}
+Entity::Entity(const EntityConfig& config)
+    : name_(config.name),
+      starting_stats_(config.starting_stats),
+      current_stats_(config.starting_stats),
+      equipped_weapons_(config.equipped_weapons),
+      attack_moves_(config.attack_moves),
+      alignment_(config.alignment) {}
 
 Entity::~Entity() {}
 

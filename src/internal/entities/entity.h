@@ -7,21 +7,47 @@
 #ifndef SRC_INTERNAL_ENTITIES_ENTITY_H_
 #define SRC_INTERNAL_ENTITIES_ENTITY_H_
 
+#include <memory>
+#include <string>
+#include <vector>
+
+#include "internal/combat/attack.h"
 #include "internal/entities/stats.h"
+#include "internal/items/weapon.h"
 #include "internal/rules/alignment.h"
 
 namespace internal {
 namespace entities {
 
+using combat::AttackSequence;
+using items::Weapon;
+
+struct EntityConfig {
+  std::string name;
+
+  Stats starting_stats;
+
+  std::vector<std::shared_ptr<Weapon>> equipped_weapons;
+  std::vector<AttackSequence> attack_moves;
+
+  rules::Alignment alignment;
+};
+
 class Entity {
  public:
-  Entity();
+  explicit Entity(const EntityConfig& config);
   virtual ~Entity();
 
  protected:
-  rules::Alignment alignment;
-  Stats starting_stats;
-  Stats current_stats;
+  std::string name_;
+
+  Stats starting_stats_;
+  Stats current_stats_;
+
+  std::vector<std::shared_ptr<Weapon>> equipped_weapons_;
+  std::vector<AttackSequence> attack_moves_;
+
+  rules::Alignment alignment_;
 };
 
 }  // namespace entities

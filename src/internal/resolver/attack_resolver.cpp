@@ -42,10 +42,6 @@ AttackResult AttackResolver::ResolveAttackMove(const AttackMove& attack_move) {
   result.d20_roll = attack_roll;
   logger_->Debug("D20 roll: {}", attack_roll);
 
-  int crit_multiplier = CheckCriticalHit(attack_move, attack_roll);
-  result.is_critical = crit_multiplier > 1;
-  logger_->Debug("Critical multiplier: {}", crit_multiplier);
-
   attack_roll += CalculateTotalAttackModifier(attack_move);
   result.total_roll = attack_roll;
 
@@ -55,6 +51,11 @@ AttackResult AttackResolver::ResolveAttackMove(const AttackMove& attack_move) {
 
   if (attack_roll >= defender_ac) {
     result.hit = true;
+
+    int crit_multiplier = CheckCriticalHit(attack_move, result.d20_roll);
+    result.is_critical = crit_multiplier > 1;
+    logger_->Debug("Critical multiplier: {}", crit_multiplier);
+
     Term damage_term = CalculateTotalDamage(attack_move);
     int damage = roller_->Roll(damage_term) * crit_multiplier;
     if (damage < 0) {

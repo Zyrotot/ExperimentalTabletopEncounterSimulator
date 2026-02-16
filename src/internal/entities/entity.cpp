@@ -14,7 +14,7 @@ Entity::Entity(const EntityConfig& config)
       starting_stats_(config.starting_stats),
       current_stats_(config.starting_stats),
       equipped_weapons_(config.equipped_weapons),
-      attack_moves_(config.attack_moves),
+      attack_sequences_(config.attack_sequences),
       alignment_(config.alignment) {}
 
 Entity::~Entity() {}

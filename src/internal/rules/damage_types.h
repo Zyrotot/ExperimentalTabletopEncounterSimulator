@@ -53,6 +53,12 @@ enum class DamageCategory {
   Energy,
 };
 
+struct DamageInstance {
+  int amount = 0;
+  uint16_t types = 0;
+  uint16_t modifiers = 0;
+};
+
 inline DamageCategory getDamageCategory(DamageType type) {
   switch (type) {
     case DamageType::Slash:

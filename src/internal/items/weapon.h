@@ -8,8 +8,10 @@
 #define SRC_INTERNAL_ITEMS_WEAPON_H_
 
 #include <string>
+#include <vector>
 
 #include "internal/dice_rolls/roller.h"
+#include "internal/items/enchantment.h"
 #include "internal/rules/damage_types.h"
 
 namespace internal {
@@ -30,6 +32,8 @@ struct Weapon {
 
   int crit_range = 0;
   int crit_multiplier = 0;
+
+  std::vector<Enchantment> enchantments = {};
 };
 
 }  // namespace items

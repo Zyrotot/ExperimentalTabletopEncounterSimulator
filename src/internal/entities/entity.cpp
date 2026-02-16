@@ -5,6 +5,7 @@
 // -----------------------------------------------------------------------------
 
 #include "internal/entities/entity.h"
+
 #include <cstddef>
 
 namespace internal {
@@ -86,6 +87,16 @@ void Entity::Heal(int amount) {
 
   if (current_stats_.base_stats.hp > starting_stats_.base_stats.hp) {
     current_stats_.base_stats.hp = starting_stats_.base_stats.hp;
+  }
+}
+
+void Entity::AddTempHP(int amount) {
+  if (amount <= 0) {
+    return;
+  }
+
+  if (current_stats_.bonus_stats.temporary_hp < amount) {
+    current_stats_.bonus_stats.temporary_hp = amount;
   }
 }
 

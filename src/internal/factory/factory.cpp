@@ -6,11 +6,10 @@
 
 #include "internal/factory/factory.h"
 
+#include <iostream>
 #include <memory>
 
 #define GLZ_USE_STD_FORMAT_FLOAT 0
-
-#include <iostream>
 #include <glaze/glaze.hpp>
 
 #include "internal/combat/attack.h"
@@ -18,6 +17,7 @@
 #include "internal/entities/entity.h"
 #include "internal/items/weapon.h"
 #include "internal/rules/damage_types.h"
+#include "internal/items/enchantment_library.h"
 
 namespace internal {
 namespace factory {
@@ -50,7 +50,7 @@ std::shared_ptr<Entity> MonsterFactory(Monster monsterType) {
               },
           .damage_type = rules::DamageType::Slash,
           .crit_range = 20,
-          .crit_multiplier = 2,
+          .crit_multiplier = 2
       });
 
       auto uktril_config =
@@ -115,7 +115,7 @@ std::shared_ptr<Entity> MonsterFactory(Monster monsterType) {
           .damage = Term{.dice_groups = {Dice{.count = 1, .sides = 8}}},
           .damage_type = rules::DamageType::Slash,
           .crit_range = 20,
-          .crit_multiplier = 2,
+          .crit_multiplier = 2
       });
 
       std::shared_ptr<Weapon> garra = std::make_shared<Weapon>(Weapon{
@@ -124,7 +124,7 @@ std::shared_ptr<Entity> MonsterFactory(Monster monsterType) {
           .damage = Term{.dice_groups = {Dice{.count = 1, .sides = 4}}},
           .damage_type = rules::DamageType::Slash,
           .crit_range = 20,
-          .crit_multiplier = 2,
+          .crit_multiplier = 2
       });
 
       auto geraktril_config =
@@ -185,6 +185,7 @@ std::shared_ptr<Entity> MonsterFactory(Monster monsterType) {
           .damage_modifier = rules::DamageModifier::Magic,
           .crit_range = 19,
           .crit_multiplier = 2,
+          .enchantments = {internal::items::CreateProfaneEnchantment()}
       });
 
       std::shared_ptr<Weapon> mordida = std::make_shared<Weapon>(Weapon{
@@ -194,7 +195,7 @@ std::shared_ptr<Entity> MonsterFactory(Monster monsterType) {
               Term{.dice_groups = {Dice{.count = 1, .sides = 4}}, .bonus = 4},
           .damage_type = rules::DamageType::Pierce,
           .crit_range = 20,
-          .crit_multiplier = 2,
+          .crit_multiplier = 2
       });
 
       std::shared_ptr<Weapon> garra = std::make_shared<Weapon>(Weapon{
@@ -204,7 +205,7 @@ std::shared_ptr<Entity> MonsterFactory(Monster monsterType) {
               Term{.dice_groups = {Dice{.count = 1, .sides = 4}}, .bonus = 0},
           .damage_type = rules::DamageType::Slash,
           .crit_range = 20,
-          .crit_multiplier = 2,
+          .crit_multiplier = 2
       });
 
       auto reishid_config =

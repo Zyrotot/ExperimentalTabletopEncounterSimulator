@@ -10,10 +10,10 @@
 #include <memory>
 #include <vector>
 
-#include "internal/dice_rolls/random_engine.h"
-
 namespace internal {
 namespace dice_rolls {
+
+class IRandomEngine;
 
 struct Dice {
   int count = 0;

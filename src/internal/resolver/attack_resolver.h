@@ -11,30 +11,41 @@
 #include <vector>
 
 #include "internal/combat/attack.h"
-#include "internal/dice_rolls/roller.h"
-#include "internal/entities/entity.h"
-#include "internal/logging/logger.h"
+#include "internal/combat/combat_events.h"
+#include "internal/items/enchantment.h"
+#include "internal/rules/damage_types.h"
 
 namespace internal {
+
+namespace entities {
+class Entity;
+}  // namespace entities
+
+namespace dice_rolls {
+class Roller;
+}  // namespace dice_rolls
+
+namespace logging {
+class Logger;
+}  // namespace logging
+
 namespace resolver {
 
 using combat::AttackMove;
 using combat::AttackSequence;
+using combat::CombatContext;
+using combat::CombatEvent;
 using dice_rolls::Roller;
 using dice_rolls::Term;
 using entities::Entity;
 using logging::Logger;
-
+using rules::DamageInstance;
+using rules::DamageModifier;
+using rules::DamageType;
 
 class AttackResolver {
  public:
-  struct AttackResult {
-    bool hit = false;
-    int d20_roll = 0;
-    int total_roll = 0;
-    int damage = 0;
-    bool is_critical = false;
-  };
+  using AttackResult = combat::CombatContext;
 
   AttackResolver(std::shared_ptr<Entity> attacker,
                  std::shared_ptr<Entity> defender,
@@ -46,6 +57,13 @@ class AttackResolver {
 
  protected:
   AttackResult ResolveAttackMove(const AttackMove& attack_move);
+
+  DamageInstance CalculateBaseDamage(const AttackMove& attack_move,
+                                     int crit_multiplier);
+  void GatherDamageFromSources(const AttackMove& attack_move,
+                               CombatContext* context);
+
+  void EmitEvent(CombatEvent event, CombatContext* context);
 
   Term CalculateTotalDamage(const AttackMove& attack_move);
   int CalculateTotalAttackModifier(const AttackMove& attack_move);

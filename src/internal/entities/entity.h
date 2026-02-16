@@ -13,10 +13,14 @@
 
 #include "internal/combat/attack.h"
 #include "internal/entities/stats.h"
-#include "internal/items/weapon.h"
 #include "internal/rules/alignment.h"
 
 namespace internal {
+
+namespace items {
+class Weapon;
+}  // namespace items
+
 namespace entities {
 
 using combat::AttackSequence;
@@ -50,6 +54,7 @@ class Entity {
 
   void TakeDamage(int damage);
   void Heal(int amount);
+  void AddTempHP(int amount);
   bool IsAlive() const;
 
  protected:

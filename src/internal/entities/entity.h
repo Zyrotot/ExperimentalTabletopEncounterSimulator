@@ -38,6 +38,20 @@ class Entity {
   explicit Entity(const EntityConfig& config);
   virtual ~Entity();
 
+  const std::string& GetName() const;
+  const Stats& GetCurrentStats() const;
+  const Stats& GetStartingStats() const;
+  const std::vector<AttackSequence>& GetAttackSequences() const;
+  const AttackSequence& GetAttackSequence(const int& index) const;
+  const std::vector<std::shared_ptr<Weapon>>& GetEquippedWeapons() const;
+  const rules::Alignment& GetAlignment() const;
+
+  int GetEffectiveAC() const;
+
+  void TakeDamage(int damage);
+  void Heal(int amount);
+  bool IsAlive() const;
+
  protected:
   std::string name_;
 

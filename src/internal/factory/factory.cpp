@@ -26,7 +26,7 @@ using dice_rolls::Dice;
 using dice_rolls::Term;
 using items::Weapon;
 
-Entity MonsterFactory(Monster monsterType) {
+std::shared_ptr<Entity> MonsterFactory(Monster monsterType) {
   switch (monsterType) {
     case Uktril: {
       std::shared_ptr<Weapon> pinca = std::make_shared<Weapon>(Weapon{
@@ -106,7 +106,7 @@ Entity MonsterFactory(Monster monsterType) {
               .alignment = rules::Alignment::ChaoticEvil,
           };
 
-      return entities::Entity{uktril_config};
+      return std::make_shared<Entity>(uktril_config);
     }
     case Geraktril: {
       std::shared_ptr<Weapon> pinca = std::make_shared<Weapon>(Weapon{
@@ -173,7 +173,7 @@ Entity MonsterFactory(Monster monsterType) {
               .alignment = rules::Alignment::ChaoticEvil,
           };
 
-      return entities::Entity{geraktril_config};
+      return std::make_shared<Entity>(geraktril_config);
     }
     case Reishid: {
       std::shared_ptr<Weapon> adaga = std::make_shared<Weapon>(Weapon{
@@ -255,18 +255,18 @@ Entity MonsterFactory(Monster monsterType) {
               .alignment = rules::Alignment::ChaoticEvil,
           };
 
-      return entities::Entity{reishid_config};
+      return std::make_shared<Entity>(reishid_config);
     }
     case Custom:
-      return entities::Entity{LoadCharacterFromJSON("resources/custom_monster.json")};
+      return std::make_shared<Entity>(LoadCharacterFromJSON("resources/custom_monster.json"));
     default:
       return MonsterFactory(Monster::Uktril);
   }
 }
 
-Entity GetPlayer(const std::string& filename) {
+std::shared_ptr<Entity> GetPlayer(const std::string& filename) {
     auto config = LoadCharacterFromJSON(filename);
-    return entities::Entity{config};
+    return std::make_shared<Entity>(config);
 }
 
 EntityConfig LoadCharacterFromJSON(const std::string& filename) {

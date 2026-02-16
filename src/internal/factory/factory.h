@@ -7,6 +7,7 @@
 #ifndef SRC_INTERNAL_FACTORY_FACTORY_H_
 #define SRC_INTERNAL_FACTORY_FACTORY_H_
 
+#include <memory>
 #include <string>
 
 #include "internal/entities/entity.h"
@@ -24,8 +25,8 @@ enum Monster {
     Custom    = 4,
 };
 
-Entity MonsterFactory(Monster monsterType);
-Entity GetPlayer(const std::string& filename);
+std::shared_ptr<Entity> MonsterFactory(Monster monsterType);
+std::shared_ptr<Entity> GetPlayer(const std::string& filename);
 
 EntityConfig LoadCharacterFromJSON(const std::string& filename);
 

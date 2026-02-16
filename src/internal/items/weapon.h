@@ -22,14 +22,14 @@ using rules::DamageType;
 struct Weapon {
   std::string name;
 
-  int attack_bonus;
-  Term damage;
+  int attack_bonus = 0;
+  Term damage = Term{};
 
-  DamageType damage_type;
-  DamageModifier damage_modifier;
+  DamageType damage_type = DamageType::None;
+  DamageModifier damage_modifier = DamageModifier::None;
 
-  int crit_range;
-  int crit_multiplier;
+  int crit_range = 0;
+  int crit_multiplier = 0;
 };
 
 }  // namespace items

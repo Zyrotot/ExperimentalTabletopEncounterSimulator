@@ -16,13 +16,13 @@ namespace internal {
 namespace dice_rolls {
 
 struct Dice {
-  int count;
-  int sides;
+  int count = 0;
+  int sides = 0;
 };
 
 struct Term {
-  std::vector<Dice> dice_groups;
-  int bonus;
+  std::vector<Dice> dice_groups = {};
+  int bonus = 0;
 };
 
 class Roller {

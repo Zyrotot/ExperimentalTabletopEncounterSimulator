@@ -20,31 +20,31 @@ using rules::Immunity;
 using rules::Weakness;
 
 struct AttackBonuses {
-  int attack_bonus;
-  int damage_bonus;
+  int attack_bonus = 0;
+  int damage_bonus = 0;
 };
 
 struct BaseStats {
-  int hp;
-  int armour_class;
-  int fortification;
+  int hp = 0;
+  int armour_class = 0;
+  int fortification = 0;
 
-  AttackBonuses attack_bonuses;
+  AttackBonuses attack_bonuses = {};
 
-  std::vector<DamageReduction> damage_reductions;
-  std::vector<EnergyResistance> energy_resistances;
-  Immunity immunity;
-  std::vector<Weakness> weaknesses;
+  std::vector<DamageReduction> damage_reductions = {};
+  std::vector<EnergyResistance> energy_resistances = {};
+  Immunity immunity = {};
+  std::vector<Weakness> weaknesses = {};
 };
 
 struct BonusStats {
-  int temporary_hp;
-  int ac_bonus;
+  int temporary_hp = 0;
+  int ac_bonus = 0;
 };
 
 struct Stats {
-  BaseStats base_stats;
-  BonusStats bonus_stats;
+  BaseStats base_stats = {};
+  BonusStats bonus_stats = {};
 };
 
 }  // namespace entities

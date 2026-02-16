@@ -23,11 +23,35 @@ test: build-tests
 clean:
 	rm -rf $(BUILD_DIR)
 
+COVERAGE_DIR  := build-coverage
+COVERAGE_INFO := coverage.info
+COVERAGE_RPT  := coverage-report
+LCOV_OPTS     := --rc lcov_branch_coverage=1
+
 coverage:
-	rm -rf build-coverage coverage.info coverage-report
-	cmake -S . -B build-coverage -G $(GEN) -DENABLE_COVERAGE=ON
-	cmake --build build-coverage
-	ctest --test-dir build-coverage
-	lcov --capture --directory build-coverage --output-file coverage.info
-	lcov --remove coverage.info '/usr/*' '*/tests/*' --output-file coverage.info
-	genhtml coverage.info --output-directory coverage-report
+	rm -rf $(COVERAGE_DIR) $(COVERAGE_INFO) $(COVERAGE_RPT)
+	cmake -S . -B $(COVERAGE_DIR) -G $(GEN) -DENABLE_COVERAGE=ON
+	cmake --build $(COVERAGE_DIR)
+	@# Capture baseline (zero counters) so untested files show 0%
+	lcov $(LCOV_OPTS) --capture --initial --directory $(COVERAGE_DIR) \
+	     --output-file coverage-base.info
+	@# Run tests
+	ctest --test-dir $(COVERAGE_DIR) --output-on-failure
+	@# Capture post-test counters
+	lcov $(LCOV_OPTS) --capture --directory $(COVERAGE_DIR) \
+	     --output-file coverage-test.info
+	@# Merge baseline + test counters
+	lcov $(LCOV_OPTS) --add-tracefile coverage-base.info \
+	     --add-tracefile coverage-test.info \
+	     --output-file $(COVERAGE_INFO)
+	@# Strip system headers, vendored deps, tests, and build artifacts
+	lcov $(LCOV_OPTS) --remove $(COVERAGE_INFO) \
+	     '/usr/*' \
+	     '*/external/*' \
+	     '*/tests/*' \
+	     '*/build-coverage/*' \
+	     --output-file $(COVERAGE_INFO)
+	@# Generate HTML report with branch coverage
+	genhtml $(LCOV_OPTS) $(COVERAGE_INFO) --output-directory $(COVERAGE_RPT)
+	@rm -f coverage-base.info coverage-test.info
+	@echo "Coverage report: $(COVERAGE_RPT)/index.html"

@@ -1,0 +1,73 @@
+{
+    "name": "Character",
+    "starting_stats": {
+        "base_stats": {
+            "hp": 160,
+            "armour_class": 21,
+            "fortification": 0,
+            "attack_bonuses": {
+                "attack_bonus": 19,
+                "damage_bonus": 21
+            },
+            "damage_reductions": [],
+            "energy_resistances": [],
+            "immunity": {},
+            "weaknesses": []
+        },
+        "bonus_stats": {
+            "temporary_hp": 0,
+            "ac_bonus": 0
+        }
+    },
+    "equipped_weapons": [
+        {
+            "name": "Machado",
+            "attack_bonus": 2,
+            "damage": {
+                "dice_groups": [
+                    {
+                        "count": 4,
+                        "sides": 8
+                    }
+                ],
+                "bonus": 0
+            },
+            "damage_type": 1,
+            "damage_modifier": 0,
+            "crit_range": 20,
+            "crit_multiplier": 3
+        }
+    ],
+    "attack_sequences": [
+        {
+            "attacks": [
+                {
+                    "weapon": {
+            "name": "Machado",
+            "attack_bonus": 2,
+            "damage": {
+                "dice_groups": [
+                    {
+                        "count": 4,
+                        "sides": 8
+                    }
+                ],
+                "bonus": 0
+            },
+            "damage_type": 1,
+            "damage_modifier": 0,
+            "crit_range": 20,
+            "crit_multiplier": 3
+        },
+                    "attack_modifier": 0,
+                    "damage_modifier": 0,
+                    "crit_range_bonus": 0,
+                    "crit_multiplier_bonus": 0
+                }
+            ],
+            "attack_modifier": 0,
+            "damage_modifier": 0
+        }
+    ],
+    "alignment": 34
+}

@@ -3,16 +3,22 @@ BUILD_DIR := build
 GEN := Ninja
 
 configure:
-	cmake -S . -B $(BUILD_DIR) -G $(GEN) -DBUILD_TESTS=OFF
+	cmake -S . -B $(BUILD_DIR) -G $(GEN) -DBUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Debug
 
 configure-tests:
-	cmake -S . -B $(BUILD_DIR) -G $(GEN) -DBUILD_TESTS=ON
+	cmake -S . -B $(BUILD_DIR) -G $(GEN) -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
+
+configure-release:
+	cmake -S . -B $(BUILD_DIR) -G $(GEN) -DBUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release
 
 build: configure
 	cmake --build $(BUILD_DIR) --target $(APP)
 
 build-tests: configure-tests
 	cmake --build $(BUILD_DIR) --target ETTES_Tests
+
+build-release: configure-release
+	cmake --build $(BUILD_DIR) --target $(APP)
 
 run: build
 	./$(BUILD_DIR)/$(APP)

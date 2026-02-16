@@ -1,12 +1,17 @@
 // -----------------------------------------------------------------------------
-// | @file      monster_factory.cpp
+// | @file      factory.cpp
 // | @author    Zyrotot
 // | @project   ETTES (2026)
 // -----------------------------------------------------------------------------
 
-#include "internal/factory/monster_factory.h"
+#include "internal/factory/factory.h"
 
 #include <memory>
+
+#define GLZ_USE_STD_FORMAT_FLOAT 0
+
+#include <iostream>
+#include <glaze/glaze.hpp>
 
 #include "internal/combat/attack.h"
 #include "internal/dice_rolls/roller.h"
@@ -252,34 +257,36 @@ Entity MonsterFactory(Monster monsterType) {
 
       return entities::Entity{reishid_config};
     }
+    case Custom:
+      return entities::Entity{LoadCharacterFromJSON("resources/custom_monster.json")};
     default:
-      // custom_enemy, err := LoadCharacterFromJSON("custom_enemy.json")
-      // if err == nil {
-      // return custom_enemy
-      // }
       return MonsterFactory(Monster::Uktril);
   }
 }
 
-// func LoadCharacterFromJSON(filename string) (*entity.Character, error) {
-//    data, err := os.ReadFile(filename)
-//    if err != nil {
-//       return nil, err
-//    }
+Entity GetPlayer(const std::string& filename) {
+    auto config = LoadCharacterFromJSON(filename);
+    return entities::Entity{config};
+}
 
-//    var c entity.Character
-//    if err := json.Unmarshal(data, &c); err != nil {
-//       return nil, err
-//    }
+EntityConfig LoadCharacterFromJSON(const std::string& filename) {
+  std::string file_contents;
+  {
+    std::ifstream ifs("resources/" + filename, std::ios::binary);
+    file_contents.assign(std::istreambuf_iterator<char>(ifs),
+                         std::istreambuf_iterator<char>());
+  }
 
-//    // Initialize runtime values
-//    c.CurrentHP = c.MaxHP
-//    c.Immortal = 0
-//    c.IsNPC = false
-//    c.TemporaryBonus = TempBonus{0, 0, 0}
+  EntityConfig parsed{};
+  auto ec = glz::read_json(parsed, file_contents);
+  if (ec) {
+    std::cerr << "Failed to parse JSON: "
+              << glz::format_error(ec, file_contents) << std::endl;
+    return EntityConfig{};
+  }
 
-//    return &c, nil
-// }
+  return parsed;
+}
 
 }  // namespace factory
 }  // namespace internal

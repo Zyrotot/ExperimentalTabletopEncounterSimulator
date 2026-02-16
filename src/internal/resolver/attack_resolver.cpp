@@ -14,8 +14,6 @@
 namespace internal {
 namespace resolver {
 
-using AttackResult = AttackResolver::AttackResult;
-
 AttackResolver::AttackResolver(std::shared_ptr<Entity> attacker,
                                std::shared_ptr<Entity> defender,
                                const int& attack_sequence_index,
@@ -31,15 +29,15 @@ AttackResolver::AttackResolver(std::shared_ptr<Entity> attacker,
 AttackResolver::~AttackResolver() {
 }
 
-std::vector<AttackResult> AttackResolver::ResolveAttack() {
-  std::vector<AttackResult> results;
+std::vector<CombatContext> AttackResolver::ResolveAttack() {
+  std::vector<CombatContext> results;
   for (const auto& attack_move : attack_sequence_.attacks) {
     results.push_back(ResolveAttackMove(attack_move));
   }
   return results;
 }
 
-AttackResult AttackResolver::ResolveAttackMove(const AttackMove& attack_move) {
+CombatContext AttackResolver::ResolveAttackMove(const AttackMove& attack_move) {
   CombatContext context{
       .attacker = attacker_,
       .target = defender_,

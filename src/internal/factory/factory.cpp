@@ -6,7 +6,6 @@
 
 #include "internal/factory/factory.h"
 
-#include <iostream>
 #include <memory>
 
 #define GLZ_USE_STD_FORMAT_FLOAT 0
@@ -24,7 +23,26 @@ namespace factory {
 
 using dice_rolls::Dice;
 using dice_rolls::Term;
+using items::Enchantment;
 using items::Weapon;
+
+Enchantment RebuildEnchantmentFromName(const std::string& name) {
+  if (name == "FlamingWeapon") {
+    return items::CreateFlamingEnchantment();
+  } else if (name == "Vampiric") {
+    return items::CreateVampiricEnchantment();
+  } else if (name == "Profane") {
+    return items::CreateProfaneEnchantment();
+  } else if (name == "Dissonant") {
+    return items::CreateDissonantEnchantment();
+  } else if (name == "Flaming Explosion") {
+    return items::CreateFlamingExplosionEnchantment();
+  } else if (name == "Draining") {
+    return items::CreateDrainingEnchantment();
+  }
+  // Unknown enchantment, return empty
+  return Enchantment{};
+}
 
 std::shared_ptr<Entity> MonsterFactory(Monster monsterType) {
   switch (monsterType) {
@@ -267,8 +285,17 @@ std::shared_ptr<Entity> MonsterFactory(Monster monsterType) {
 
 std::shared_ptr<Entity> GetPlayer(const std::string& filename) {
     auto config = LoadCharacterFromJSON(filename);
-    for (const auto& attack_sequence : config.attack_sequences) {
-        for (auto attack_move : attack_sequence.attacks) {
+
+    for (auto& weapon : config.equipped_weapons) {
+        std::vector<Enchantment> rebuilt_enchantments;
+        for (const auto& ench : weapon->enchantments) {
+            rebuilt_enchantments.push_back(RebuildEnchantmentFromName(ench.name));
+        }
+        weapon->enchantments = rebuilt_enchantments;
+    }
+
+    for (auto& attack_sequence : config.attack_sequences) {
+        for (auto& attack_move : attack_sequence.attacks) {
             if (attack_move.weapon) {
                 for (const auto& equipped_weapon : config.equipped_weapons) {
                     if (attack_move.weapon->name == equipped_weapon->name) {
@@ -278,6 +305,7 @@ std::shared_ptr<Entity> GetPlayer(const std::string& filename) {
             }
         }
     }
+
     return std::make_shared<Entity>(config);
 }
 
@@ -292,8 +320,6 @@ EntityConfig LoadCharacterFromJSON(const std::string& filename) {
   EntityConfig parsed{};
   auto ec = glz::read_json(parsed, file_contents);
   if (ec) {
-    std::cerr << "Failed to parse JSON: "
-              << glz::format_error(ec, file_contents) << std::endl;
     return EntityConfig{};
   }
 

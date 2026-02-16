@@ -11,7 +11,10 @@
             },
             "damage_reductions": [],
             "energy_resistances": [],
-            "immunity": {},
+            "immunity": {
+                "immune_types": [],
+                "immune_categories": []
+            },
             "weaknesses": []
         },
         "bonus_stats": {
@@ -35,7 +38,30 @@
             "damage_type": 1,
             "damage_modifier": 0,
             "crit_range": 20,
-            "crit_multiplier": 3
+            "crit_multiplier": 3,
+            "enchantments": [
+                {
+                    "name": "FlamingWeapon",
+                    "damage_sources": [
+                        {
+                            "name": "Flaming",
+                            "contribute": "std::function<internal::rules::DamageInstance(const internal::combat::CombatContext&,internal::dice_rolls::Roller&)>"
+                        }
+                    ],
+                    "effects": []
+                },
+                {
+                    "name": "Vampiric",
+                    "damage_sources": [],
+                    "effects": [
+                        {
+                            "name": "Vampiric",
+                            "trigger": 4,
+                            "on": "std::function<void(const internal::combat::CombatContext&)>"
+                        }
+                    ]
+                }
+            ]
         }
     ],
     "attack_sequences": [
@@ -43,22 +69,23 @@
             "attacks": [
                 {
                     "weapon": {
-            "name": "Machado",
-            "attack_bonus": 2,
-            "damage": {
-                "dice_groups": [
-                    {
-                        "count": 4,
-                        "sides": 8
-                    }
-                ],
-                "bonus": 0
-            },
-            "damage_type": 1,
-            "damage_modifier": 0,
-            "crit_range": 20,
-            "crit_multiplier": 3
-        },
+                        "name": "Machado",
+                        "attack_bonus": 2,
+                        "damage": {
+                            "dice_groups": [
+                                {
+                                    "count": 4,
+                                    "sides": 8
+                                }
+                            ],
+                            "bonus": 0
+                        },
+                        "damage_type": 1,
+                        "damage_modifier": 0,
+                        "crit_range": 20,
+                        "crit_multiplier": 3,
+                        "enchantments": []
+                    },
                     "attack_modifier": 0,
                     "damage_modifier": 0,
                     "crit_range_bonus": 0,

@@ -11,11 +11,13 @@
 #include <vector>
 
 #include "internal/items/weapon.h"
+#include "internal/dice_rolls/roller.h"
 
 namespace internal {
 namespace combat {
 
 using items::Weapon;
+using dice_rolls::Term;
 
 struct AttackMove {
   std::shared_ptr<Weapon> weapon;
@@ -25,6 +27,9 @@ struct AttackMove {
 
   int crit_range_bonus = 0;
   int crit_multiplier_bonus = 0;
+
+  int GetAttackModifier() const;
+  Term GetAttackDamage() const;
 };
 
 struct AttackSequence {

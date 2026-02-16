@@ -23,7 +23,21 @@ struct Dice {
 struct Term {
   std::vector<Dice> dice_groups = {};
   int bonus = 0;
+
+  void AddModifier(const int& modifier);
 };
+
+inline Term operator+ (const Term& lhs, const Term& rhs) {
+  Term result;
+  result.dice_groups = lhs.dice_groups;
+  result.dice_groups.insert(result.dice_groups.end(), rhs.dice_groups.begin(), rhs.dice_groups.end());
+  result.bonus = lhs.bonus + rhs.bonus;
+  return result;
+}
+
+inline void Term::AddModifier(const int& modifier) {
+  bonus += modifier;
+}
 
 class Roller {
  public:

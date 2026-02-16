@@ -81,7 +81,7 @@ Entity MonsterFactory(Monster monsterType) {
                   },
 
               .equipped_weapons = {pinca, garra},
-              .attack_moves =
+              .attack_sequences =
                   std::vector<combat::AttackSequence>{
                       combat::AttackSequence{
                           .attacks =
@@ -154,7 +154,7 @@ Entity MonsterFactory(Monster monsterType) {
                           },
                   },
               .equipped_weapons = {pinca, garra},
-              .attack_moves =
+              .attack_sequences =
                   std::vector<combat::AttackSequence>{
                       combat::AttackSequence{
                           .attacks =
@@ -234,7 +234,7 @@ Entity MonsterFactory(Monster monsterType) {
                           },
                   },
               .equipped_weapons = {adaga, mordida, garra},
-              .attack_moves =
+              .attack_sequences =
                   std::vector<combat::AttackSequence>{
                       combat::AttackSequence{
                           .attacks =

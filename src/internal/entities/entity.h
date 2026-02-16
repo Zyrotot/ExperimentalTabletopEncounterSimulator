@@ -28,7 +28,7 @@ struct EntityConfig {
   Stats starting_stats;
 
   std::vector<std::shared_ptr<Weapon>> equipped_weapons;
-  std::vector<AttackSequence> attack_moves;
+  std::vector<AttackSequence> attack_sequences;
 
   rules::Alignment alignment;
 };
@@ -45,7 +45,7 @@ class Entity {
   Stats current_stats_;
 
   std::vector<std::shared_ptr<Weapon>> equipped_weapons_;
-  std::vector<AttackSequence> attack_moves_;
+  std::vector<AttackSequence> attack_sequences_;
 
   rules::Alignment alignment_;
 };

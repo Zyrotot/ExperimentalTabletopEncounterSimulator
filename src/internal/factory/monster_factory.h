@@ -21,7 +21,7 @@ enum Monster {
     Custom    = 4,
 };
 
-static Entity MonsterFactory(Monster monsterType);
+Entity MonsterFactory(Monster monsterType);
 
 }  // namespace factory
 }  // namespace internal

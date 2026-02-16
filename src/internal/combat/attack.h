@@ -20,18 +20,18 @@ using items::Weapon;
 struct AttackMove {
   std::shared_ptr<Weapon> weapon;
 
-  int attack_modifier;
-  int damage_modifier;
+  int attack_modifier = 0;
+  int damage_modifier = 0;
 
-  int crit_range_bonus;
-  int crit_multiplier_bonus;
+  int crit_range_bonus = 0;
+  int crit_multiplier_bonus = 0;
 };
 
 struct AttackSequence {
-  std::vector<AttackMove> attacks;
+  std::vector<AttackMove> attacks = {};
 
-  int attack_modifier;
-  int damage_modifier;
+  int attack_modifier = 0;
+  int damage_modifier = 0;
 };
 
 }  // namespace combat

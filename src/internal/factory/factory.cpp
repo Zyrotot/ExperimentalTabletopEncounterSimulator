@@ -266,6 +266,17 @@ std::shared_ptr<Entity> MonsterFactory(Monster monsterType) {
 
 std::shared_ptr<Entity> GetPlayer(const std::string& filename) {
     auto config = LoadCharacterFromJSON(filename);
+    for (const auto& attack_sequence : config.attack_sequences) {
+        for (auto attack_move : attack_sequence.attacks) {
+            if (attack_move.weapon) {
+                for (const auto& equipped_weapon : config.equipped_weapons) {
+                    if (attack_move.weapon->name == equipped_weapon->name) {
+                        attack_move.weapon = equipped_weapon;
+                    }
+                }
+            }
+        }
+    }
     return std::make_shared<Entity>(config);
 }
 

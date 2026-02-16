@@ -62,7 +62,6 @@ void Entity::TakeDamage(int damage) {
     return;
   }
 
-  // First deplete temporary HP
   if (current_stats_.bonus_stats.temporary_hp > 0) {
     if (damage <= current_stats_.bonus_stats.temporary_hp) {
       current_stats_.bonus_stats.temporary_hp -= damage;
@@ -72,7 +71,6 @@ void Entity::TakeDamage(int damage) {
     current_stats_.bonus_stats.temporary_hp = 0;
   }
 
-  // Then apply to regular HP
   current_stats_.base_stats.hp -= damage;
   if (current_stats_.base_stats.hp < 0) {
     current_stats_.base_stats.hp = 0;
@@ -86,7 +84,6 @@ void Entity::Heal(int amount) {
 
   current_stats_.base_stats.hp += amount;
 
-  // Cap at maximum HP
   if (current_stats_.base_stats.hp > starting_stats_.base_stats.hp) {
     current_stats_.base_stats.hp = starting_stats_.base_stats.hp;
   }

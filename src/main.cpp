@@ -14,7 +14,7 @@ int main() {
     auto resolver = std::make_shared<internal::resolver::AttackResolver>(
         player, uktril, 0, roller);
 
-    std::vector<internal::resolver::AttackResolver::AttackResult> results =
+    std::vector<internal::resolver::CombatContext> results =
         resolver->ResolveAttack();
 
     for (const auto& result : results) {
@@ -36,7 +36,7 @@ int main() {
     auto resolver2 = std::make_shared<internal::resolver::AttackResolver>(
         reishid, player, 0, roller);
 
-    std::vector<internal::resolver::AttackResolver::AttackResult> results2 =
+    std::vector<internal::resolver::CombatContext> results2 =
         resolver2->ResolveAttack();
 
     for (const auto& result : results2) {

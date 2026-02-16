@@ -45,18 +45,16 @@ using rules::DamageType;
 
 class AttackResolver {
  public:
-  using AttackResult = combat::CombatContext;
-
   AttackResolver(std::shared_ptr<Entity> attacker,
                  std::shared_ptr<Entity> defender,
                  const int& attack_sequence_index,
                  std::shared_ptr<Roller> roller);
   ~AttackResolver();
 
-  std::vector<AttackResult> ResolveAttack();
+  std::vector<CombatContext> ResolveAttack();
 
  protected:
-  AttackResult ResolveAttackMove(const AttackMove& attack_move);
+  CombatContext ResolveAttackMove(const AttackMove& attack_move);
 
   DamageInstance CalculateBaseDamage(const AttackMove& attack_move,
                                      int crit_multiplier);

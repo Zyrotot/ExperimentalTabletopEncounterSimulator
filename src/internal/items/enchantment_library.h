@@ -12,7 +12,7 @@
 
 #include "internal/combat/combat_events.h"
 #include "internal/dice_rolls/roller.h"
-#include "internal/entities/entity.h"
+#include "internal/entities/entity.h"  // IWYU pragma: keep
 #include "internal/items/enchantment.h"
 #include "internal/rules/alignment.h"
 #include "internal/rules/damage_types.h"
@@ -20,24 +20,17 @@
 namespace internal {
 namespace items {
 
-using combat::CombatEvent;
-using dice_rolls::Roller;
-using dice_rolls::Term;
-using entities::Entity;
-using rules::DamageInstance;
-using rules::DamageModifier;
-using rules::DamageType;
-
 inline Enchantment CreateFlamingEnchantment() {
   Enchantment ench;
   ench.name = "FlamingWeapon";
 
   DamageSource source;
   source.name = "Flaming";
-  source.contribute = [](const combat::CombatContext& /* unused */, Roller& roller) {
-    return DamageInstance{.amount = roller.Roll(Term{.dice_groups = {{1, 6}}}),
-                          .types = static_cast<uint16_t>(DamageType::Fire),
-                          .modifiers = 0};
+  source.contribute = [](std::shared_ptr<combat::CombatContext> ctx) {
+    return rules::DamageInstance{
+        .amount = ctx->roller->Roll(dice_rolls::Term{.dice_groups = {{1, 6}}}),
+        .types = static_cast<uint16_t>(rules::DamageType::Fire),
+        .modifiers = 0};
   };
   ench.damage_sources.push_back(source);
 
@@ -50,19 +43,23 @@ inline Enchantment CreateDissonantEnchantment() {
 
   DamageSource source;
   source.name = "Dissonant";
-  source.contribute = [](const combat::CombatContext& /* unused */, Roller& roller) {
-    return DamageInstance{.amount = roller.Roll(Term{.dice_groups = {{2, 6}}}),
-                          .types = static_cast<uint16_t>(DamageType::Negative),
-                          .modifiers = 0};
+  source.contribute = [](std::shared_ptr<combat::CombatContext> ctx) {
+    return rules::DamageInstance{
+        .amount = ctx->roller->Roll(dice_rolls::Term{.dice_groups = {{2, 6}}}),
+        .types = static_cast<uint16_t>(rules::DamageType::Negative),
+        .modifiers = 0};
   };
   ench.damage_sources.push_back(source);
 
   Effect effect;
   effect.name = "Dissonant (self-damage)";
-  effect.trigger = CombatEvent::DealDamage;
-  effect.on = [](const combat::CombatContext& ctx) {
-    int self_damage = ctx.roller->Roll(Term{.dice_groups = {{1, 6}}});
-    ctx.attacker->TakeDamage(self_damage);  // TODO(zyrotot): Resolve trough damage dealer to apply resistances, etc.
+  effect.trigger = combat::CombatEvent::DealDamage;
+  effect.on = [](std::shared_ptr<combat::CombatContext> ctx) {
+    int self_damage =
+        ctx->roller->Roll(dice_rolls::Term{.dice_groups = {{1, 6}}});
+    ctx->attacker->TakeDamage(
+        self_damage); // TODO(zyrotot): Resolve trough damage dealer to apply
+                      // resistances, etc.
   };
   ench.effects.push_back(effect);
 
@@ -75,16 +72,23 @@ inline Enchantment CreateFlamingExplosionEnchantment() {
 
   DamageSource source;
   source.name = "Flaming Explosion";
-  source.contribute = [](const combat::CombatContext& ctx, Roller& roller) {
-    int damage;
-    if (ctx.is_crit) {
-      int dice = std::min(ctx.crit_multiplier - 1, 3);
-      damage = roller.Roll(Term{.dice_groups = {{dice, 10}, {1, 6}}});
-    } else {
-      damage = roller.Roll(Term{.dice_groups = {{1, 6}}});
+  source.contribute = [](std::shared_ptr<combat::CombatContext> ctx) {
+    if (ctx->results.empty()) {
+      return rules::DamageInstance{};
     }
-    return DamageInstance{
-        .amount = damage, .types = static_cast<uint16_t>(DamageType::Fire), .modifiers = 0};
+    auto &result = ctx->results.back();
+    int damage;
+    if (result.is_crit) {
+      int dice = std::min(result.crit_multiplier - 1, 3);
+      damage = ctx->roller->Roll(
+          dice_rolls::Term{.dice_groups = {{dice, 10}, {1, 6}}});
+    } else {
+      damage = ctx->roller->Roll(dice_rolls::Term{.dice_groups = {{1, 6}}});
+    }
+    return rules::DamageInstance{
+        .amount = damage,
+        .types = static_cast<uint16_t>(rules::DamageType::Fire),
+        .modifiers = 0};
   };
   ench.damage_sources.push_back(source);
 
@@ -97,18 +101,18 @@ inline Enchantment CreateVampiricEnchantment() {
 
   Effect effect;
   effect.name = "Vampiric";
-  effect.trigger = CombatEvent::DealDamage;
-  effect.on = [](const combat::CombatContext& ctx) {
-    if (ctx.damage_instances.empty()) {
+  effect.trigger = combat::CombatEvent::DealDamage;
+  effect.on = [](std::shared_ptr<combat::CombatContext> ctx) {
+    if (ctx->results.empty() || ctx->results.back().damage_instances.empty()) {
       return;
     }
     int total_damage = 0;
-    for (const auto& dmg : ctx.damage_instances) {
+    for (const auto &dmg : ctx->results.back().damage_instances) {
       total_damage += dmg.amount;
     }
 
     int temp_hp = total_damage / 2;
-    ctx.attacker->AddTempHP(temp_hp);
+    ctx->attacker->AddTempHP(temp_hp);
   };
   ench.effects.push_back(effect);
 
@@ -121,9 +125,9 @@ inline Enchantment CreateDrainingEnchantment() {
 
   Effect effect;
   effect.name = "Draining";
-  effect.trigger = CombatEvent::Hit;
-  effect.on = [](const combat::CombatContext& ctx) {
-    ctx.attacker->Heal(1);
+  effect.trigger = combat::CombatEvent::Hit;
+  effect.on = [](std::shared_ptr<combat::CombatContext> ctx) {
+    ctx->attacker->Heal(1);
   };
   ench.effects.push_back(effect);
 
@@ -136,22 +140,23 @@ inline Enchantment CreateProfaneEnchantment() {
 
   DamageSource source;
   source.name = "Profane";
-  source.contribute = [](const combat::CombatContext& ctx, Roller& roller) {
-    if (static_cast<uint16_t>(ctx.target->GetAlignment()) &
+  source.contribute = [](std::shared_ptr<combat::CombatContext> ctx) {
+    if (static_cast<uint16_t>(ctx->target->GetAlignment()) &
         static_cast<uint16_t>(rules::Alignment::Good)) {
-      return DamageInstance{
-          .amount = roller.Roll(Term{.dice_groups = {{2, 6}}}),
+      return rules::DamageInstance{
+          .amount =
+              ctx->roller->Roll(dice_rolls::Term{.dice_groups = {{2, 6}}}),
           .types = 0,
-          .modifiers = static_cast<uint16_t>(DamageModifier::Evil)};
+          .modifiers = static_cast<uint16_t>(rules::DamageModifier::Evil)};
     }
-    return DamageInstance{};
+    return rules::DamageInstance{};
   };
   ench.damage_sources.push_back(source);
 
   return ench;
 }
 
-}  // namespace items
-}  // namespace internal
+} // namespace items
+} // namespace internal
 
-#endif  // SRC_INTERNAL_ITEMS_ENCHANTMENT_LIBRARY_H_
+#endif // SRC_INTERNAL_ITEMS_ENCHANTMENT_LIBRARY_H_

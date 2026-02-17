@@ -8,7 +8,6 @@
 #define SRC_INTERNAL_RESOLVER_ATTACK_RESOLVER_H_
 
 #include <memory>
-#include <vector>
 
 #include "internal/combat/attack.h"
 #include "internal/combat/combat_events.h"
@@ -31,48 +30,38 @@ class Logger;
 
 namespace resolver {
 
-using combat::AttackMove;
-using combat::AttackSequence;
-using combat::CombatContext;
-using combat::CombatEvent;
-using dice_rolls::Roller;
-using dice_rolls::Term;
-using entities::Entity;
-using logging::Logger;
-using rules::DamageInstance;
-using rules::DamageModifier;
-using rules::DamageType;
 
 class AttackResolver {
  public:
-  AttackResolver(std::shared_ptr<Entity> attacker,
-                 std::shared_ptr<Entity> defender,
+  AttackResolver(std::shared_ptr<entities::Entity> attacker,
+                 std::shared_ptr<entities::Entity> defender,
                  const int& attack_sequence_index,
-                 std::shared_ptr<Roller> roller);
+                 std::shared_ptr<dice_rolls::Roller> roller);
   ~AttackResolver();
 
-  std::vector<CombatContext> ResolveAttack();
+  std::shared_ptr<combat::CombatContext> ResolveAttack();
 
  protected:
-  CombatContext ResolveAttackMove(const AttackMove& attack_move);
+  void ResolveAttackMove(const combat::AttackMove& attack_move,
+                         std::shared_ptr<combat::CombatContext> context);
 
-  DamageInstance CalculateBaseDamage(const AttackMove& attack_move,
+  rules::DamageInstance CalculateBaseDamage(const combat::AttackMove& attack_move,
                                      int crit_multiplier);
-  void GatherDamageFromSources(const AttackMove& attack_move,
-                               CombatContext* context);
+  void GatherDamageFromSources(const combat::AttackMove& attack_move,
+                               std::shared_ptr<combat::CombatContext> context,
+                               combat::AttackResult& result);
 
-  void EmitEvent(CombatEvent event, CombatContext* context);
+  dice_rolls::Term CalculateTotalDamage(const combat::AttackMove& attack_move);
+  int CalculateTotalAttackModifier(const combat::AttackMove& attack_move);
+  int CheckCriticalHit(const combat::AttackMove &attack_move, const int &attack_roll,
+                       const int &fortification);
 
-  Term CalculateTotalDamage(const AttackMove& attack_move);
-  int CalculateTotalAttackModifier(const AttackMove& attack_move);
-  int CheckCriticalHit(const AttackMove& attack_move, const int& attack_roll);
-
- private:
-  std::shared_ptr<Entity> attacker_;
-  std::shared_ptr<Entity> defender_;
-  AttackSequence attack_sequence_;
-  std::shared_ptr<Roller> roller_;
-  std::shared_ptr<Logger> logger_;
+private:
+  std::shared_ptr<entities::Entity> attacker_;
+  std::shared_ptr<entities::Entity> defender_;
+  combat::AttackSequence attack_sequence_;
+  std::shared_ptr<dice_rolls::Roller> roller_;
+  std::shared_ptr<logging::Logger> logger_;
 };
 
 }  // namespace resolver

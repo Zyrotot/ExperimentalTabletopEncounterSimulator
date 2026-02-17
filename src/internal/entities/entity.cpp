@@ -11,51 +11,52 @@
 namespace internal {
 namespace entities {
 
-Entity::Entity(const EntityConfig& config)
-    : name_(config.name),
-      starting_stats_(config.starting_stats),
+using combat::AttackSequence;
+using items::Weapon;
+
+Entity::Entity(const EntityConfig &config)
+    : name_(config.name), starting_stats_(config.starting_stats),
       current_stats_(config.starting_stats),
       equipped_weapons_(config.equipped_weapons),
-      attack_sequences_(config.attack_sequences),
-      alignment_(config.alignment) {
+      attack_sequences_(config.attack_sequences), alignment_(config.alignment) {
 }
 
-Entity::~Entity() {
-}
+Entity::~Entity() {}
 
-const std::string& Entity::GetName() const {
-  return name_;
-}
+const std::string &Entity::GetName() const { return name_; }
 
-const Stats& Entity::GetCurrentStats() const {
-  return current_stats_;
-}
+const Stats &Entity::GetCurrentStats() const { return current_stats_; }
 
-const Stats& Entity::GetStartingStats() const {
-  return starting_stats_;
-}
+const Stats &Entity::GetStartingStats() const { return starting_stats_; }
 
-const std::vector<AttackSequence>& Entity::GetAttackSequences() const {
+const std::vector<AttackSequence> &Entity::GetAttackSequences() const {
   return attack_sequences_;
 }
 
-const AttackSequence& Entity::GetAttackSequence(const int& index) const {
+const AttackSequence &Entity::GetAttackSequence(const int &index) const {
   if (index < 0 || static_cast<size_t>(index) >= attack_sequences_.size()) {
     return attack_sequences_[0];
   }
   return attack_sequences_[static_cast<size_t>(index)];
 }
 
-const std::vector<std::shared_ptr<Weapon>>& Entity::GetEquippedWeapons() const {
+const std::vector<std::shared_ptr<Weapon>> &Entity::GetEquippedWeapons() const {
   return equipped_weapons_;
 }
 
-const rules::Alignment& Entity::GetAlignment() const {
-  return alignment_;
-}
+const rules::Alignment &Entity::GetAlignment() const { return alignment_; }
 
 int Entity::GetEffectiveAC() const {
-  return current_stats_.base_stats.armour_class + current_stats_.bonus_stats.ac_bonus;
+  return current_stats_.base_stats.armour_class +
+         current_stats_.bonus_stats.ac_bonus;
+}
+
+int Entity::GetFortification() const {
+  return current_stats_.base_stats.fortification;
+}
+
+Resistances Entity::GetResistancesCopy() const {
+  return current_stats_.base_stats.resistances;
 }
 
 void Entity::TakeDamage(int damage) {
@@ -100,9 +101,7 @@ void Entity::AddTempHP(int amount) {
   }
 }
 
-bool Entity::IsAlive() const {
-  return current_stats_.base_stats.hp > 0;
-}
+bool Entity::IsAlive() const { return current_stats_.base_stats.hp > 0; }
 
-}  // namespace entities
-}  // namespace internal
+} // namespace entities
+} // namespace internal

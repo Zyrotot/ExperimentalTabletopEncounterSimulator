@@ -23,16 +23,13 @@ class Weapon;
 
 namespace entities {
 
-using combat::AttackSequence;
-using items::Weapon;
-
 struct EntityConfig {
   std::string name;
 
   Stats starting_stats;
 
-  std::vector<std::shared_ptr<Weapon>> equipped_weapons;
-  std::vector<AttackSequence> attack_sequences;
+  std::vector<std::shared_ptr<items::Weapon>> equipped_weapons;
+  std::vector<combat::AttackSequence> attack_sequences;
 
   rules::Alignment alignment;
 };
@@ -45,12 +42,15 @@ class Entity {
   const std::string& GetName() const;
   const Stats& GetCurrentStats() const;
   const Stats& GetStartingStats() const;
-  const std::vector<AttackSequence>& GetAttackSequences() const;
-  const AttackSequence& GetAttackSequence(const int& index) const;
-  const std::vector<std::shared_ptr<Weapon>>& GetEquippedWeapons() const;
+  const std::vector<combat::AttackSequence>& GetAttackSequences() const;
+  const combat::AttackSequence& GetAttackSequence(const int& index) const;
+  const std::vector<std::shared_ptr<items::Weapon>>& GetEquippedWeapons() const;
   const rules::Alignment& GetAlignment() const;
 
   int GetEffectiveAC() const;
+  int GetFortification() const;
+
+  Resistances GetResistancesCopy() const;
 
   void TakeDamage(int damage);
   void Heal(int amount);
@@ -63,8 +63,8 @@ class Entity {
   Stats starting_stats_;
   Stats current_stats_;
 
-  std::vector<std::shared_ptr<Weapon>> equipped_weapons_;
-  std::vector<AttackSequence> attack_sequences_;
+  std::vector<std::shared_ptr<items::Weapon>> equipped_weapons_;
+  std::vector<combat::AttackSequence> attack_sequences_;
 
   rules::Alignment alignment_;
 };

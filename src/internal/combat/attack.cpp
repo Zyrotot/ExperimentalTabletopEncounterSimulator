@@ -10,6 +10,8 @@
 namespace internal {
 namespace combat {
 
+using dice_rolls::Term;
+
 int AttackMove::GetAttackModifier() const {
   return attack_modifier + (weapon ? weapon->attack_bonus : 0);
 }

@@ -14,14 +14,16 @@
 namespace internal {
 namespace entities {
 
-using rules::DamageReduction;
-using rules::EnergyResistance;
-using rules::Immunity;
-using rules::Weakness;
-
 struct AttackBonuses {
   int attack_bonus = 0;
   int damage_bonus = 0;
+};
+
+struct Resistances {
+  std::vector<rules::DamageReduction> damage_reductions = {};
+  std::vector<rules::EnergyResistance> energy_resistances = {};
+  rules::Immunity immunity = {};
+  std::vector<rules::Weakness> weaknesses = {};
 };
 
 struct BaseStats {
@@ -31,10 +33,7 @@ struct BaseStats {
 
   AttackBonuses attack_bonuses = {};
 
-  std::vector<DamageReduction> damage_reductions = {};
-  std::vector<EnergyResistance> energy_resistances = {};
-  Immunity immunity = {};
-  std::vector<Weakness> weaknesses = {};
+  Resistances resistances = {};
 };
 
 struct BonusStats {

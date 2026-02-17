@@ -22,20 +22,16 @@ class Roller;
 
 namespace items {
 
-using combat::CombatContext;
-using combat::CombatEvent;
-using rules::DamageInstance;
-
 struct DamageSource {
   std::string name;
-  std::function<DamageInstance(const CombatContext&, dice_rolls::Roller&)>
+  std::function<rules::DamageInstance(std::shared_ptr<combat::CombatContext>)>
       contribute;
 };
 
 struct Effect {
   std::string name;
-  CombatEvent trigger;
-  std::function<void(const CombatContext&)> on;
+  combat::CombatEvent trigger;
+  std::function<void(std::shared_ptr<combat::CombatContext>)> on;
 };
 
 struct Enchantment {
@@ -44,7 +40,7 @@ struct Enchantment {
   std::vector<Effect> effects;
 };
 
-}  // namespace items
-}  // namespace internal
+} // namespace items
+} // namespace internal
 
-#endif  // SRC_INTERNAL_ITEMS_ENCHANTMENT_H_
+#endif // SRC_INTERNAL_ITEMS_ENCHANTMENT_H_

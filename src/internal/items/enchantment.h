@@ -24,14 +24,14 @@ namespace items {
 
 struct DamageSource {
   std::string name;
-  std::function<rules::DamageInstance(std::shared_ptr<combat::CombatContext>)>
+  std::function<rules::DamageInstance(std::shared_ptr<combat::EventContext>)>
       contribute;
 };
 
 struct Effect {
   std::string name;
   combat::CombatEvent trigger;
-  std::function<void(std::shared_ptr<combat::CombatContext>)> on;
+  std::function<void(std::shared_ptr<combat::EventContext>)> on;
 };
 
 struct Enchantment {

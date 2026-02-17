@@ -102,7 +102,7 @@ std::shared_ptr<Entity> MonsterFactory(Monster monsterType) {
                     .damage_modifier = 0,
                 },
             },
-
+        .abilities = {},
         .alignment = rules::Alignment::ChaoticEvil,
     };
 
@@ -168,6 +168,7 @@ std::shared_ptr<Entity> MonsterFactory(Monster monsterType) {
                     .attack_modifier = 0,
                     .damage_modifier = 0,
                 }},
+        .abilities = {},
         .alignment = rules::Alignment::ChaoticEvil,
     };
 
@@ -248,6 +249,7 @@ std::shared_ptr<Entity> MonsterFactory(Monster monsterType) {
                     .damage_modifier = 0,
                 },
             },
+        .abilities = {},
         .alignment = rules::Alignment::ChaoticEvil,
     };
 

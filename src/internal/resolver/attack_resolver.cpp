@@ -36,11 +36,7 @@ AttackResolver::AttackResolver(std::shared_ptr<Entity> attacker,
 AttackResolver::~AttackResolver() {}
 
 std::shared_ptr<CombatContext> AttackResolver::ResolveAttack() {
-  auto context =
-      std::make_shared<CombatContext>(CombatContext{.attacker = attacker_,
-                                                    .target = defender_,
-                                                    .roller = roller_,
-                                                    .results = {}});
+  auto context = std::make_shared<CombatContext>(attacker_, defender_, roller_);
 
   for (const auto &attack_move : attack_sequence_.attacks) {
     ResolveAttackMove(attack_move, context);

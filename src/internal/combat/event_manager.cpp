@@ -20,10 +20,42 @@ void EventManager::Emit(CombatEvent event,
   }
 
   auto logger = logging::LogManager::GetLogger("events");
-
   auto entities = context->GetInvolvedEntities();
 
-  for (const auto& entity : entities) {
+  std::vector<std::shared_ptr<entities::Entity>> relevant_entities;
+  
+  if (auto dmg_ctx = std::dynamic_pointer_cast<DamageContext>(context)) {
+    switch (event) {
+      case CombatEvent::TakeDamage:
+        if (dmg_ctx->target) relevant_entities.push_back(dmg_ctx->target);
+        break;
+      case CombatEvent::DealDamage:
+        if (dmg_ctx->attacker) relevant_entities.push_back(dmg_ctx->attacker);
+        break;
+      case CombatEvent::Kill:
+        if (dmg_ctx->attacker) relevant_entities.push_back(dmg_ctx->attacker);
+        break;
+      default:
+        relevant_entities = entities;
+        break;
+    }
+  } else if (auto heal_ctx = std::dynamic_pointer_cast<HealContext>(context)) {
+    if (event == CombatEvent::Heal) {
+      if (heal_ctx->target) relevant_entities.push_back(heal_ctx->target);
+    } else {
+      relevant_entities = entities;
+    }
+  } else if (auto hit_ctx = std::dynamic_pointer_cast<HitContext>(context)) {
+    if (event == CombatEvent::Hit) {
+       if (dmg_ctx->attacker) relevant_entities.push_back(dmg_ctx->attacker);
+    } else {
+      relevant_entities = entities;
+    }
+  } else {
+    relevant_entities = entities;
+  }
+
+  for (const auto& entity : relevant_entities) {
     if (!entity) continue;
     
     for (const auto& effect : entity->GetActiveEffects()) {

@@ -11,6 +11,7 @@
 #define GLZ_USE_STD_FORMAT_FLOAT 0
 #include <glaze/glaze.hpp>
 
+#include "internal/abilities/ability.h"
 #include "internal/combat/attack.h"
 #include "internal/dice_rolls/roller.h"
 #include "internal/entities/entity.h"
@@ -274,6 +275,12 @@ std::shared_ptr<Entity> GetPlayer(const std::string &filename) {
     weapon->enchantments = rebuilt_enchantments;
   }
 
+  std::vector<abilities::Ability> rebuilt_abilities;
+  for (const auto &ability : config.abilities) {
+    rebuilt_abilities.push_back(RebuildAbilityFromName(ability.name, ability.stack_count));
+  }
+  config.abilities = rebuilt_abilities;
+
   for (auto &attack_sequence : config.attack_sequences) {
     for (auto &attack_move : attack_sequence.attacks) {
       if (attack_move.weapon) {
@@ -322,6 +329,26 @@ Enchantment RebuildEnchantmentFromName(const std::string &name) {
   }
   // Unknown enchantment, return empty
   return Enchantment{};
+}
+
+abilities::Ability RebuildAbilityFromName(const std::string &name, int stack_count) {
+  if (name == "Erosion") {
+    return abilities::CreateErosao();
+  } else if (name == "Rigidez Raivosa") {
+    auto ability = abilities::CreateRigidezRaivosa();
+    ability.stack_count = stack_count;
+    return ability;
+  } else if (name == "Trespassar") {
+    auto ability = abilities::CreateTrespassar();
+    ability.stack_count = stack_count;
+    return ability;
+  } else if (name == "Duro de Ferir") {
+    return abilities::CreateDuroDeFerir(stack_count);
+  } else if (name == "Duro de Matar") {
+    return abilities::CreateDuroDeMatar(stack_count);
+  }
+  // Unknown ability, return empty
+  return abilities::Ability{};
 }
 
 } // namespace factory

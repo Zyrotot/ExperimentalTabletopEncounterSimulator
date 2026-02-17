@@ -39,6 +39,8 @@ struct BaseStats {
 struct BonusStats {
   int temporary_hp = 0;
   int ac_bonus = 0;
+
+  Resistances bonus_resistances = {};
 };
 
 struct Stats {

@@ -11,7 +11,9 @@
 #include <string>
 #include <vector>
 
+#include "internal/abilities/ability.h"
 #include "internal/combat/attack.h"
+#include "internal/combat/combat_events.h"
 #include "internal/entities/stats.h"
 #include "internal/rules/alignment.h"
 
@@ -30,6 +32,7 @@ struct EntityConfig {
 
   std::vector<std::shared_ptr<items::Weapon>> equipped_weapons;
   std::vector<combat::AttackSequence> attack_sequences;
+  std::vector<abilities::Ability> abilities;
 
   rules::Alignment alignment;
 };
@@ -47,15 +50,30 @@ class Entity {
   const std::vector<std::shared_ptr<items::Weapon>>& GetEquippedWeapons() const;
   const rules::Alignment& GetAlignment() const;
 
+  const std::vector<abilities::Ability>& GetAbilities() const;
+  bool HasAbility(const std::string& ability_name) const;
+  int GetAbilityStack(const std::string& ability_name) const;
+  
+  const std::vector<combat::Effect>& GetActiveEffects() const;
+  void BuildActiveEffects();
+  
+  void IncrementAbilityStack(const std::string& ability_name);
+  void DecrementAbilityStack(const std::string& ability_name);
+  void SetAbilityStack(const std::string& ability_name, int value);
+
   int GetEffectiveAC() const;
   int GetFortification() const;
 
-  Resistances GetResistancesCopy() const;
+  Resistances GetResistances() const;
 
   void TakeDamage(int damage);
   void Heal(int amount);
   void AddTempHP(int amount);
   bool IsAlive() const;
+  
+  void AddDR(const rules::DamageReduction& dr, bool is_bonus = true);
+  void RemoveDR(int amount, bool from_bonus = true);
+  void ClearAllDR(bool from_bonus = true);
 
  protected:
   std::string name_;
@@ -65,8 +83,11 @@ class Entity {
 
   std::vector<std::shared_ptr<items::Weapon>> equipped_weapons_;
   std::vector<combat::AttackSequence> attack_sequences_;
+  std::vector<abilities::Ability> abilities_;
 
   rules::Alignment alignment_;
+  
+  std::vector<combat::Effect> active_effects_;
 };
 
 }  // namespace entities

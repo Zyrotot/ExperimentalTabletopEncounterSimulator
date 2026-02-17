@@ -6,8 +6,7 @@
 
 #include "internal/combat/event_manager.h"
 
-#include "internal/combat/attack.h"
-#include "internal/items/enchantment.h"
+#include "internal/entities/entity.h"
 #include "internal/logging/log_manager.h"
 #include "internal/logging/logger.h"
 
@@ -15,27 +14,29 @@ namespace internal {
 namespace combat {
 
 void EventManager::Emit(CombatEvent event,
-                        std::shared_ptr<CombatContext> context) {
-  if (!context || context->results.empty()) {
-    return;
-  }
-
-  auto& current_result = context->results.back();
-  if (!current_result.attack || !current_result.attack->weapon) {
+                        std::shared_ptr<EventContext> context) {
+  if (!context) {
     return;
   }
 
   auto logger = logging::LogManager::GetLogger("events");
 
-  for (const auto& enchantment : current_result.attack->weapon->enchantments) {
-    for (const auto& effect : enchantment.effects) {
-      if (effect.trigger == event) {
-        logger->Debug("Triggering {} effect", effect.name);
-        effect.on(context);
+  auto entities = context->GetInvolvedEntities();
+
+  for (const auto& entity : entities) {
+    if (!entity) continue;
+    
+    for (const auto& effect : entity->GetActiveEffects()) {
+      if (!effect.is_active) continue;
+      
+      if (effect.trigger == event && effect.on_event) {
+        logger->Debug("Triggering {} effect from {} for {}", 
+                     effect.name, effect.source, entity->GetName());
+        effect.on_event(context);
       }
     }
   }
 }
 
-}  // namespace combat
-}  // namespace internal
+} // namespace combat
+} // namespace internal

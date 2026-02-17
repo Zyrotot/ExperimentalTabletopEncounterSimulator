@@ -5,10 +5,11 @@
 // -----------------------------------------------------------------------------
 
 #include "internal/resolver/damage_resolver.h"
+#include "internal/combat/event_manager.h"
 #include "internal/entities/entity.h" // IWYU pragma: keep
 #include "internal/entities/stats.h"
-#include "internal/rules/resistances.h"
 #include "internal/logging/log_manager.h"
+#include "internal/rules/resistances.h"
 
 namespace internal {
 namespace resolver {
@@ -23,25 +24,39 @@ DamageResolver::~DamageResolver() {}
 
 void DamageResolver::ApplyDamage() {
   for (auto &result : context_->results) {
-    Resistances remaining_resistances = context_->target->GetResistancesCopy();
     if (!result.is_hit) {
       continue;
     }
-    int total_damage = 0;
-    for (auto &dmg_instance : result.damage_instances) {
+
+    auto damage_context = std::make_shared<combat::DamageContext>(
+        context_->attacker, context_->target);
+    damage_context->damage = result.damage_instances;
+
+    Resistances remaining_resistances = context_->target->GetResistances();
+
+    for (auto &dmg_instance : damage_context->damage) {
       ApplyResistancesToDamage(&dmg_instance, &remaining_resistances);
+    }
+
+    combat::EventManager::Emit(combat::CombatEvent::TakeDamage, damage_context);
+
+    int total_damage = 0;
+    for (const auto &dmg_instance : damage_context->damage) {
       total_damage += dmg_instance.amount;
     }
-    logger_->Info("Total damage applied: {}", total_damage);
-    context_->target->TakeDamage(total_damage);
 
-    if (result.attack && result.attack->weapon) {
-      for (const auto &enchantment : result.attack->weapon->enchantments) {
-        for (const auto &effect : enchantment.effects) {
-          if (effect.trigger == combat::CombatEvent::DealDamage) {
-            effect.on(context_);
-          }
-        }
+    combat::EventManager::Emit(combat::CombatEvent::DealDamage, damage_context);
+
+    if (total_damage > 0) {
+      logger_->Info("Total damage applied: {}", total_damage);
+
+      context_->target->TakeDamage(total_damage);
+      bool is_alive = context_->target->IsAlive();
+
+      if (!is_alive) {
+        logger_->Info("{} killed {}!", context_->attacker->GetName(),
+                      context_->target->GetName());
+        combat::EventManager::Emit(combat::CombatEvent::Kill, damage_context);
       }
     }
   }
@@ -50,7 +65,7 @@ void DamageResolver::ApplyDamage() {
 void DamageResolver::ApplyResistancesToDamage(
     rules::DamageInstance *dmg_instance, Resistances *resistances) {
   auto logger = logging::LogManager::GetLogger("attack");
-  
+
   if ((dmg_instance->types &
        static_cast<uint16_t>(resistances->immunity.immune_types)) != 0) {
     logger->Debug("Damage fully negated by immunity");

@@ -15,6 +15,8 @@ int main() {
   // for debugging purposes, set log level to debug for attack logger
   auto logger = internal::logging::LogManager::GetLogger("attack");
   logger->SetLogLevel(internal::logging::LogLevel::DEBUG);
+  auto entity_logger = internal::logging::LogManager::GetLogger("entity");
+  entity_logger->SetLogLevel(internal::logging::LogLevel::DEBUG);
 
   auto player = internal::factory::GetPlayer("character.json");
   auto uktril =
@@ -29,6 +31,21 @@ int main() {
   auto context = resolver->ResolveAttack();
 
   auto damage_resolver =
+      std::make_shared<internal::resolver::DamageResolver>(context);
+  damage_resolver->ApplyDamage();
+
+  std::cout << uktril->GetName() << " has "
+            << uktril->GetCurrentStats().base_stats.hp << " HP left."
+            << std::endl;
+
+  std::cout << player->GetName() << " has "
+            << player->GetCurrentStats().base_stats.hp << " HP left and "
+            << player->GetCurrentStats().bonus_stats.temporary_hp
+            << " temporary HP left." << std::endl;
+
+context = resolver->ResolveAttack();
+
+  damage_resolver =
       std::make_shared<internal::resolver::DamageResolver>(context);
   damage_resolver->ApplyDamage();
 

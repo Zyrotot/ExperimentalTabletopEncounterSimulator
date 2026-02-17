@@ -27,25 +27,28 @@ using rules::DamageInstance;
 
 AttackResolver::AttackResolver(std::shared_ptr<Entity> attacker,
                                std::shared_ptr<Entity> defender,
-                               const int &attack_sequence_index,
+                               const int& attack_sequence_index,
                                std::shared_ptr<Roller> roller)
-    : attacker_(attacker), defender_(defender),
+    : attacker_(attacker),
+      defender_(defender),
       attack_sequence_(attacker->GetAttackSequence(attack_sequence_index)),
-      roller_(roller), logger_(logging::LogManager::GetLogger("attack")) {
+      roller_(roller),
+      logger_(logging::LogManager::GetLogger("attack")) {
 }
 
-AttackResolver::~AttackResolver() {}
+AttackResolver::~AttackResolver() {
+}
 
 std::shared_ptr<CombatContext> AttackResolver::ResolveAttack() {
   auto context = std::make_shared<CombatContext>(attacker_, defender_, roller_);
 
-  for (const auto &attack_move : attack_sequence_.attacks) {
+  for (const auto& attack_move : attack_sequence_.attacks) {
     ResolveAttackMove(attack_move, context);
   }
   return context;
 }
 
-void AttackResolver::ResolveAttackMove(const AttackMove &attack_move,
+void AttackResolver::ResolveAttackMove(const AttackMove& attack_move,
                                        std::shared_ptr<CombatContext> context) {
   AttackResult current_result{.attack = &attack_move,
                               .d20_roll = 0,
@@ -87,10 +90,10 @@ void AttackResolver::ResolveAttackMove(const AttackMove &attack_move,
         CalculateBaseDamage(attack_move, current_result.crit_multiplier);
     current_result.damage_instances.push_back(base_dmg);
 
-    GatherDamageFromSources(attack_move, context, current_result);
+    GatherDamageFromSources(attack_move, context, &current_result);
 
     int total_damage = 0;
-    for (const auto &dmg : current_result.damage_instances) {
+    for (const auto& dmg : current_result.damage_instances) {
       total_damage += dmg.amount;
     }
     logger_->Info("Hit! Total damage: {}", total_damage);
@@ -101,9 +104,8 @@ void AttackResolver::ResolveAttackMove(const AttackMove &attack_move,
   context->results.push_back(current_result);
 }
 
-DamageInstance
-AttackResolver::CalculateBaseDamage(const AttackMove &attack_move,
-                                    int crit_multiplier) {
+DamageInstance AttackResolver::CalculateBaseDamage(
+    const AttackMove& attack_move, int crit_multiplier) {
   Term damage_term = CalculateTotalDamage(attack_move);
   int damage = roller_->Roll(damage_term) * crit_multiplier;
   if (damage < 0) {
@@ -122,24 +124,24 @@ AttackResolver::CalculateBaseDamage(const AttackMove &attack_move,
 }
 
 void AttackResolver::GatherDamageFromSources(
-    const AttackMove &attack_move, std::shared_ptr<CombatContext> context,
-    AttackResult &result) {
+    const AttackMove& attack_move, std::shared_ptr<CombatContext> context,
+    AttackResult* result) {
   if (!attack_move.weapon) {
     return;
   }
 
-  for (const auto &enchantment : attack_move.weapon->enchantments) {
-    for (const auto &source : enchantment.damage_sources) {
+  for (const auto& enchantment : attack_move.weapon->enchantments) {
+    for (const auto& source : enchantment.damage_sources) {
       DamageInstance dmg = source.contribute(context);
       if (dmg.amount > 0) {
-        result.damage_instances.push_back(dmg);
+        result->damage_instances.push_back(dmg);
         logger_->Debug("{} contributes {} damage", source.name, dmg.amount);
       }
     }
   }
 }
 
-Term AttackResolver::CalculateTotalDamage(const AttackMove &attack_move) {
+Term AttackResolver::CalculateTotalDamage(const AttackMove& attack_move) {
   Term total_damage = attack_move.GetAttackDamage();
   total_damage.AddModifier(attack_sequence_.damage_modifier);
   total_damage.AddModifier(
@@ -149,7 +151,7 @@ Term AttackResolver::CalculateTotalDamage(const AttackMove &attack_move) {
 }
 
 int AttackResolver::CalculateTotalAttackModifier(
-    const AttackMove &attack_move) {
+    const AttackMove& attack_move) {
   int total_attack_modifier = attack_move.GetAttackModifier();
   total_attack_modifier += attack_sequence_.attack_modifier;
   total_attack_modifier +=
@@ -158,9 +160,9 @@ int AttackResolver::CalculateTotalAttackModifier(
   return total_attack_modifier;
 }
 
-int AttackResolver::CheckCriticalHit(const AttackMove &attack_move,
-                                     const int &attack_roll,
-                                     const int &fortification) {
+int AttackResolver::CheckCriticalHit(const AttackMove& attack_move,
+                                     const int& attack_roll,
+                                     const int& fortification) {
   if (!attack_move.weapon) {
     return 1;
   }
@@ -182,5 +184,5 @@ int AttackResolver::CheckCriticalHit(const AttackMove &attack_move,
   return 1;
 }
 
-} // namespace resolver
-} // namespace internal
+}  // namespace resolver
+}  // namespace internal

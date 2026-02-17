@@ -5,8 +5,9 @@
 // -----------------------------------------------------------------------------
 
 #include "internal/resolver/damage_resolver.h"
+
 #include "internal/combat/event_manager.h"
-#include "internal/entities/entity.h" // IWYU pragma: keep
+#include "internal/entities/entity.h"  // IWYU pragma: keep
 #include "internal/entities/stats.h"
 #include "internal/logging/log_manager.h"
 #include "internal/rules/resistances.h"
@@ -18,12 +19,14 @@ using combat::CombatContext;
 using entities::Resistances;
 
 DamageResolver::DamageResolver(std::shared_ptr<CombatContext> context)
-    : context_(context), logger_(logging::LogManager::GetLogger("attack")) {}
+    : context_(context), logger_(logging::LogManager::GetLogger("attack")) {
+}
 
-DamageResolver::~DamageResolver() {}
+DamageResolver::~DamageResolver() {
+}
 
 void DamageResolver::ApplyDamage() {
-  for (auto &result : context_->results) {
+  for (auto& result : context_->results) {
     if (!result.is_hit) {
       continue;
     }
@@ -34,14 +37,14 @@ void DamageResolver::ApplyDamage() {
 
     Resistances remaining_resistances = context_->target->GetResistances();
 
-    for (auto &dmg_instance : damage_context->damage) {
+    for (auto& dmg_instance : damage_context->damage) {
       ApplyResistancesToDamage(&dmg_instance, &remaining_resistances);
     }
 
     combat::EventManager::Emit(combat::CombatEvent::TakeDamage, damage_context);
 
     int total_damage = 0;
-    for (const auto &dmg_instance : damage_context->damage) {
+    for (const auto& dmg_instance : damage_context->damage) {
       total_damage += dmg_instance.amount;
     }
 
@@ -63,7 +66,7 @@ void DamageResolver::ApplyDamage() {
 }
 
 void DamageResolver::ApplyResistancesToDamage(
-    rules::DamageInstance *dmg_instance, Resistances *resistances) {
+    rules::DamageInstance* dmg_instance, Resistances* resistances) {
   auto logger = logging::LogManager::GetLogger("attack");
 
   if ((dmg_instance->types &
@@ -73,7 +76,7 @@ void DamageResolver::ApplyResistancesToDamage(
     return;
   }
 
-  for (auto &weakness : resistances->weaknesses) {
+  for (auto& weakness : resistances->weaknesses) {
     if ((dmg_instance->types & static_cast<uint16_t>(weakness.weak_types)) !=
         0) {
       logger->Debug("Damage increased by weakness ({} -> {})",
@@ -85,7 +88,7 @@ void DamageResolver::ApplyResistancesToDamage(
 
   if (GetDamageCategory(static_cast<rules::DamageType>(dmg_instance->types)) ==
       rules::DamageCategory::Physical) {
-    for (auto &dr : resistances->damage_reductions) {
+    for (auto& dr : resistances->damage_reductions) {
       if (dr.amount <= 0) {
         continue;
       }
@@ -111,7 +114,7 @@ void DamageResolver::ApplyResistancesToDamage(
     }
   } else if (GetDamageCategory(static_cast<rules::DamageType>(
                  dmg_instance->types)) == rules::DamageCategory::Energy) {
-    for (auto &er : resistances->energy_resistances) {
+    for (auto& er : resistances->energy_resistances) {
       if ((dmg_instance->types & static_cast<uint16_t>(er.resistance_type)) !=
           0) {
         if (dmg_instance->amount > er.amount) {
@@ -134,5 +137,5 @@ void DamageResolver::ApplyResistancesToDamage(
   }
 }
 
-} // namespace resolver
-} // namespace internal
+}  // namespace resolver
+}  // namespace internal

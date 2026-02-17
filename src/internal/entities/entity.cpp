@@ -17,42 +17,53 @@ namespace entities {
 using combat::AttackSequence;
 using items::Weapon;
 
-Entity::Entity(const EntityConfig &config)
-    : name_(config.name), starting_stats_(config.starting_stats),
+Entity::Entity(const EntityConfig& config)
+    : name_(config.name),
+      starting_stats_(config.starting_stats),
       current_stats_(config.starting_stats),
       equipped_weapons_(config.equipped_weapons),
-      attack_sequences_(config.attack_sequences), abilities_(config.abilities),
+      attack_sequences_(config.attack_sequences),
+      abilities_(config.abilities),
       alignment_(config.alignment),
       logger_(internal::logging::LogManager::GetLogger("entity")) {
   BuildActiveEffects();
 }
 
-Entity::~Entity() {}
+Entity::~Entity() {
+}
 
-const std::string &Entity::GetName() const { return name_; }
+const std::string& Entity::GetName() const {
+  return name_;
+}
 
-const Stats &Entity::GetCurrentStats() const { return current_stats_; }
+const Stats& Entity::GetCurrentStats() const {
+  return current_stats_;
+}
 
-const Stats &Entity::GetStartingStats() const { return starting_stats_; }
+const Stats& Entity::GetStartingStats() const {
+  return starting_stats_;
+}
 
-const std::vector<AttackSequence> &Entity::GetAttackSequences() const {
+const std::vector<AttackSequence>& Entity::GetAttackSequences() const {
   return attack_sequences_;
 }
 
-const AttackSequence &Entity::GetAttackSequence(const int &index) const {
+const AttackSequence& Entity::GetAttackSequence(const int& index) const {
   if (index < 0 || static_cast<size_t>(index) >= attack_sequences_.size()) {
     return attack_sequences_[0];
   }
   return attack_sequences_[static_cast<size_t>(index)];
 }
 
-const std::vector<std::shared_ptr<Weapon>> &Entity::GetEquippedWeapons() const {
+const std::vector<std::shared_ptr<Weapon>>& Entity::GetEquippedWeapons() const {
   return equipped_weapons_;
 }
 
-const rules::Alignment &Entity::GetAlignment() const { return alignment_; }
+const rules::Alignment& Entity::GetAlignment() const {
+  return alignment_;
+}
 
-const std::vector<abilities::Ability> &Entity::GetAbilities() const {
+const std::vector<abilities::Ability>& Entity::GetAbilities() const {
   return abilities_;
 }
 
@@ -111,7 +122,8 @@ int Entity::GetFortification() const {
 }
 
 Resistances Entity::GetResistances() const {
-  return current_stats_.base_stats.resistances + current_stats_.bonus_stats.bonus_resistances;
+  return current_stats_.base_stats.resistances +
+         current_stats_.bonus_stats.bonus_resistances;
 }
 
 void Entity::TakeDamage(int damage) {
@@ -162,10 +174,11 @@ const std::vector<combat::Effect>& Entity::GetActiveEffects() const {
 
 void Entity::BuildActiveEffects() {
   active_effects_.clear();
-  
+
   for (const auto& ability : abilities_) {
-    if (!ability.is_active) continue;
-    
+    if (!ability.is_active)
+      continue;
+
     for (const auto& ability_effect : ability.effects) {
       combat::Effect effect;
       effect.name = ability.name;
@@ -176,10 +189,11 @@ void Entity::BuildActiveEffects() {
       active_effects_.push_back(effect);
     }
   }
-  
+
   for (const auto& weapon : equipped_weapons_) {
-    if (!weapon) continue;
-    
+    if (!weapon)
+      continue;
+
     for (const auto& enchantment : weapon->enchantments) {
       for (const auto& ench_effect : enchantment.effects) {
         combat::Effect effect;
@@ -194,28 +208,32 @@ void Entity::BuildActiveEffects() {
   }
 }
 
-bool Entity::IsAlive() const { return current_stats_.base_stats.hp > 0; }
+bool Entity::IsAlive() const {
+  return current_stats_.base_stats.hp > 0;
+}
 
 void Entity::AddDR(const rules::DamageReduction& dr, bool is_bonus) {
   if (is_bonus) {
-    current_stats_.bonus_stats.bonus_resistances.damage_reductions.push_back(dr);
+    current_stats_.bonus_stats.bonus_resistances.damage_reductions.push_back(
+        dr);
   } else {
     current_stats_.base_stats.resistances.damage_reductions.push_back(dr);
   }
 }
 
 void Entity::RemoveDR(int amount, bool from_bonus) {
-  logger_->Debug("Removing {} DR from {}", amount, from_bonus ? "bonus DR" : "base DR");
-  auto& dr_list = from_bonus 
-    ? current_stats_.bonus_stats.bonus_resistances.damage_reductions
-    : current_stats_.base_stats.resistances.damage_reductions;
-  
-  for (auto it = dr_list.rbegin(); it != dr_list.rend() && amount > 0; ) {
+  logger_->Debug("Removing {} DR from {}", amount,
+                 from_bonus ? "bonus DR" : "base DR");
+  auto& dr_list =
+      from_bonus
+          ? current_stats_.bonus_stats.bonus_resistances.damage_reductions
+          : current_stats_.base_stats.resistances.damage_reductions;
+
+  for (auto it = dr_list.rbegin(); it != dr_list.rend() && amount > 0;) {
     if (it->amount <= amount) {
       amount -= it->amount;
       it = std::vector<rules::DamageReduction>::reverse_iterator(
-        dr_list.erase(std::next(it).base())
-      );
+          dr_list.erase(std::next(it).base()));
     } else {
       it->amount -= amount;
       amount = 0;
@@ -232,5 +250,5 @@ void Entity::ClearAllDR(bool from_bonus) {
   }
 }
 
-} // namespace entities
-} // namespace internal
+}  // namespace entities
+}  // namespace internal

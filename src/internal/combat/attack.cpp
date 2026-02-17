@@ -4,7 +4,6 @@
 // | @project   ETTES (2026)
 // -----------------------------------------------------------------------------
 
-
 #include "internal/combat/attack.h"
 
 namespace internal {

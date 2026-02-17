@@ -24,6 +24,32 @@ struct Resistances {
   std::vector<rules::EnergyResistance> energy_resistances = {};
   rules::Immunity immunity = {};
   std::vector<rules::Weakness> weaknesses = {};
+
+  Resistances operator+(const Resistances& other) const {
+    Resistances result;
+    
+    result.damage_reductions = damage_reductions;
+    result.damage_reductions.insert(result.damage_reductions.end(),
+                                    other.damage_reductions.begin(),
+                                    other.damage_reductions.end());
+    
+    result.energy_resistances = energy_resistances;
+    result.energy_resistances.insert(result.energy_resistances.end(),
+                                     other.energy_resistances.begin(),
+                                     other.energy_resistances.end());
+    
+    result.immunity.immune_types = static_cast<rules::DamageType>(
+        static_cast<int>(immunity.immune_types) | static_cast<int>(other.immunity.immune_types));
+    result.immunity.immune_categories = static_cast<rules::DamageCategory>(
+        static_cast<int>(immunity.immune_categories) | static_cast<int>(other.immunity.immune_categories));
+    
+    result.weaknesses = weaknesses;
+    result.weaknesses.insert(result.weaknesses.end(),
+                             other.weaknesses.begin(),
+                             other.weaknesses.end());
+    
+    return result;
+  }
 };
 
 struct BaseStats {

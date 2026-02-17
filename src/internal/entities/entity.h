@@ -15,13 +15,18 @@
 #include "internal/combat/attack.h"
 #include "internal/combat/combat_events.h"
 #include "internal/entities/stats.h"
+#include "internal/logging/logger.h"
 #include "internal/rules/alignment.h"
 
 namespace internal {
 
+namespace logging {
+class Logger;
+} // namespace logging
+
 namespace items {
 class Weapon;
-}  // namespace items
+} // namespace items
 
 namespace entities {
 
@@ -88,9 +93,11 @@ class Entity {
   rules::Alignment alignment_;
   
   std::vector<combat::Effect> active_effects_;
+
+  std::shared_ptr<logging::Logger> logger_;
 };
 
-}  // namespace entities
-}  // namespace internal
+} // namespace entities
+} // namespace internal
 
 #endif  // SRC_INTERNAL_ENTITIES_ENTITY_H_

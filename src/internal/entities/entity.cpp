@@ -9,6 +9,7 @@
 #include <cstddef>
 
 #include "internal/items/weapon.h"
+#include "internal/logging/log_manager.h"
 
 namespace internal {
 namespace entities {
@@ -20,8 +21,9 @@ Entity::Entity(const EntityConfig &config)
     : name_(config.name), starting_stats_(config.starting_stats),
       current_stats_(config.starting_stats),
       equipped_weapons_(config.equipped_weapons),
-      attack_sequences_(config.attack_sequences),
-      abilities_(config.abilities), alignment_(config.alignment) {
+      attack_sequences_(config.attack_sequences), abilities_(config.abilities),
+      alignment_(config.alignment),
+      logger_(internal::logging::LogManager::GetLogger("entity")) {
   BuildActiveEffects();
 }
 
@@ -109,7 +111,7 @@ int Entity::GetFortification() const {
 }
 
 Resistances Entity::GetResistances() const {
-  return current_stats_.base_stats.resistances;
+  return current_stats_.base_stats.resistances + current_stats_.bonus_stats.bonus_resistances;
 }
 
 void Entity::TakeDamage(int damage) {

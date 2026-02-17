@@ -42,7 +42,7 @@ enum class CombatEvent {
   CriticalHit,
 };
 
-struct EventContext {
+struct EventContext {  // TODO(zyrotot): Simplify context, this has gotten too complex
   virtual ~EventContext() = default;
   virtual std::vector<std::shared_ptr<entities::Entity>>
   GetInvolvedEntities() const = 0;
@@ -135,6 +135,10 @@ struct HitContext : EventContext {
   bool is_crit = false;
 
   HitContext() = default;
+  HitContext(std::shared_ptr<entities::Entity> attacker_,
+             std::shared_ptr<entities::Entity> target_,
+             bool is_crit_ = false)
+      : attacker(attacker_), target(target_), is_crit(is_crit_) {}
 
   std::vector<std::shared_ptr<entities::Entity>>
   GetInvolvedEntities() const override {

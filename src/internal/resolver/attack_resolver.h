@@ -30,7 +30,6 @@ class Logger;
 
 namespace resolver {
 
-
 class AttackResolver {
  public:
   AttackResolver(std::shared_ptr<entities::Entity> attacker,
@@ -45,18 +44,18 @@ class AttackResolver {
   void ResolveAttackMove(const combat::AttackMove& attack_move,
                          std::shared_ptr<combat::CombatContext> context);
 
-  rules::DamageInstance CalculateBaseDamage(const combat::AttackMove& attack_move,
-                                     int crit_multiplier);
+  rules::DamageInstance CalculateBaseDamage(
+      const combat::AttackMove& attack_move, int crit_multiplier);
   void GatherDamageFromSources(const combat::AttackMove& attack_move,
                                std::shared_ptr<combat::CombatContext> context,
-                               combat::AttackResult& result);
+                               combat::AttackResult* result);
 
   dice_rolls::Term CalculateTotalDamage(const combat::AttackMove& attack_move);
   int CalculateTotalAttackModifier(const combat::AttackMove& attack_move);
-  int CheckCriticalHit(const combat::AttackMove &attack_move, const int &attack_roll,
-                       const int &fortification);
+  int CheckCriticalHit(const combat::AttackMove& attack_move,
+                       const int& attack_roll, const int& fortification);
 
-private:
+ private:
   std::shared_ptr<entities::Entity> attacker_;
   std::shared_ptr<entities::Entity> defender_;
   combat::AttackSequence attack_sequence_;

@@ -31,260 +31,261 @@ using items::Weapon;
 
 std::shared_ptr<Entity> MonsterFactory(Monster monsterType) {
   switch (monsterType) {
-  case Uktril: {
-    std::shared_ptr<Weapon> pinca = std::make_shared<Weapon>(Weapon{
-        .name = "pinca",
-        .attack_bonus = 1,
-        .damage =
-            Term{
-                .dice_groups = {Dice{.count = 1, .sides = 8}},
-            },
-        .damage_type = rules::DamageType::Slash,
-        .crit_range = 20,
-        .crit_multiplier = 2,
-    });
+    case Uktril: {
+      std::shared_ptr<Weapon> pinca = std::make_shared<Weapon>(Weapon{
+          .name = "pinca",
+          .attack_bonus = 1,
+          .damage =
+              Term{
+                  .dice_groups = {Dice{.count = 1, .sides = 8}},
+              },
+          .damage_type = rules::DamageType::Slash,
+          .crit_range = 20,
+          .crit_multiplier = 2,
+      });
 
-    std::shared_ptr<Weapon> garra = std::make_shared<Weapon>(
-        Weapon{.name = "garra",
-               .attack_bonus = 0,
-               .damage =
-                   Term{
-                       .dice_groups = {Dice{.count = 1, .sides = 4}},
-                   },
-               .damage_type = rules::DamageType::Slash,
-               .crit_range = 20,
-               .crit_multiplier = 2});
+      std::shared_ptr<Weapon> garra = std::make_shared<Weapon>(
+          Weapon{.name = "garra",
+                 .attack_bonus = 0,
+                 .damage =
+                     Term{
+                         .dice_groups = {Dice{.count = 1, .sides = 4}},
+                     },
+                 .damage_type = rules::DamageType::Slash,
+                 .crit_range = 20,
+                 .crit_multiplier = 2});
 
-    auto uktril_config = entities::EntityConfig{
-        .name = "Uktril",
-        .starting_stats =
-            entities::Stats{
-                .base_stats =
-                    entities::BaseStats{
-                        .hp = 60,
-                        .armour_class = 22,
-                        .fortification = 100,
+      auto uktril_config = entities::EntityConfig{
+          .name = "Uktril",
+          .starting_stats =
+              entities::Stats{
+                  .base_stats =
+                      entities::BaseStats{
+                          .hp = 60,
+                          .armour_class = 22,
+                          .fortification = 100,
 
-                        .attack_bonuses =
-                            entities::AttackBonuses{
-                                .attack_bonus = 12,
-                                .damage_bonus = 8,
-                            },
-                        .resistances =
-                            entities::Resistances{
-                                .damage_reductions = {rules::DamageReduction{
-                                    .bypass_modifiers =
-                                        rules::DamageModifier::Magic,
-                                    .amount = 5,
-                                }},
-                                .immunity =
-                                    rules::Immunity{
-                                        .immune_categories =
-                                            rules::DamageCategory::Energy,
-                                    },
-                            },
-                    },
-            },
-        .equipped_weapons = {pinca, garra},
-        .attack_sequences =
-            std::vector<combat::AttackSequence>{
-                combat::AttackSequence{
-                    .name = "Multiple Attacks",
-                    .attacks =
-                        std::vector<combat::AttackMove>{
-                            combat::AttackMove{
-                                .weapon = pinca,
-                            },
-                            combat::AttackMove{
-                                .weapon = garra,
-                            },
-                        },
-                    .attack_modifier = 0,
-                    .damage_modifier = 0,
-                },
-            },
-        .abilities = {},
-        .alignment = rules::Alignment::ChaoticEvil,
-    };
+                          .attack_bonuses =
+                              entities::AttackBonuses{
+                                  .attack_bonus = 12,
+                                  .damage_bonus = 8,
+                              },
+                          .resistances =
+                              entities::Resistances{
+                                  .damage_reductions = {rules::DamageReduction{
+                                      .bypass_modifiers =
+                                          rules::DamageModifier::Magic,
+                                      .amount = 5,
+                                  }},
+                                  .immunity =
+                                      rules::Immunity{
+                                          .immune_categories =
+                                              rules::DamageCategory::Energy,
+                                      },
+                              },
+                      },
+              },
+          .equipped_weapons = {pinca, garra},
+          .attack_sequences =
+              std::vector<combat::AttackSequence>{
+                  combat::AttackSequence{
+                      .name = "Multiple Attacks",
+                      .attacks =
+                          std::vector<combat::AttackMove>{
+                              combat::AttackMove{
+                                  .weapon = pinca,
+                              },
+                              combat::AttackMove{
+                                  .weapon = garra,
+                              },
+                          },
+                      .attack_modifier = 0,
+                      .damage_modifier = 0,
+                  },
+              },
+          .abilities = {},
+          .alignment = rules::Alignment::ChaoticEvil,
+      };
 
-    return std::make_shared<Entity>(uktril_config);
-  }
-  case Geraktril: {
-    std::shared_ptr<Weapon> pinca = std::make_shared<Weapon>(
-        Weapon{.name = "pinca",
-               .attack_bonus = 1,
-               .damage = Term{.dice_groups = {Dice{.count = 1, .sides = 8}}},
-               .damage_type = rules::DamageType::Slash,
-               .crit_range = 20,
-               .crit_multiplier = 2});
+      return std::make_shared<Entity>(uktril_config);
+    }
+    case Geraktril: {
+      std::shared_ptr<Weapon> pinca = std::make_shared<Weapon>(
+          Weapon{.name = "pinca",
+                 .attack_bonus = 1,
+                 .damage = Term{.dice_groups = {Dice{.count = 1, .sides = 8}}},
+                 .damage_type = rules::DamageType::Slash,
+                 .crit_range = 20,
+                 .crit_multiplier = 2});
 
-    std::shared_ptr<Weapon> garra = std::make_shared<Weapon>(
-        Weapon{.name = "garra",
-               .attack_bonus = 0,
-               .damage = Term{.dice_groups = {Dice{.count = 1, .sides = 4}}},
-               .damage_type = rules::DamageType::Slash,
-               .crit_range = 20,
-               .crit_multiplier = 2});
+      std::shared_ptr<Weapon> garra = std::make_shared<Weapon>(
+          Weapon{.name = "garra",
+                 .attack_bonus = 0,
+                 .damage = Term{.dice_groups = {Dice{.count = 1, .sides = 4}}},
+                 .damage_type = rules::DamageType::Slash,
+                 .crit_range = 20,
+                 .crit_multiplier = 2});
 
-    auto geraktril_config = entities::EntityConfig{
-        .name = "Geraktril",
-        .starting_stats =
-            entities::Stats{
-                .base_stats =
-                    entities::BaseStats{
-                        .hp = 99,
-                        .armour_class = 25,
-                        .fortification = 100,
+      auto geraktril_config = entities::EntityConfig{
+          .name = "Geraktril",
+          .starting_stats =
+              entities::Stats{
+                  .base_stats =
+                      entities::BaseStats{
+                          .hp = 99,
+                          .armour_class = 25,
+                          .fortification = 100,
 
-                        .attack_bonuses =
-                            entities::AttackBonuses{
-                                .attack_bonus = 16,
-                                .damage_bonus = 10,
-                            },
-                        .resistances =
-                            entities::Resistances{
-                                .damage_reductions = {rules::DamageReduction{
-                                    .bypass_modifiers =
-                                        rules::DamageModifier::Magic,
-                                    .amount = 10,
-                                }},
-                                .immunity =
-                                    rules::Immunity{
-                                        .immune_categories =
-                                            rules::DamageCategory::Energy,
-                                    },
-                            },
-                    },
-            },
-        .equipped_weapons = {pinca, garra},
-        .attack_sequences =
-            std::vector<combat::AttackSequence>{
-                combat::AttackSequence{
-                    .name = "Multiple Attacks",
-                    .attacks =
-                        std::vector<combat::AttackMove>{
-                            combat::AttackMove{.weapon = pinca},
-                            combat::AttackMove{.weapon = garra},
-                        },
-                    .attack_modifier = 0,
-                    .damage_modifier = 0,
-                }},
-        .abilities = {},
-        .alignment = rules::Alignment::ChaoticEvil,
-    };
+                          .attack_bonuses =
+                              entities::AttackBonuses{
+                                  .attack_bonus = 16,
+                                  .damage_bonus = 10,
+                              },
+                          .resistances =
+                              entities::Resistances{
+                                  .damage_reductions = {rules::DamageReduction{
+                                      .bypass_modifiers =
+                                          rules::DamageModifier::Magic,
+                                      .amount = 10,
+                                  }},
+                                  .immunity =
+                                      rules::Immunity{
+                                          .immune_categories =
+                                              rules::DamageCategory::Energy,
+                                      },
+                              },
+                      },
+              },
+          .equipped_weapons = {pinca, garra},
+          .attack_sequences =
+              std::vector<combat::AttackSequence>{
+                  combat::AttackSequence{
+                      .name = "Multiple Attacks",
+                      .attacks =
+                          std::vector<combat::AttackMove>{
+                              combat::AttackMove{.weapon = pinca},
+                              combat::AttackMove{.weapon = garra},
+                          },
+                      .attack_modifier = 0,
+                      .damage_modifier = 0,
+                  }},
+          .abilities = {},
+          .alignment = rules::Alignment::ChaoticEvil,
+      };
 
-    return std::make_shared<Entity>(geraktril_config);
-  }
-  case Reishid: {
-    std::shared_ptr<Weapon> adaga = std::make_shared<Weapon>(
-        Weapon{.name = "adaga",
-               .attack_bonus = 4,
-               .damage = Term{.dice_groups = {Dice{.count = 1, .sides = 4}},
-                              .bonus = 4},
-               .damage_type = rules::DamageType::Pierce,
-               .damage_modifier = rules::DamageModifier::Magic,
-               .crit_range = 19,
-               .crit_multiplier = 2,
-               .enchantments = {internal::items::CreateProfaneEnchantment()}});
+      return std::make_shared<Entity>(geraktril_config);
+    }
+    case Reishid: {
+      std::shared_ptr<Weapon> adaga = std::make_shared<Weapon>(Weapon{
+          .name = "adaga",
+          .attack_bonus = 4,
+          .damage =
+              Term{.dice_groups = {Dice{.count = 1, .sides = 4}}, .bonus = 4},
+          .damage_type = rules::DamageType::Pierce,
+          .damage_modifier = rules::DamageModifier::Magic,
+          .crit_range = 19,
+          .crit_multiplier = 2,
+          .enchantments = {internal::items::CreateProfaneEnchantment()}});
 
-    std::shared_ptr<Weapon> mordida = std::make_shared<Weapon>(
-        Weapon{.name = "mordida",
-               .attack_bonus = 0,
-               .damage = Term{.dice_groups = {Dice{.count = 1, .sides = 4}},
-                              .bonus = 4},
-               .damage_type = rules::DamageType::Pierce,
-               .crit_range = 20,
-               .crit_multiplier = 2});
+      std::shared_ptr<Weapon> mordida = std::make_shared<Weapon>(Weapon{
+          .name = "mordida",
+          .attack_bonus = 0,
+          .damage =
+              Term{.dice_groups = {Dice{.count = 1, .sides = 4}}, .bonus = 4},
+          .damage_type = rules::DamageType::Pierce,
+          .crit_range = 20,
+          .crit_multiplier = 2});
 
-    std::shared_ptr<Weapon> garra = std::make_shared<Weapon>(
-        Weapon{.name = "garra",
-               .attack_bonus = 0,
-               .damage = Term{.dice_groups = {Dice{.count = 1, .sides = 4}},
-                              .bonus = 0},
-               .damage_type = rules::DamageType::Slash,
-               .crit_range = 20,
-               .crit_multiplier = 2});
+      std::shared_ptr<Weapon> garra = std::make_shared<Weapon>(Weapon{
+          .name = "garra",
+          .attack_bonus = 0,
+          .damage =
+              Term{.dice_groups = {Dice{.count = 1, .sides = 4}}, .bonus = 0},
+          .damage_type = rules::DamageType::Slash,
+          .crit_range = 20,
+          .crit_multiplier = 2});
 
-    auto reishid_config = entities::EntityConfig{
-        .name = "Reishid",
-        .starting_stats =
-            entities::Stats{
-                .base_stats =
-                    entities::BaseStats{
-                        .hp = 143,
-                        .armour_class = 30,
-                        .fortification = 100,
+      auto reishid_config = entities::EntityConfig{
+          .name = "Reishid",
+          .starting_stats =
+              entities::Stats{
+                  .base_stats =
+                      entities::BaseStats{
+                          .hp = 143,
+                          .armour_class = 30,
+                          .fortification = 100,
 
-                        .attack_bonuses =
-                            entities::AttackBonuses{
-                                .attack_bonus = 22,
-                                .damage_bonus = 10,
-                            },
-                        .resistances =
-                            entities::Resistances{
-                                .damage_reductions = {rules::DamageReduction{
-                                    .bypass_modifiers =
-                                        rules::DamageModifier::Magic,
-                                    .amount = 10,
-                                }},
-                                .immunity =
-                                    rules::Immunity{
-                                        .immune_categories =
-                                            rules::DamageCategory::Energy,
-                                    },
-                            },
-                    },
-            },
-        .equipped_weapons = {adaga, mordida, garra},
-        .attack_sequences =
-            std::vector<combat::AttackSequence>{
-                combat::AttackSequence{
-                    .name = "Multiple Attacks",
-                    .attacks =
-                        std::vector<combat::AttackMove>{
-                            combat::AttackMove{.weapon = adaga},
-                            combat::AttackMove{.weapon = mordida},
-                            combat::AttackMove{.weapon = garra},
-                        },
-                    .attack_modifier = 0,
-                    .damage_modifier = 0,
-                },
-            },
-        .abilities = {},
-        .alignment = rules::Alignment::ChaoticEvil,
-    };
+                          .attack_bonuses =
+                              entities::AttackBonuses{
+                                  .attack_bonus = 22,
+                                  .damage_bonus = 10,
+                              },
+                          .resistances =
+                              entities::Resistances{
+                                  .damage_reductions = {rules::DamageReduction{
+                                      .bypass_modifiers =
+                                          rules::DamageModifier::Magic,
+                                      .amount = 10,
+                                  }},
+                                  .immunity =
+                                      rules::Immunity{
+                                          .immune_categories =
+                                              rules::DamageCategory::Energy,
+                                      },
+                              },
+                      },
+              },
+          .equipped_weapons = {adaga, mordida, garra},
+          .attack_sequences =
+              std::vector<combat::AttackSequence>{
+                  combat::AttackSequence{
+                      .name = "Multiple Attacks",
+                      .attacks =
+                          std::vector<combat::AttackMove>{
+                              combat::AttackMove{.weapon = adaga},
+                              combat::AttackMove{.weapon = mordida},
+                              combat::AttackMove{.weapon = garra},
+                          },
+                      .attack_modifier = 0,
+                      .damage_modifier = 0,
+                  },
+              },
+          .abilities = {},
+          .alignment = rules::Alignment::ChaoticEvil,
+      };
 
-    return std::make_shared<Entity>(reishid_config);
-  }
-  case Custom:
-    return std::make_shared<Entity>(
-        LoadCharacterFromJSON("resources/custom_monster.json"));
-  default:
-    return MonsterFactory(Monster::Uktril);
+      return std::make_shared<Entity>(reishid_config);
+    }
+    case Custom:
+      return std::make_shared<Entity>(
+          LoadCharacterFromJSON("resources/custom_monster.json"));
+    default:
+      return MonsterFactory(Monster::Uktril);
   }
 }
 
-std::shared_ptr<Entity> GetPlayer(const std::string &filename) {
+std::shared_ptr<Entity> GetPlayer(const std::string& filename) {
   auto config = LoadCharacterFromJSON(filename);
 
-  for (auto &weapon : config.equipped_weapons) {
+  for (auto& weapon : config.equipped_weapons) {
     std::vector<Enchantment> rebuilt_enchantments;
-    for (const auto &ench : weapon->enchantments) {
+    for (const auto& ench : weapon->enchantments) {
       rebuilt_enchantments.push_back(RebuildEnchantmentFromName(ench.name));
     }
     weapon->enchantments = rebuilt_enchantments;
   }
 
   std::vector<abilities::Ability> rebuilt_abilities;
-  for (const auto &ability : config.abilities) {
-    rebuilt_abilities.push_back(RebuildAbilityFromName(ability.name, ability.stack_count));
+  for (const auto& ability : config.abilities) {
+    rebuilt_abilities.push_back(
+        RebuildAbilityFromName(ability.name, ability.stack_count));
   }
   config.abilities = rebuilt_abilities;
 
-  for (auto &attack_sequence : config.attack_sequences) {
-    for (auto &attack_move : attack_sequence.attacks) {
+  for (auto& attack_sequence : config.attack_sequences) {
+    for (auto& attack_move : attack_sequence.attacks) {
       if (attack_move.weapon) {
-        for (const auto &equipped_weapon : config.equipped_weapons) {
+        for (const auto& equipped_weapon : config.equipped_weapons) {
           if (attack_move.weapon->name == equipped_weapon->name) {
             attack_move.weapon = equipped_weapon;
           }
@@ -296,7 +297,7 @@ std::shared_ptr<Entity> GetPlayer(const std::string &filename) {
   return std::make_shared<Entity>(config);
 }
 
-EntityConfig LoadCharacterFromJSON(const std::string &filename) {
+EntityConfig LoadCharacterFromJSON(const std::string& filename) {
   std::string file_contents;
   {
     std::ifstream ifs("resources/" + filename, std::ios::binary);
@@ -313,7 +314,7 @@ EntityConfig LoadCharacterFromJSON(const std::string &filename) {
   return parsed;
 }
 
-Enchantment RebuildEnchantmentFromName(const std::string &name) {
+Enchantment RebuildEnchantmentFromName(const std::string& name) {
   if (name == "FlamingWeapon") {
     return items::CreateFlamingEnchantment();
   } else if (name == "Vampiric") {
@@ -331,7 +332,8 @@ Enchantment RebuildEnchantmentFromName(const std::string &name) {
   return Enchantment{};
 }
 
-abilities::Ability RebuildAbilityFromName(const std::string &name, int stack_count) {
+abilities::Ability RebuildAbilityFromName(const std::string& name,
+                                          int stack_count) {
   if (name == "Erosion") {
     return abilities::CreateErosao();
   } else if (name == "Rigidez Raivosa") {
@@ -351,5 +353,5 @@ abilities::Ability RebuildAbilityFromName(const std::string &name, int stack_cou
   return abilities::Ability{};
 }
 
-} // namespace factory
-} // namespace internal
+}  // namespace factory
+}  // namespace internal

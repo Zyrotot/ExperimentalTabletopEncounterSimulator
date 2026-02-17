@@ -42,10 +42,11 @@ enum class CombatEvent {
   CriticalHit,
 };
 
-struct EventContext {  // TODO(zyrotot): Simplify context, this has gotten too complex
+struct EventContext {  // TODO(zyrotot): Simplify context, this has gotten too
+                       // complex
   virtual ~EventContext() = default;
-  virtual std::vector<std::shared_ptr<entities::Entity>>
-  GetInvolvedEntities() const = 0;
+  virtual std::vector<std::shared_ptr<entities::Entity>> GetInvolvedEntities()
+      const = 0;
 };
 
 struct Effect {
@@ -57,7 +58,7 @@ struct Effect {
 };
 
 struct AttackResult {
-  const combat::AttackMove *attack;
+  const combat::AttackMove* attack;
   int d20_roll = 0;
   int total_attack_roll = 0;
   bool is_hit = false;
@@ -76,10 +77,11 @@ struct CombatContext : EventContext {
   CombatContext(std::shared_ptr<entities::Entity> attacker_,
                 std::shared_ptr<entities::Entity> target_,
                 std::shared_ptr<dice_rolls::Roller> roller_)
-      : attacker(attacker_), target(target_), roller(roller_) {}
+      : attacker(attacker_), target(target_), roller(roller_) {
+  }
 
-  std::vector<std::shared_ptr<entities::Entity>>
-  GetInvolvedEntities() const override {
+  std::vector<std::shared_ptr<entities::Entity>> GetInvolvedEntities()
+      const override {
     std::vector<std::shared_ptr<entities::Entity>> entities;
     if (attacker)
       entities.push_back(attacker);
@@ -97,10 +99,11 @@ struct DamageContext : EventContext {
   DamageContext() = default;
   DamageContext(std::shared_ptr<entities::Entity> attacker_,
                 std::shared_ptr<entities::Entity> target_)
-      : attacker(attacker_), target(target_) {}
+      : attacker(attacker_), target(target_) {
+  }
 
-  std::vector<std::shared_ptr<entities::Entity>>
-  GetInvolvedEntities() const override {
+  std::vector<std::shared_ptr<entities::Entity>> GetInvolvedEntities()
+      const override {
     std::vector<std::shared_ptr<entities::Entity>> entities;
     if (attacker)
       entities.push_back(attacker);
@@ -118,8 +121,8 @@ struct HealContext : EventContext {
 
   HealContext() = default;
 
-  std::vector<std::shared_ptr<entities::Entity>>
-  GetInvolvedEntities() const override {
+  std::vector<std::shared_ptr<entities::Entity>> GetInvolvedEntities()
+      const override {
     std::vector<std::shared_ptr<entities::Entity>> entities;
     if (source)
       entities.push_back(source);
@@ -136,12 +139,12 @@ struct HitContext : EventContext {
 
   HitContext() = default;
   HitContext(std::shared_ptr<entities::Entity> attacker_,
-             std::shared_ptr<entities::Entity> target_,
-             bool is_crit_ = false)
-      : attacker(attacker_), target(target_), is_crit(is_crit_) {}
+             std::shared_ptr<entities::Entity> target_, bool is_crit_ = false)
+      : attacker(attacker_), target(target_), is_crit(is_crit_) {
+  }
 
-  std::vector<std::shared_ptr<entities::Entity>>
-  GetInvolvedEntities() const override {
+  std::vector<std::shared_ptr<entities::Entity>> GetInvolvedEntities()
+      const override {
     std::vector<std::shared_ptr<entities::Entity>> entities;
     if (attacker)
       entities.push_back(attacker);
@@ -151,7 +154,7 @@ struct HitContext : EventContext {
   }
 };
 
-} // namespace combat
-} // namespace internal
+}  // namespace combat
+}  // namespace internal
 
-#endif // SRC_INTERNAL_COMBAT_COMBAT_EVENTS_H_
+#endif  // SRC_INTERNAL_COMBAT_COMBAT_EVENTS_H_

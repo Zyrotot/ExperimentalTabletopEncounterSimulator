@@ -8,10 +8,11 @@
 #define SRC_INTERNAL_COMBAT_ATTACK_H_
 
 #include <memory>
+#include <string>
 #include <vector>
 
-#include "internal/items/weapon.h"
 #include "internal/dice_rolls/roller.h"
+#include "internal/items/weapon.h"
 
 namespace internal {
 namespace combat {

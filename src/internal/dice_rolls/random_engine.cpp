@@ -9,7 +9,8 @@
 namespace internal {
 namespace dice_rolls {
 
-StdMt19937Engine::StdMt19937Engine() : rng_(std::random_device {}()) {}
+StdMt19937Engine::StdMt19937Engine() : rng_(std::random_device {}()) {
+}
 
 int StdMt19937Engine::GetRand(int hi) {
   std::uniform_int_distribution<> distr(1, hi);

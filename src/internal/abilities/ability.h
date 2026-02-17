@@ -8,6 +8,7 @@
 #define SRC_INTERNAL_ABILITIES_ABILITY_H_
 
 #include <functional>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -29,7 +30,7 @@ struct AbilityEffect {
 struct Ability {
   std::string name;
   std::vector<AbilityEffect> effects;
-  
+
   int stack_count = 0;
   bool is_active = true;
 };

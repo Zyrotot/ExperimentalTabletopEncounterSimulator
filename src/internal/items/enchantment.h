@@ -8,6 +8,7 @@
 #define SRC_INTERNAL_ITEMS_ENCHANTMENT_H_
 
 #include <functional>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -40,7 +41,7 @@ struct Enchantment {
   std::vector<Effect> effects;
 };
 
-} // namespace items
-} // namespace internal
+}  // namespace items
+}  // namespace internal
 
-#endif // SRC_INTERNAL_ITEMS_ENCHANTMENT_H_
+#endif  // SRC_INTERNAL_ITEMS_ENCHANTMENT_H_

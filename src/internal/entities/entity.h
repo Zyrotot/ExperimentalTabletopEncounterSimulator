@@ -22,11 +22,11 @@ namespace internal {
 
 namespace logging {
 class Logger;
-} // namespace logging
+}  // namespace logging
 
 namespace items {
-class Weapon;
-} // namespace items
+struct Weapon;
+}  // namespace items
 
 namespace entities {
 
@@ -58,10 +58,10 @@ class Entity {
   const std::vector<abilities::Ability>& GetAbilities() const;
   bool HasAbility(const std::string& ability_name) const;
   int GetAbilityStack(const std::string& ability_name) const;
-  
+
   const std::vector<combat::Effect>& GetActiveEffects() const;
   void BuildActiveEffects();
-  
+
   void IncrementAbilityStack(const std::string& ability_name);
   void DecrementAbilityStack(const std::string& ability_name);
   void SetAbilityStack(const std::string& ability_name, int value);
@@ -75,7 +75,7 @@ class Entity {
   void Heal(int amount);
   void AddTempHP(int amount);
   bool IsAlive() const;
-  
+
   void AddDR(const rules::DamageReduction& dr, bool is_bonus = true);
   void RemoveDR(int amount, bool from_bonus = true);
   void ClearAllDR(bool from_bonus = true);
@@ -91,13 +91,13 @@ class Entity {
   std::vector<abilities::Ability> abilities_;
 
   rules::Alignment alignment_;
-  
+
   std::vector<combat::Effect> active_effects_;
 
   std::shared_ptr<logging::Logger> logger_;
 };
 
-} // namespace entities
-} // namespace internal
+}  // namespace entities
+}  // namespace internal
 
 #endif  // SRC_INTERNAL_ENTITIES_ENTITY_H_

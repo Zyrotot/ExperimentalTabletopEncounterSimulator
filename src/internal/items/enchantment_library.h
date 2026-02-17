@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <memory>
 
 #include "internal/combat/combat_events.h"
 #include "internal/dice_rolls/roller.h"
@@ -29,8 +30,9 @@ inline Enchantment CreateFlamingEnchantment() {
   source.name = "Flaming";
   source.contribute = [](std::shared_ptr<combat::EventContext> base_ctx) {
     auto ctx = std::dynamic_pointer_cast<combat::CombatContext>(base_ctx);
-    if (!ctx) return rules::DamageInstance{};
-    
+    if (!ctx)
+      return rules::DamageInstance{};
+
     return rules::DamageInstance{
         .amount = ctx->roller->Roll(dice_rolls::Term{.dice_groups = {{1, 6}}}),
         .types = static_cast<uint16_t>(rules::DamageType::Fire),
@@ -49,8 +51,9 @@ inline Enchantment CreateDissonantEnchantment() {
   source.name = "Dissonant";
   source.contribute = [](std::shared_ptr<combat::EventContext> base_ctx) {
     auto ctx = std::dynamic_pointer_cast<combat::CombatContext>(base_ctx);
-    if (!ctx) return rules::DamageInstance{};
-    
+    if (!ctx)
+      return rules::DamageInstance{};
+
     return rules::DamageInstance{
         .amount = ctx->roller->Roll(dice_rolls::Term{.dice_groups = {{2, 6}}}),
         .types = static_cast<uint16_t>(rules::DamageType::Negative),
@@ -63,14 +66,14 @@ inline Enchantment CreateDissonantEnchantment() {
   effect.trigger = combat::CombatEvent::Hit;
   effect.on = [](std::shared_ptr<combat::EventContext> base_ctx) {
     auto ctx = std::dynamic_pointer_cast<combat::CombatContext>(base_ctx);
-    if (!ctx) return;
-    
+    if (!ctx)
+      return;
+
     rules::DamageInstance self_damage = {
         .amount = ctx->roller->Roll(dice_rolls::Term{.dice_groups = {{1, 6}}}),
         .types = static_cast<uint16_t>(rules::DamageType::Negative),
         .modifiers = 0};
-    entities::Resistances target_resistances =
-        ctx->attacker->GetResistances();
+    entities::Resistances target_resistances = ctx->attacker->GetResistances();
     resolver::DamageResolver::ApplyResistancesToDamage(&self_damage,
                                                        &target_resistances);
     ctx->attacker->TakeDamage(self_damage.amount);
@@ -91,8 +94,8 @@ inline Enchantment CreateFlamingExplosionEnchantment() {
     if (!ctx || ctx->results.empty()) {
       return rules::DamageInstance{};
     }
-    
-    auto &result = ctx->results.back();
+
+    auto& result = ctx->results.back();
     int damage;
     if (result.is_crit) {
       int dice = std::min(result.crit_multiplier - 1, 3);
@@ -120,10 +123,11 @@ inline Enchantment CreateVampiricEnchantment() {
   effect.trigger = combat::CombatEvent::DealDamage;
   effect.on = [](std::shared_ptr<combat::EventContext> base_ctx) {
     auto dmg_ctx = std::dynamic_pointer_cast<combat::DamageContext>(base_ctx);
-    if (!dmg_ctx) return;
-    
+    if (!dmg_ctx)
+      return;
+
     int total_damage = 0;
-    for (const auto &dmg : dmg_ctx->damage) {
+    for (const auto& dmg : dmg_ctx->damage) {
       total_damage += dmg.amount;
     }
 
@@ -146,8 +150,9 @@ inline Enchantment CreateDrainingEnchantment() {
   effect.trigger = combat::CombatEvent::Hit;
   effect.on = [](std::shared_ptr<combat::EventContext> base_ctx) {
     auto ctx = std::dynamic_pointer_cast<combat::HitContext>(base_ctx);
-    if (!ctx || !ctx->attacker) return;
-    
+    if (!ctx || !ctx->attacker)
+      return;
+
     ctx->attacker->Heal(1);
   };
   ench.effects.push_back(effect);
@@ -163,8 +168,9 @@ inline Enchantment CreateProfaneEnchantment() {
   source.name = "Profane";
   source.contribute = [](std::shared_ptr<combat::EventContext> base_ctx) {
     auto ctx = std::dynamic_pointer_cast<combat::CombatContext>(base_ctx);
-    if (!ctx || !ctx->target) return rules::DamageInstance{};
-    
+    if (!ctx || !ctx->target)
+      return rules::DamageInstance{};
+
     if (static_cast<uint16_t>(ctx->target->GetAlignment()) &
         static_cast<uint16_t>(rules::Alignment::Good)) {
       return rules::DamageInstance{
@@ -180,7 +186,7 @@ inline Enchantment CreateProfaneEnchantment() {
   return ench;
 }
 
-} // namespace items
-} // namespace internal
+}  // namespace items
+}  // namespace internal
 
-#endif // SRC_INTERNAL_ITEMS_ENCHANTMENT_LIBRARY_H_
+#endif  // SRC_INTERNAL_ITEMS_ENCHANTMENT_LIBRARY_H_

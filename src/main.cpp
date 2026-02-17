@@ -43,7 +43,7 @@ int main() {
             << player->GetCurrentStats().bonus_stats.temporary_hp
             << " temporary HP left." << std::endl;
 
-context = resolver->ResolveAttack();
+  context = resolver->ResolveAttack();
 
   damage_resolver =
       std::make_shared<internal::resolver::DamageResolver>(context);

@@ -20,7 +20,8 @@ class RollerTest : public ::testing::Test {
   class TestableRoller : public Roller {
    public:
     explicit TestableRoller(std::shared_ptr<IRandomEngine> engine)
-        : Roller(engine) {}
+        : Roller(engine) {
+    }
   };
 
   std::unique_ptr<TestableRoller> sut_;
@@ -44,7 +45,8 @@ TEST_F(RollerTest, MultipleDiceSumsValues) {
   EXPECT_CALL(*mock, GetRand(6)).WillOnce(Return(2)).WillOnce(Return(4));
 
   Term term;
-  term.dice_groups = {Dice{.count = 1, .sides = 6}, Dice{.count = 1, .sides = 6}};
+  term.dice_groups = {Dice{.count = 1, .sides = 6},
+                      Dice{.count = 1, .sides = 6}};
   term.bonus = 0;
 
   EXPECT_EQ(sut_->Roll(term), 6);
@@ -57,7 +59,8 @@ TEST_F(RollerTest, UsesCorrectSidesForEachDie) {
   EXPECT_CALL(*mock, GetRand(10)).WillOnce(Return(2));
 
   Term term;
-  term.dice_groups = {Dice{.count = 1, .sides = 8}, Dice{.count = 1, .sides = 10}};
+  term.dice_groups = {Dice{.count = 1, .sides = 8},
+                      Dice{.count = 1, .sides = 10}};
   term.bonus = 0;
 
   EXPECT_EQ(sut_->Roll(term), 3);

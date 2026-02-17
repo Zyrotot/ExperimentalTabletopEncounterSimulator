@@ -7,10 +7,10 @@
 #ifndef SRC_INTERNAL_RESOLVER_DAMAGE_RESOLVER_H_
 #define SRC_INTERNAL_RESOLVER_DAMAGE_RESOLVER_H_
 
+#include <memory>
+
 #include "internal/combat/combat_events.h"
 #include "internal/entities/stats.h"
-
-#include <memory>
 
 namespace internal {
 namespace logging {
@@ -20,20 +20,20 @@ class Logger;
 namespace resolver {
 
 class DamageResolver {
-public:
-  DamageResolver(std::shared_ptr<combat::CombatContext> context);
+ public:
+  explicit DamageResolver(std::shared_ptr<combat::CombatContext> context);
   ~DamageResolver();
 
   void ApplyDamage();
-  static void ApplyResistancesToDamage(rules::DamageInstance *dmg_instance,
-                                       entities::Resistances *resistances);
+  static void ApplyResistancesToDamage(rules::DamageInstance* dmg_instance,
+                                       entities::Resistances* resistances);
 
-private:
+ private:
   std::shared_ptr<combat::CombatContext> context_;
   std::shared_ptr<logging::Logger> logger_;
 };
 
-} // namespace resolver
-} // namespace internal
+}  // namespace resolver
+}  // namespace internal
 
-#endif // SRC_INTERNAL_RESOLVER_DAMAGE_RESOLVER_H_
+#endif  // SRC_INTERNAL_RESOLVER_DAMAGE_RESOLVER_H_

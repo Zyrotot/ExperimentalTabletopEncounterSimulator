@@ -205,6 +205,7 @@ void Entity::AddDR(const rules::DamageReduction& dr, bool is_bonus) {
 }
 
 void Entity::RemoveDR(int amount, bool from_bonus) {
+  logger_->Debug("Removing {} DR from {}", amount, from_bonus ? "bonus DR" : "base DR");
   auto& dr_list = from_bonus 
     ? current_stats_.bonus_stats.bonus_resistances.damage_reductions
     : current_stats_.base_stats.resistances.damage_reductions;

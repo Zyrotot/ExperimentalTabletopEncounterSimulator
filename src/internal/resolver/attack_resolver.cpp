@@ -6,6 +6,7 @@
 
 #include "internal/resolver/attack_resolver.h"
 
+#include "internal/combat/combat_events.h"
 #include "internal/combat/event_manager.h"
 #include "internal/dice_rolls/roller.h"
 #include "internal/entities/entity.h"
@@ -77,7 +78,10 @@ void AttackResolver::ResolveAttackMove(const AttackMove &attack_move,
       combat::EventManager::Emit(CombatEvent::CriticalHit, context);
     }
 
-    combat::EventManager::Emit(CombatEvent::Hit, context);
+    auto hit_context = std::make_shared<combat::HitContext>(
+        attacker_, defender_, current_result.is_crit);
+
+    combat::EventManager::Emit(CombatEvent::Hit, hit_context);
 
     DamageInstance base_dmg =
         CalculateBaseDamage(attack_move, current_result.crit_multiplier);

@@ -5,9 +5,10 @@
 // -----------------------------------------------------------------------------
 
 #include "internal/resolver/damage_resolver.h"
-#include "internal/entities/entity.h"  // IWYU pragma: keep
+#include "internal/entities/entity.h" // IWYU pragma: keep
 #include "internal/entities/stats.h"
 #include "internal/rules/resistances.h"
+#include "internal/logging/log_manager.h"
 
 namespace internal {
 namespace resolver {
@@ -16,7 +17,7 @@ using combat::CombatContext;
 using entities::Resistances;
 
 DamageResolver::DamageResolver(std::shared_ptr<CombatContext> context)
-    : context_(context) {}
+    : context_(context), logger_(logging::LogManager::GetLogger("attack")) {}
 
 DamageResolver::~DamageResolver() {}
 
@@ -28,9 +29,10 @@ void DamageResolver::ApplyDamage() {
     }
     int total_damage = 0;
     for (auto &dmg_instance : result.damage_instances) {
-      ApplyResistances(&dmg_instance, &remaining_resistances);
+      ApplyResistancesToDamage(&dmg_instance, &remaining_resistances);
       total_damage += dmg_instance.amount;
     }
+    logger_->Info("Total damage applied: {}", total_damage);
     context_->target->TakeDamage(total_damage);
 
     if (result.attack && result.attack->weapon) {
@@ -45,10 +47,13 @@ void DamageResolver::ApplyDamage() {
   }
 }
 
-void DamageResolver::ApplyResistances(rules::DamageInstance *dmg_instance,
-                                      Resistances *resistances) {
+void DamageResolver::ApplyResistancesToDamage(
+    rules::DamageInstance *dmg_instance, Resistances *resistances) {
+  auto logger = logging::LogManager::GetLogger("attack");
+  
   if ((dmg_instance->types &
        static_cast<uint16_t>(resistances->immunity.immune_types)) != 0) {
+    logger->Debug("Damage fully negated by immunity");
     dmg_instance->amount = 0;
     return;
   }
@@ -56,6 +61,9 @@ void DamageResolver::ApplyResistances(rules::DamageInstance *dmg_instance,
   for (auto &weakness : resistances->weaknesses) {
     if ((dmg_instance->types & static_cast<uint16_t>(weakness.weak_types)) !=
         0) {
+      logger->Debug("Damage increased by weakness ({} -> {})",
+                    dmg_instance->amount,
+                    dmg_instance->amount + weakness.amount);
       dmg_instance->amount += weakness.amount;
     }
   }
@@ -71,12 +79,19 @@ void DamageResolver::ApplyResistances(rules::DamageInstance *dmg_instance,
           ((dmg_instance->modifiers &
             static_cast<uint16_t>(dr.bypass_modifiers)) == 0)) {
         if (dmg_instance->amount > dr.amount) {
+          logger->Debug("Damage reduction of {} applied", dr.amount);
           dmg_instance->amount -= dr.amount;
           dr.amount = 0;
         } else {
+          logger->Debug(
+              "Damage reduction of {} applied, but damage fully absorbed",
+              dmg_instance->amount);
           dr.amount -= dmg_instance->amount;
           dmg_instance->amount = 0;
         }
+      } else {
+        logger->Debug("Damage reduction of {} bypassed by modifiers/types",
+                      dr.amount);
       }
     }
   } else if (GetDamageCategory(static_cast<rules::DamageType>(
@@ -85,9 +100,13 @@ void DamageResolver::ApplyResistances(rules::DamageInstance *dmg_instance,
       if ((dmg_instance->types & static_cast<uint16_t>(er.resistance_type)) !=
           0) {
         if (dmg_instance->amount > er.amount) {
+          logger->Debug("Energy resistance of {} applied", er.amount);
           dmg_instance->amount -= er.amount;
           er.amount = 0;
         } else {
+          logger->Debug(
+              "Energy resistance of {} applied, but damage fully absorbed",
+              dmg_instance->amount);
           er.amount -= dmg_instance->amount;
           dmg_instance->amount = 0;
         }

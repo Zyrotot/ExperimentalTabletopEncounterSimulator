@@ -14,6 +14,7 @@
 #include "internal/dice_rolls/roller.h"
 #include "internal/entities/entity.h"  // IWYU pragma: keep
 #include "internal/items/enchantment.h"
+#include "internal/resolver/damage_resolver.h"
 #include "internal/rules/alignment.h"
 #include "internal/rules/damage_types.h"
 
@@ -55,11 +56,15 @@ inline Enchantment CreateDissonantEnchantment() {
   effect.name = "Dissonant (self-damage)";
   effect.trigger = combat::CombatEvent::DealDamage;
   effect.on = [](std::shared_ptr<combat::CombatContext> ctx) {
-    int self_damage =
-        ctx->roller->Roll(dice_rolls::Term{.dice_groups = {{1, 6}}});
-    ctx->attacker->TakeDamage(
-        self_damage); // TODO(zyrotot): Resolve trough damage dealer to apply
-                      // resistances, etc.
+    rules::DamageInstance self_damage = {
+        .amount = ctx->roller->Roll(dice_rolls::Term{.dice_groups = {{1, 6}}}),
+        .types = static_cast<uint16_t>(rules::DamageType::Negative),
+        .modifiers = 0};
+    entities::Resistances target_resistances =
+        ctx->attacker->GetResistancesCopy();
+    resolver::DamageResolver::ApplyResistancesToDamage(&self_damage,
+                                                       &target_resistances);
+    ctx->attacker->TakeDamage(self_damage.amount);
   };
   ench.effects.push_back(effect);
 

@@ -13,6 +13,10 @@
 #include <memory>
 
 namespace internal {
+namespace logging {
+class Logger;
+}  // namespace logging
+
 namespace resolver {
 
 class DamageResolver {
@@ -21,13 +25,12 @@ public:
   ~DamageResolver();
 
   void ApplyDamage();
-
-protected:
-  void ApplyResistances(rules::DamageInstance *dmg_instance,
-                        entities::Resistances *resistances);
+  static void ApplyResistancesToDamage(rules::DamageInstance *dmg_instance,
+                                       entities::Resistances *resistances);
 
 private:
   std::shared_ptr<combat::CombatContext> context_;
+  std::shared_ptr<logging::Logger> logger_;
 };
 
 } // namespace resolver

@@ -31,7 +31,6 @@ AttackResolver::AttackResolver(std::shared_ptr<Entity> attacker,
     : attacker_(attacker), defender_(defender),
       attack_sequence_(attacker->GetAttackSequence(attack_sequence_index)),
       roller_(roller), logger_(logging::LogManager::GetLogger("attack")) {
-  logger_->SetLogLevel(logging::LogLevel::DEBUG);
 }
 
 AttackResolver::~AttackResolver() {}

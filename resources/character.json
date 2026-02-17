@@ -1,5 +1,5 @@
 {
-    "name": "Character/AtaquePoderoso/Erosao/Rigidez/Trespassar",
+    "name": "Character",
     "starting_stats": {
         "base_stats": {
             "hp": 160,
@@ -8,11 +8,29 @@
             "attack_bonuses": {
                 "attack_bonus": 19,
                 "damage_bonus": 21
+            },
+            "resistances": {
+                "damage_reductions": [],
+                "energy_resistances": [],
+                "immunity": {
+                    "immune_types": 0,
+                    "immune_categories": 0
+                },
+                "weaknesses": []
             }
         },
         "bonus_stats": {
             "temporary_hp": 0,
-            "ac_bonus": 0
+            "ac_bonus": 0,
+            "bonus_resistances": {
+                "damage_reductions": [],
+                "energy_resistances": [],
+                "immunity": {
+                    "immune_types": 0,
+                    "immune_categories": 0
+                },
+                "weaknesses": []
+            }
         }
     },
     "equipped_weapons": [
@@ -40,7 +58,7 @@
                         {
                             "name": "Vampiric",
                             "trigger": 4,
-                            "on": "std::function<void(const internal::combat::CombatContext&)>"
+                            "on": "std::function<void(std::shared_ptr<internal::combat::EventContext>)>"
                         }
                     ]
                 }
@@ -68,7 +86,19 @@
                         "damage_modifier": 0,
                         "crit_range": 20,
                         "crit_multiplier": 3,
-                        "enchantments": []
+                        "enchantments": [
+                            {
+                                "name": "Vampiric",
+                                "damage_sources": [],
+                                "effects": [
+                                    {
+                                        "name": "Vampiric",
+                                        "trigger": 4,
+                                        "on": "std::function<void(std::shared_ptr<internal::combat::EventContext>)>"
+                                    }
+                                ]
+                            }
+                        ]
                     },
                     "attack_modifier": 0,
                     "damage_modifier": 0,
@@ -99,7 +129,19 @@
                         "damage_modifier": 0,
                         "crit_range": 20,
                         "crit_multiplier": 3,
-                        "enchantments": []
+                        "enchantments": [
+                            {
+                                "name": "Vampiric",
+                                "damage_sources": [],
+                                "effects": [
+                                    {
+                                        "name": "Vampiric",
+                                        "trigger": 4,
+                                        "on": "std::function<void(std::shared_ptr<internal::combat::EventContext>)>"
+                                    }
+                                ]
+                            }
+                        ]
                     },
                     "attack_modifier": 0,
                     "damage_modifier": 0,
@@ -109,6 +151,45 @@
             ],
             "attack_modifier": -2,
             "damage_modifier": 4
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Erosion",
+            "effects": [
+                {
+                    "trigger": 2,
+                    "on_event": "std::function<void(std::shared_ptr<internal::combat::EventContext>)>"
+                }
+            ],
+            "stack_count": 0,
+            "is_active": true
+        },
+        {
+            "name": "Rigidez Raivosa",
+            "effects": [
+                {
+                    "trigger": 5,
+                    "on_event": "std::function<void(std::shared_ptr<internal::combat::EventContext>)>"
+                },
+                {
+                    "trigger": 7,
+                    "on_event": "std::function<void(std::shared_ptr<internal::combat::EventContext>)>"
+                }
+            ],
+            "stack_count": 0,
+            "is_active": true
+        },
+        {
+            "name": "Trespassar",
+            "effects": [
+                {
+                    "trigger": 6,
+                    "on_event": "std::function<void(std::shared_ptr<internal::combat::EventContext>)>"
+                }
+            ],
+            "stack_count": 0,
+            "is_active": true
         }
     ],
     "alignment": 34

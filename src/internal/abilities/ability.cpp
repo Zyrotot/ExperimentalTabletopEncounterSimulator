@@ -24,7 +24,6 @@ Ability CreateErosao() {
     auto context = std::dynamic_pointer_cast<combat::HitContext>(base_context);
     if (!context || !context->target)
       return;
-    // TODO(zyrotot): Fix coredump
     auto& bonus_dr = context->target->GetCurrentStats()
                          .bonus_stats.bonus_resistances.damage_reductions;
     if (!bonus_dr.empty()) {

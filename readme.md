@@ -11,8 +11,6 @@ A small simulator for testing combat balance (originally for TormentaRPG). It ru
   - GCC ≥ 10 **or** Clang ≥ 12
 - CMake ≥ 3.16
 - Ninja
-- GoogleTest
-- nlohmann/json
 
 ---
 
@@ -23,9 +21,7 @@ sudo apt update
 sudo apt install -y \
   build-essential \
   cmake \
-  ninja-build \
-  libgtest-dev \
-  nlohmann-json3-dev
+  ninja-build
 ```
 For development also install:
 
@@ -37,6 +33,11 @@ sudo apt install -y \
   clangd
 ```
 
+### Update submodules
+
+```bash
+git submodule update --init --recursive
+```
 
 ## Quick Start
 

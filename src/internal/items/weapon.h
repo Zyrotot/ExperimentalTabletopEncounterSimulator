@@ -17,18 +17,14 @@
 namespace internal {
 namespace items {
 
-using dice_rolls::Term;
-using rules::DamageModifier;
-using rules::DamageType;
-
 struct Weapon {
   std::string name;
 
   int attack_bonus = 0;
-  Term damage = Term{};
+  dice_rolls::Term damage = dice_rolls::Term{};
 
-  DamageType damage_type = DamageType::None;
-  DamageModifier damage_modifier = DamageModifier::None;
+  rules::DamageType damage_type = rules::DamageType::None;
+  rules::DamageModifier damage_modifier = rules::DamageModifier::None;
 
   int crit_range = 0;
   int crit_multiplier = 0;

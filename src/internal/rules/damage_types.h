@@ -47,10 +47,10 @@ enum class DamageModifier : uint16_t {
   RubySteel = 1 << 7,
 };
 
-enum class DamageCategory {
-  None,
-  Physical,
-  Energy,
+enum class DamageCategory : uint16_t {
+  None = 0,
+  Physical = 1 << 0,
+  Energy = 1 << 1,
 };
 
 struct DamageInstance {
@@ -59,7 +59,7 @@ struct DamageInstance {
   uint16_t modifiers = 0;
 };
 
-inline DamageCategory getDamageCategory(DamageType type) {
+inline DamageCategory GetDamageCategory(DamageType type) {
   switch (type) {
     case DamageType::Slash:
     case DamageType::Pierce:

@@ -42,21 +42,21 @@ enum class CombatEvent {
   CriticalHit  // Critical hit confirmed
 };
 
-struct CombatContext {
-  std::shared_ptr<entities::Entity> attacker;
-  std::shared_ptr<entities::Entity> target;
+struct AttackResult {
   const combat::AttackMove* attack;
-  std::shared_ptr<dice_rolls::Roller> roller;
-
-  // Attack roll results
   int d20_roll = 0;
   int total_attack_roll = 0;
   bool is_hit = false;
   bool is_crit = false;
   int crit_multiplier = 1;
-
-  // Damage results (accumulated during resolution)
   std::vector<rules::DamageInstance> damage_instances;
+};
+
+struct CombatContext {
+  std::shared_ptr<entities::Entity> attacker;
+  std::shared_ptr<entities::Entity> target;
+  std::shared_ptr<dice_rolls::Roller> roller;
+  std::vector<AttackResult> results;
 };
 
 struct DamageContext {

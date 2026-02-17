@@ -15,9 +15,6 @@
 namespace internal {
 namespace factory {
 
-using entities::Entity;
-using entities::EntityConfig;
-
 enum Monster {
     Uktril    = 1,
     Geraktril = 2,
@@ -25,10 +22,13 @@ enum Monster {
     Custom    = 4,
 };
 
-std::shared_ptr<Entity> MonsterFactory(Monster monsterType);
-std::shared_ptr<Entity> GetPlayer(const std::string& filename);
+std::shared_ptr<entities::Entity> MonsterFactory(Monster monsterType);
+std::shared_ptr<entities::Entity> GetPlayer(const std::string& filename);
 
-EntityConfig LoadCharacterFromJSON(const std::string& filename);
+entities::EntityConfig LoadCharacterFromJSON(const std::string& filename);
+
+items::Enchantment RebuildEnchantmentFromName(const std::string& name);
+
 
 }  // namespace factory
 }  // namespace internal

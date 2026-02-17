@@ -7,16 +7,14 @@
 #ifndef SRC_INTERNAL_RULES_RESISTANCES_H_
 #define SRC_INTERNAL_RULES_RESISTANCES_H_
 
-#include <vector>
-
 #include "internal/rules/damage_types.h"
 
 namespace internal {
 namespace rules {
 
 struct DamageReduction {
-  std::vector<DamageType> bypass_types = {};
-  std::vector<DamageModifier> bypass_modifiers = {};
+  DamageType bypass_types = DamageType::None;
+  DamageModifier bypass_modifiers = DamageModifier::None;
   int amount = 0;
 };
 
@@ -26,12 +24,12 @@ struct EnergyResistance {
 };
 
 struct Immunity {
-  std::vector<DamageType> immune_types = {};
-  std::vector<DamageCategory> immune_categories = {};
+  DamageType immune_types = DamageType::None;
+  DamageCategory immune_categories = DamageCategory::None;
 };
 
 struct Weakness {
-  std::vector<DamageType> weak_types = {};
+  DamageType weak_types = DamageType::None;
   int amount = 0;
 };
 

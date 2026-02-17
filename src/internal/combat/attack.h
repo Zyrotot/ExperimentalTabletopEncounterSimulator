@@ -16,11 +16,8 @@
 namespace internal {
 namespace combat {
 
-using items::Weapon;
-using dice_rolls::Term;
-
 struct AttackMove {
-  std::shared_ptr<Weapon> weapon;
+  std::shared_ptr<items::Weapon> weapon;
 
   int attack_modifier = 0;
   int damage_modifier = 0;
@@ -29,10 +26,12 @@ struct AttackMove {
   int crit_multiplier_bonus = 0;
 
   int GetAttackModifier() const;
-  Term GetAttackDamage() const;
+  dice_rolls::Term GetAttackDamage() const;
 };
 
 struct AttackSequence {
+  std::string name;
+
   std::vector<AttackMove> attacks = {};
 
   int attack_modifier = 0;

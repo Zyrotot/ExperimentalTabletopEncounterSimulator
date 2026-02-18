@@ -28,8 +28,7 @@ inline Enchantment CreateFlamingEnchantment() {
 
   DamageSource source;
   source.name = "Flaming";
-  source.contribute = [](std::shared_ptr<combat::EventContext> base_ctx) {
-    auto ctx = std::dynamic_pointer_cast<combat::CombatContext>(base_ctx);
+  source.contribute = [](std::shared_ptr<combat::CombatEventContext> ctx) {
     if (!ctx)
       return rules::DamageInstance{};
 
@@ -49,8 +48,7 @@ inline Enchantment CreateDissonantEnchantment() {
 
   DamageSource source;
   source.name = "Dissonant";
-  source.contribute = [](std::shared_ptr<combat::EventContext> base_ctx) {
-    auto ctx = std::dynamic_pointer_cast<combat::CombatContext>(base_ctx);
+  source.contribute = [](std::shared_ptr<combat::CombatEventContext> ctx) {
     if (!ctx)
       return rules::DamageInstance{};
 
@@ -61,22 +59,22 @@ inline Enchantment CreateDissonantEnchantment() {
   };
   ench.damage_sources.push_back(source);
 
-  Effect effect;
+  combat::Effect effect;
   effect.name = "Dissonant (self-damage)";
+  effect.source = "Weapon Enchantment: Dissonant";
   effect.trigger = combat::CombatEvent::Hit;
-  effect.on = [](std::shared_ptr<combat::EventContext> base_ctx) {
-    auto ctx = std::dynamic_pointer_cast<combat::CombatContext>(base_ctx);
-    if (!ctx)
+  effect.on_event = [](std::shared_ptr<combat::CombatEventContext> ctx) {
+    if (!ctx || !ctx->source || !ctx->roller)
       return;
 
     rules::DamageInstance self_damage = {
         .amount = ctx->roller->Roll(dice_rolls::Term{.dice_groups = {{1, 6}}}),
         .types = static_cast<uint16_t>(rules::DamageType::Negative),
         .modifiers = 0};
-    entities::Resistances target_resistances = ctx->attacker->GetResistances();
+    entities::Resistances target_resistances = ctx->source->GetResistances();
     resolver::DamageResolver::ApplyResistancesToDamage(&self_damage,
                                                        &target_resistances);
-    ctx->attacker->TakeDamage(self_damage.amount);
+    ctx->source->TakeDamage(self_damage.amount);
   };
   ench.effects.push_back(effect);
 
@@ -89,8 +87,7 @@ inline Enchantment CreateFlamingExplosionEnchantment() {
 
   DamageSource source;
   source.name = "Flaming Explosion";
-  source.contribute = [](std::shared_ptr<combat::EventContext> base_ctx) {
-    auto ctx = std::dynamic_pointer_cast<combat::CombatContext>(base_ctx);
+  source.contribute = [](std::shared_ptr<combat::CombatEventContext> ctx) {
     if (!ctx || ctx->results.empty()) {
       return rules::DamageInstance{};
     }
@@ -118,22 +115,28 @@ inline Enchantment CreateVampiricEnchantment() {
   Enchantment ench;
   ench.name = "Vampiric";
 
-  Effect effect;
+  combat::Effect effect;
   effect.name = "Vampiric";
+  effect.source = "Weapon Enchantment: Vampiric";
   effect.trigger = combat::CombatEvent::DealDamage;
-  effect.on = [](std::shared_ptr<combat::EventContext> base_ctx) {
-    auto dmg_ctx = std::dynamic_pointer_cast<combat::DamageContext>(base_ctx);
-    if (!dmg_ctx)
+  effect.on_event = [](std::shared_ptr<combat::CombatEventContext> ctx) {
+    if (!ctx) {
       return;
+    }
+
+    if (ctx->current_index >= ctx->results.size()) {
+      return;
+    }
+    auto current_result = ctx->results[ctx->current_index];
 
     int total_damage = 0;
-    for (const auto& dmg : dmg_ctx->damage) {
+    for (const auto& dmg : current_result.damage_instances) {
       total_damage += dmg.amount;
     }
 
     int temp_hp = total_damage / 2;
-    if (dmg_ctx->attacker) {
-      dmg_ctx->attacker->AddTempHP(temp_hp);
+    if (ctx->source) {
+      ctx->source->AddTempHP(temp_hp);
     }
   };
   ench.effects.push_back(effect);
@@ -145,15 +148,15 @@ inline Enchantment CreateDrainingEnchantment() {
   Enchantment ench;
   ench.name = "Draining";
 
-  Effect effect;
+  combat::Effect effect;
   effect.name = "Draining";
+  effect.source = "Weapon Enchantment: Draining";
   effect.trigger = combat::CombatEvent::Hit;
-  effect.on = [](std::shared_ptr<combat::EventContext> base_ctx) {
-    auto ctx = std::dynamic_pointer_cast<combat::HitContext>(base_ctx);
-    if (!ctx || !ctx->attacker)
+  effect.on_event = [](std::shared_ptr<combat::CombatEventContext> ctx) {
+    if (!ctx || !ctx->source)
       return;
 
-    ctx->attacker->Heal(1);
+    ctx->source->Heal(1);
   };
   ench.effects.push_back(effect);
 
@@ -166,8 +169,7 @@ inline Enchantment CreateProfaneEnchantment() {
 
   DamageSource source;
   source.name = "Profane";
-  source.contribute = [](std::shared_ptr<combat::EventContext> base_ctx) {
-    auto ctx = std::dynamic_pointer_cast<combat::CombatContext>(base_ctx);
+  source.contribute = [](std::shared_ptr<combat::CombatEventContext> ctx) {
     if (!ctx || !ctx->target)
       return rules::DamageInstance{};
 

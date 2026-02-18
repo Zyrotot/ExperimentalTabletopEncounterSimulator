@@ -18,8 +18,8 @@ namespace resolver {
 
 using combat::AttackMove;
 using combat::AttackResult;
-using combat::CombatContext;
 using combat::CombatEvent;
+using combat::CombatEventContext;
 using dice_rolls::Roller;
 using dice_rolls::Term;
 using entities::Entity;
@@ -39,8 +39,11 @@ AttackResolver::AttackResolver(std::shared_ptr<Entity> attacker,
 AttackResolver::~AttackResolver() {
 }
 
-std::shared_ptr<CombatContext> AttackResolver::ResolveAttack() {
-  auto context = std::make_shared<CombatContext>(attacker_, defender_, roller_);
+std::shared_ptr<CombatEventContext> AttackResolver::ResolveAttack() {
+  auto context = std::make_shared<CombatEventContext>();
+  context->source = attacker_;
+  context->target = defender_;
+  context->roller = roller_;
 
   for (const auto& attack_move : attack_sequence_.attacks) {
     ResolveAttackMove(attack_move, context);
@@ -48,8 +51,9 @@ std::shared_ptr<CombatContext> AttackResolver::ResolveAttack() {
   return context;
 }
 
-void AttackResolver::ResolveAttackMove(const AttackMove& attack_move,
-                                       std::shared_ptr<CombatContext> context) {
+void AttackResolver::ResolveAttackMove(
+    const AttackMove& attack_move,
+    std::shared_ptr<CombatEventContext> context) {
   AttackResult current_result{.attack = &attack_move,
                               .d20_roll = 0,
                               .total_attack_roll = 0,
@@ -81,10 +85,7 @@ void AttackResolver::ResolveAttackMove(const AttackMove& attack_move,
       combat::EventManager::Emit(CombatEvent::CriticalHit, context);
     }
 
-    auto hit_context = std::make_shared<combat::HitContext>(
-        attacker_, defender_, current_result.is_crit);
-
-    combat::EventManager::Emit(CombatEvent::Hit, hit_context);
+    combat::EventManager::Emit(CombatEvent::Hit, context);
 
     DamageInstance base_dmg =
         CalculateBaseDamage(attack_move, current_result.crit_multiplier);
@@ -124,8 +125,8 @@ DamageInstance AttackResolver::CalculateBaseDamage(
 }
 
 void AttackResolver::GatherDamageFromSources(
-    const AttackMove& attack_move, std::shared_ptr<CombatContext> context,
-    AttackResult* result) {
+    const AttackMove& attack_move,
+    std::shared_ptr<CombatEventContext> context, AttackResult* result) {
   if (!attack_move.weapon) {
     return;
   }

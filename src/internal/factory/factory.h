@@ -27,6 +27,9 @@ std::shared_ptr<entities::Entity> GetPlayer(const std::string& filename);
 
 entities::EntityConfig LoadCharacterFromJSON(const std::string& filename);
 
+std::shared_ptr<entities::Entity> CreateExampleCharacter();
+void SaveCharacterToJSON(const entities::EntityConfig& character, const std::string& filename);
+
 items::Enchantment RebuildEnchantmentFromName(const std::string& name);
 abilities::Ability RebuildAbilityFromName(const std::string& name,
                                           int stack_count = 0);

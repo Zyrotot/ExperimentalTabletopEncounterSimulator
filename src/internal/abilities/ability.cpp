@@ -18,10 +18,11 @@ Ability CreateErosao() {
   ability.name = "Erosion";
   ability.is_active = true;
 
-  AbilityEffect effect;
+  combat::Effect effect;
+  effect.name = "Erosion";
+  effect.source = "Ability: Erosion";
   effect.trigger = combat::CombatEvent::Hit;
-  effect.on_event = [](std::shared_ptr<combat::EventContext> base_context) {
-    auto context = std::dynamic_pointer_cast<combat::HitContext>(base_context);
+  effect.on_event = [](std::shared_ptr<combat::CombatEventContext> context) {
     if (!context || !context->target)
       return;
     auto& bonus_dr = context->target->GetCurrentStats()
@@ -43,12 +44,12 @@ Ability CreateRigidezRaivosa() {
   ability.is_active = true;
   ability.stack_count = 0;
 
-  AbilityEffect take_damage_effect;
+  combat::Effect take_damage_effect;
+  take_damage_effect.name = "Rigidez Raivosa";
+  take_damage_effect.source = "Ability: Rigidez Raivosa";
   take_damage_effect.trigger = combat::CombatEvent::TakeDamage;
   take_damage_effect.on_event =
-      [](std::shared_ptr<combat::EventContext> base_context) {
-        auto context =
-            std::dynamic_pointer_cast<combat::DamageContext>(base_context);
+      [](std::shared_ptr<combat::CombatEventContext> context) {
         if (!context || !context->target)
           return;
 
@@ -59,12 +60,12 @@ Ability CreateRigidezRaivosa() {
         context->target->IncrementAbilityStack("Rigidez Raivosa");
       };
 
-  AbilityEffect heal_effect;
+  combat::Effect heal_effect;
+  heal_effect.name = "Rigidez Raivosa";
+  heal_effect.source = "Ability: Rigidez Raivosa";
   heal_effect.trigger = combat::CombatEvent::Heal;
   heal_effect.on_event =
-      [](std::shared_ptr<combat::EventContext> base_context) {
-        auto context =
-            std::dynamic_pointer_cast<combat::HealContext>(base_context);
+      [](std::shared_ptr<combat::CombatEventContext> context) {
         if (!context || !context->target || context->is_temp_hp)
           return;
 
@@ -82,15 +83,15 @@ Ability CreateTrespassar() {
   ability.name = "Trespassar";
   ability.is_active = true;
 
-  AbilityEffect effect;
+  combat::Effect effect;
+  effect.name = "Trespassar";
+  effect.source = "Ability: Trespassar";
   effect.trigger = combat::CombatEvent::Kill;
-  effect.on_event = [](std::shared_ptr<combat::EventContext> base_context) {
-    auto context =
-        std::dynamic_pointer_cast<combat::DamageContext>(base_context);
-    if (!context || !context->attacker || !context->target)
+  effect.on_event = [](std::shared_ptr<combat::CombatEventContext> context) {
+    if (!context || !context->source || !context->target)
       return;
     if (!context->target->IsAlive()) {
-      context->attacker->IncrementAbilityStack("Trespassar");
+      context->source->IncrementAbilityStack("Trespassar");
       // TODO(zyrotot): Trigger additional attack here - need to add attack
       // queue system
     }
@@ -106,16 +107,23 @@ Ability CreateDuroDeFerir(int stacks) {
   ability.is_active = true;
   ability.stack_count = stacks;
 
-  AbilityEffect effect;
+  combat::Effect effect;
+  effect.name = "Duro de Ferir";
+  effect.source = "Ability: Duro de Ferir";
   effect.trigger = combat::CombatEvent::TakeDamage;
-  effect.on_event = [](std::shared_ptr<combat::EventContext> base_context) {
-    auto context =
-        std::dynamic_pointer_cast<combat::DamageContext>(base_context);
-    if (!context || !context->target)
+  effect.on_event = [](std::shared_ptr<combat::CombatEventContext> context) {
+    if (!context || !context->target) {
       return;
+    }
+
+    if (context->current_index >= context->results.size()) {
+      return;
+    }
+
+    auto current_result = context->results[context->current_index];
 
     if (context->target->GetAbilityStack("Duro de Ferir") > 0) {
-      for (auto& dmg : context->damage) {
+      for (auto& dmg : current_result.damage_instances) {
         dmg.amount = 0;
       }
       context->target->DecrementAbilityStack("Duro de Ferir");
@@ -132,17 +140,25 @@ Ability CreateDuroDeMatar(int stacks) {
   ability.is_active = true;
   ability.stack_count = stacks;
 
-  AbilityEffect effect;
+  combat::Effect effect;
+  effect.name = "Duro de Matar";
+  effect.source = "Ability: Duro de Matar";
   effect.trigger = combat::CombatEvent::TakeDamage;
-  effect.on_event = [](std::shared_ptr<combat::EventContext> base_context) {
-    auto context =
-        std::dynamic_pointer_cast<combat::DamageContext>(base_context);
-    if (!context || !context->target)
+  effect.on_event = [](std::shared_ptr<combat::CombatEventContext> context) {
+    if (!context || !context->target) {
       return;
+    }
+
+    if (context->current_index >= context->results.size()) {
+      return;
+    }
+
+    auto current_result = context->results[context->current_index];
 
     if (context->target->GetAbilityStack("Duro de Matar") > 0) {
       int total_damage = 0;
-      for (const auto& dmg : context->damage) {
+
+      for (const auto& dmg : current_result.damage_instances) {
         total_damage += dmg.amount;
       }
 
@@ -151,7 +167,7 @@ Ability CreateDuroDeMatar(int stacks) {
           context->target->GetCurrentStats().bonus_stats.temporary_hp;
 
       if (total_damage >= current_hp) {
-        for (auto& dmg : context->damage) {
+        for (auto& dmg : current_result.damage_instances) {
           dmg.amount = 0;
         }
         context->target->DecrementAbilityStack("Duro de Matar");

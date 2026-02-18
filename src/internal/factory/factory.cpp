@@ -353,5 +353,80 @@ abilities::Ability RebuildAbilityFromName(const std::string& name,
   return abilities::Ability{};
 }
 
+std::shared_ptr<Entity> CreateExampleCharacter() {
+  std::shared_ptr<Weapon> machado = std::make_shared<Weapon>(Weapon{
+      .name = "Machado",
+      .attack_bonus = 2,
+      .damage = Term{.dice_groups = {Dice{.count = 4, .sides = 8}}, .bonus = 0},
+      .damage_type = rules::DamageType::Slash,
+      .damage_modifier = rules::DamageModifier::None,
+      .crit_range = 20,
+      .crit_multiplier = 3,
+      .enchantments = {internal::items::CreateVampiricEnchantment()},
+  });
+
+  auto character_config = entities::EntityConfig{
+      .name = "Character",
+      .starting_stats =
+          entities::Stats{
+              .base_stats =
+                  entities::BaseStats{
+                      .hp = 160,
+                      .armour_class = 21,
+                      .fortification = 0,
+                      .attack_bonuses = entities::AttackBonuses{
+                          .attack_bonus = 19,
+                          .damage_bonus = 21,
+                      },
+                      .resistances = entities::Resistances{},
+                  },
+              .bonus_stats =
+                  entities::BonusStats{
+                      .temporary_hp = 0,
+                      .ac_bonus = 0,
+                      .bonus_resistances = entities::Resistances{},
+                  },
+          },
+      .equipped_weapons = {machado},
+      .attack_sequences = std::vector<combat::AttackSequence>{
+          combat::AttackSequence{
+              .name = "Normal Attack",
+              .attacks = std::vector<combat::AttackMove>{
+                  combat::AttackMove{.weapon = machado,
+                                      .attack_modifier = 0,
+                                      .damage_modifier = 0},
+              },
+              .attack_modifier = 0,
+              .damage_modifier = 0,
+          },
+          combat::AttackSequence{
+              .name = "Powerful Attack",
+              .attacks = std::vector<combat::AttackMove>{
+                  combat::AttackMove{.weapon = machado,
+                                      .attack_modifier = 0,
+                                      .damage_modifier = 0},
+              },
+              .attack_modifier = -2,
+              .damage_modifier = 4,
+          },
+      },
+      .abilities = std::vector<abilities::Ability>{
+          abilities::CreateErosao(),
+          abilities::CreateRigidezRaivosa(),
+          abilities::CreateTrespassar(),
+      },
+      .alignment = rules::Alignment::ChaoticNeutral,
+  };
+
+  SaveCharacterToJSON(character_config, "resources/example_character.json");
+
+  return std::make_shared<Entity>(character_config);
+}
+
+void SaveCharacterToJSON(const entities::EntityConfig &character_config, const std::string &filename) {
+    std::string buffer;
+    glz::write_file_json(character_config, filename, buffer);
+}
+
 }  // namespace factory
 }  // namespace internal

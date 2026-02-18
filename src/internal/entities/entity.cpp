@@ -179,13 +179,7 @@ void Entity::BuildActiveEffects() {
     if (!ability.is_active)
       continue;
 
-    for (const auto& ability_effect : ability.effects) {
-      combat::Effect effect;
-      effect.name = ability.name;
-      effect.source = "Ability: " + ability.name;
-      effect.trigger = ability_effect.trigger;
-      effect.on_event = ability_effect.on_event;
-      effect.is_active = true;
+    for (const auto& effect : ability.effects) {
       active_effects_.push_back(effect);
     }
   }
@@ -195,13 +189,7 @@ void Entity::BuildActiveEffects() {
       continue;
 
     for (const auto& enchantment : weapon->enchantments) {
-      for (const auto& ench_effect : enchantment.effects) {
-        combat::Effect effect;
-        effect.name = enchantment.name;
-        effect.source = "Weapon: " + weapon->name;
-        effect.trigger = ench_effect.trigger;
-        effect.on_event = ench_effect.on;
-        effect.is_active = true;
+      for (const auto& effect : enchantment.effects) {
         active_effects_.push_back(effect);
       }
     }

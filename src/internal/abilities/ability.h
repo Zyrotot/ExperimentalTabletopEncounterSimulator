@@ -7,8 +7,6 @@
 #ifndef SRC_INTERNAL_ABILITIES_ABILITY_H_
 #define SRC_INTERNAL_ABILITIES_ABILITY_H_
 
-#include <functional>
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -22,14 +20,9 @@ class Entity;
 
 namespace abilities {
 
-struct AbilityEffect {
-  combat::CombatEvent trigger;
-  std::function<void(std::shared_ptr<combat::EventContext>)> on_event;
-};
-
 struct Ability {
   std::string name;
-  std::vector<AbilityEffect> effects;
+  std::vector<combat::Effect> effects;
 
   int stack_count = 0;
   bool is_active = true;

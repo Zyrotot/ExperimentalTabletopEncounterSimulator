@@ -52,6 +52,18 @@ struct AttackResult {
   std::vector<rules::DamageInstance> damage_instances;
 };
 
+struct QueuedAttack {
+  std::shared_ptr<entities::Entity> attacker;
+  std::shared_ptr<entities::Entity> target;
+  int attack_sequence_index = 0;
+};
+
+class IAttackQueue {  // Can i improve this?
+ public:
+  virtual ~IAttackQueue() = default;
+  virtual void QueueAttack(QueuedAttack attack) = 0;
+};
+
 struct CombatEventContext {
   std::shared_ptr<entities::Entity> source;
   std::shared_ptr<entities::Entity> target;
@@ -62,6 +74,8 @@ struct CombatEventContext {
 
   int heal_amount = 0;
   bool is_temp_hp = false;
+
+  IAttackQueue* attack_queue = nullptr;
 };
 
 struct Effect {

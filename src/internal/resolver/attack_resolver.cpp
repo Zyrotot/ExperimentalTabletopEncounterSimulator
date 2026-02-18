@@ -51,6 +51,15 @@ std::shared_ptr<CombatEventContext> AttackResolver::ResolveAttack() {
   return context;
 }
 
+void AttackResolver::ResolveSingleAttack(
+    size_t move_index,
+    std::shared_ptr<CombatEventContext> context) {
+  if (move_index >= attack_sequence_.attacks.size()) {
+    return;
+  }
+  ResolveAttackMove(attack_sequence_.attacks[move_index], context);
+}
+
 void AttackResolver::ResolveAttackMove(
     const AttackMove& attack_move,
     std::shared_ptr<CombatEventContext> context) {
@@ -99,6 +108,7 @@ void AttackResolver::ResolveAttackMove(
     }
     logger_->Info("Hit! Total damage: {}", total_damage);
   } else {
+    logger_->Info("Miss!");
     combat::EventManager::Emit(CombatEvent::Miss, context);
   }
 

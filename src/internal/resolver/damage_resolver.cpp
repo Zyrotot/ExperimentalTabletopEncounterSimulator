@@ -27,38 +27,46 @@ DamageResolver::~DamageResolver() {
 
 void DamageResolver::ApplyDamage() {
   for (size_t i = 0; i < context_->results.size(); ++i) {
-    auto& result = context_->results[i];
-    context_->current_index = i;
-    if (!result.is_hit) {
-      continue;
-    }
+    ApplySingleAttack(i);
+  }
+}
 
-    Resistances remaining_resistances = context_->target->GetResistances();
+void DamageResolver::ApplySingleAttack(size_t result_index) {
+  if (result_index >= context_->results.size()) {
+    return;
+  }
 
-    for (auto& dmg_instance : result.damage_instances) {
-      ApplyResistancesToDamage(&dmg_instance, &remaining_resistances);
-    }
+  auto& result = context_->results[result_index];
+  context_->current_index = result_index;
+  if (!result.is_hit) {
+    return;
+  }
 
-    combat::EventManager::Emit(combat::CombatEvent::TakeDamage, context_);
+  Resistances remaining_resistances = context_->target->GetResistances();
 
-    int total_damage = 0;
-    for (const auto& dmg_instance : result.damage_instances) {
-      total_damage += dmg_instance.amount;
-    }
+  for (auto& dmg_instance : result.damage_instances) {
+    ApplyResistancesToDamage(&dmg_instance, &remaining_resistances);
+  }
 
-    combat::EventManager::Emit(combat::CombatEvent::DealDamage, context_);
+  combat::EventManager::Emit(combat::CombatEvent::TakeDamage, context_);
 
-    if (total_damage > 0) {
-      logger_->Info("Total damage applied: {}", total_damage);
+  int total_damage = 0;
+  for (const auto& dmg_instance : result.damage_instances) {
+    total_damage += dmg_instance.amount;
+  }
 
-      context_->target->TakeDamage(total_damage);
-      bool is_alive = context_->target->IsAlive();
+  combat::EventManager::Emit(combat::CombatEvent::DealDamage, context_);
 
-      if (!is_alive) {
-        logger_->Info("{} killed {}!", context_->source->GetName(),
-                      context_->target->GetName());
-        combat::EventManager::Emit(combat::CombatEvent::Kill, context_);
-      }
+  if (total_damage > 0) {
+    logger_->Info("Total damage applied: {}", total_damage);
+
+    context_->target->TakeDamage(total_damage);
+    bool is_alive = context_->target->IsAlive();
+
+    if (!is_alive) {
+      logger_->Info("{} killed {}!", context_->source->GetName(),
+                    context_->target->GetName());
+      combat::EventManager::Emit(combat::CombatEvent::Kill, context_);
     }
   }
 }

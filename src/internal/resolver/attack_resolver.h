@@ -38,17 +38,18 @@ class AttackResolver {
                  std::shared_ptr<dice_rolls::Roller> roller);
   ~AttackResolver();
 
-  std::shared_ptr<combat::CombatContext> ResolveAttack();
+  std::shared_ptr<combat::CombatEventContext> ResolveAttack();
 
  protected:
   void ResolveAttackMove(const combat::AttackMove& attack_move,
-                         std::shared_ptr<combat::CombatContext> context);
+                         std::shared_ptr<combat::CombatEventContext> context);
 
   rules::DamageInstance CalculateBaseDamage(
       const combat::AttackMove& attack_move, int crit_multiplier);
-  void GatherDamageFromSources(const combat::AttackMove& attack_move,
-                               std::shared_ptr<combat::CombatContext> context,
-                               combat::AttackResult* result);
+  void GatherDamageFromSources(
+      const combat::AttackMove& attack_move,
+      std::shared_ptr<combat::CombatEventContext> context,
+      combat::AttackResult* result);
 
   dice_rolls::Term CalculateTotalDamage(const combat::AttackMove& attack_move);
   int CalculateTotalAttackModifier(const combat::AttackMove& attack_move);

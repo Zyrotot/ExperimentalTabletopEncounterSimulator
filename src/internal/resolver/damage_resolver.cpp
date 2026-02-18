@@ -15,10 +15,10 @@
 namespace internal {
 namespace resolver {
 
-using combat::CombatContext;
+using combat::CombatEventContext;
 using entities::Resistances;
 
-DamageResolver::DamageResolver(std::shared_ptr<CombatContext> context)
+DamageResolver::DamageResolver(std::shared_ptr<CombatEventContext> context)
     : context_(context), logger_(logging::LogManager::GetLogger("attack")) {
 }
 
@@ -26,29 +26,27 @@ DamageResolver::~DamageResolver() {
 }
 
 void DamageResolver::ApplyDamage() {
-  for (auto& result : context_->results) {
+  for (size_t i = 0; i < context_->results.size(); ++i) {
+    auto& result = context_->results[i];
+    context_->current_index = i;
     if (!result.is_hit) {
       continue;
     }
 
-    auto damage_context = std::make_shared<combat::DamageContext>(
-        context_->attacker, context_->target);
-    damage_context->damage = result.damage_instances;
-
     Resistances remaining_resistances = context_->target->GetResistances();
 
-    for (auto& dmg_instance : damage_context->damage) {
+    for (auto& dmg_instance : result.damage_instances) {
       ApplyResistancesToDamage(&dmg_instance, &remaining_resistances);
     }
 
-    combat::EventManager::Emit(combat::CombatEvent::TakeDamage, damage_context);
+    combat::EventManager::Emit(combat::CombatEvent::TakeDamage, context_);
 
     int total_damage = 0;
-    for (const auto& dmg_instance : damage_context->damage) {
+    for (const auto& dmg_instance : result.damage_instances) {
       total_damage += dmg_instance.amount;
     }
 
-    combat::EventManager::Emit(combat::CombatEvent::DealDamage, damage_context);
+    combat::EventManager::Emit(combat::CombatEvent::DealDamage, context_);
 
     if (total_damage > 0) {
       logger_->Info("Total damage applied: {}", total_damage);
@@ -57,9 +55,9 @@ void DamageResolver::ApplyDamage() {
       bool is_alive = context_->target->IsAlive();
 
       if (!is_alive) {
-        logger_->Info("{} killed {}!", context_->attacker->GetName(),
+        logger_->Info("{} killed {}!", context_->source->GetName(),
                       context_->target->GetName());
-        combat::EventManager::Emit(combat::CombatEvent::Kill, damage_context);
+        combat::EventManager::Emit(combat::CombatEvent::Kill, context_);
       }
     }
   }

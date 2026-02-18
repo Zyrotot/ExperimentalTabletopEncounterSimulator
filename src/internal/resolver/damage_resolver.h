@@ -21,7 +21,7 @@ namespace resolver {
 
 class DamageResolver {
  public:
-  explicit DamageResolver(std::shared_ptr<combat::CombatContext> context);
+  explicit DamageResolver(std::shared_ptr<combat::CombatEventContext> context);
   ~DamageResolver();
 
   void ApplyDamage();
@@ -29,7 +29,7 @@ class DamageResolver {
                                        entities::Resistances* resistances);
 
  private:
-  std::shared_ptr<combat::CombatContext> context_;
+  std::shared_ptr<combat::CombatEventContext> context_;
   std::shared_ptr<logging::Logger> logger_;
 };
 

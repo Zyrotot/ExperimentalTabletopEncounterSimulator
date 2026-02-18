@@ -16,7 +16,8 @@ namespace combat {
 
 class EventManager {
  public:
-  static void Emit(CombatEvent event, std::shared_ptr<EventContext> context);
+  static void Emit(CombatEvent event,
+                   std::shared_ptr<CombatEventContext> context);
 };
 
 }  // namespace combat

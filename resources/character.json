@@ -57,8 +57,10 @@
                     "effects": [
                         {
                             "name": "Vampiric",
+                            "source": "Weapon Enchantment: Vampiric",
                             "trigger": 4,
-                            "on": "std::function<void(std::shared_ptr<internal::combat::EventContext>)>"
+                            "on_event": "std::function<void(std::shared_ptr<internal::combat::CombatEventContext>)>",
+                            "is_active": true
                         }
                     ]
                 }
@@ -93,8 +95,10 @@
                                 "effects": [
                                     {
                                         "name": "Vampiric",
+                                        "source": "Weapon Enchantment: Vampiric",
                                         "trigger": 4,
-                                        "on": "std::function<void(std::shared_ptr<internal::combat::EventContext>)>"
+                                        "on_event": "std::function<void(std::shared_ptr<internal::combat::CombatEventContext>)>",
+                                        "is_active": true
                                     }
                                 ]
                             }
@@ -136,8 +140,10 @@
                                 "effects": [
                                     {
                                         "name": "Vampiric",
+                                        "source": "Weapon Enchantment: Vampiric",
                                         "trigger": 4,
-                                        "on": "std::function<void(std::shared_ptr<internal::combat::EventContext>)>"
+                                        "on_event": "std::function<void(std::shared_ptr<internal::combat::CombatEventContext>)>",
+                                        "is_active": true
                                     }
                                 ]
                             }
@@ -158,8 +164,11 @@
             "name": "Erosion",
             "effects": [
                 {
+                    "name": "Erosion",
+                    "source": "Ability: Erosion",
                     "trigger": 2,
-                    "on_event": "std::function<void(std::shared_ptr<internal::combat::EventContext>)>"
+                    "on_event": "std::function<void(std::shared_ptr<internal::combat::CombatEventContext>)>",
+                    "is_active": true
                 }
             ],
             "stack_count": 0,
@@ -169,12 +178,18 @@
             "name": "Rigidez Raivosa",
             "effects": [
                 {
+                    "name": "Rigidez Raivosa",
+                    "source": "Ability: Rigidez Raivosa",
                     "trigger": 5,
-                    "on_event": "std::function<void(std::shared_ptr<internal::combat::EventContext>)>"
+                    "on_event": "std::function<void(std::shared_ptr<internal::combat::CombatEventContext>)>",
+                    "is_active": true
                 },
                 {
+                    "name": "Rigidez Raivosa",
+                    "source": "Ability: Rigidez Raivosa",
                     "trigger": 7,
-                    "on_event": "std::function<void(std::shared_ptr<internal::combat::EventContext>)>"
+                    "on_event": "std::function<void(std::shared_ptr<internal::combat::CombatEventContext>)>",
+                    "is_active": true
                 }
             ],
             "stack_count": 0,
@@ -184,8 +199,11 @@
             "name": "Trespassar",
             "effects": [
                 {
+                    "name": "Trespassar",
+                    "source": "Ability: Trespassar",
                     "trigger": 6,
-                    "on_event": "std::function<void(std::shared_ptr<internal::combat::EventContext>)>"
+                    "on_event": "std::function<void(std::shared_ptr<internal::combat::CombatEventContext>)>",
+                    "is_active": true
                 }
             ],
             "stack_count": 0,

@@ -25,20 +25,14 @@ namespace items {
 
 struct DamageSource {
   std::string name;
-  std::function<rules::DamageInstance(std::shared_ptr<combat::EventContext>)>
+  std::function<rules::DamageInstance(std::shared_ptr<combat::CombatEventContext>)>
       contribute;
-};
-
-struct Effect {
-  std::string name;
-  combat::CombatEvent trigger;
-  std::function<void(std::shared_ptr<combat::EventContext>)> on;
 };
 
 struct Enchantment {
   std::string name;
   std::vector<DamageSource> damage_sources;
-  std::vector<Effect> effects;
+  std::vector<combat::Effect> effects;
 };
 
 }  // namespace items

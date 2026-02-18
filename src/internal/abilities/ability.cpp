@@ -92,8 +92,11 @@ Ability CreateTrespassar() {
       return;
     if (!context->target->IsAlive()) {
       context->source->IncrementAbilityStack("Trespassar");
-      // TODO(zyrotot): Trigger additional attack here - need to add attack
-      // queue system
+      if (context->attack_queue) {
+        context->attack_queue->QueueAttack(
+            {context->source, context->target,
+             0});  // TODO(zyrotot): support multiple attack sequences
+      }
     }
   };
 

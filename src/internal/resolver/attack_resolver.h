@@ -40,6 +40,9 @@ class AttackResolver {
 
   std::shared_ptr<combat::CombatEventContext> ResolveAttack();
 
+  void ResolveSingleAttack(size_t move_index,
+                           std::shared_ptr<combat::CombatEventContext> context);
+
  protected:
   void ResolveAttackMove(const combat::AttackMove& attack_move,
                          std::shared_ptr<combat::CombatEventContext> context);

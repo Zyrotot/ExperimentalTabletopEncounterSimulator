@@ -77,7 +77,7 @@ Simulator::Simulator(std::string player_filename, factory::Monster monster_type,
 }
 
 SimulationResults Simulator::Run(int num_simulations) const {
-  SetLoggers(logging::LogLevel::INFO);
+  SetLoggers(logging::LogLevel::ERROR);
 
   SimulationResults results;
   results.num_simulations = num_simulations;

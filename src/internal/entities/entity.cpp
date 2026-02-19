@@ -201,12 +201,20 @@ bool Entity::IsAlive() const {
 }
 
 void Entity::AddDR(const rules::DamageReduction& dr, bool is_bonus) {
-  if (is_bonus) {
-    current_stats_.bonus_stats.bonus_resistances.damage_reductions.push_back(
-        dr);
-  } else {
-    current_stats_.base_stats.resistances.damage_reductions.push_back(dr);
+  auto& dr_list =
+      is_bonus
+          ? current_stats_.bonus_stats.bonus_resistances.damage_reductions
+          : current_stats_.base_stats.resistances.damage_reductions;
+
+  for (auto& existing : dr_list) {
+    if (existing.bypass_types == dr.bypass_types &&
+        existing.bypass_modifiers == dr.bypass_modifiers) {
+      existing.amount += dr.amount;
+      return;
+    }
   }
+
+  dr_list.push_back(dr);
 }
 
 void Entity::RemoveDR(int amount, bool from_bonus) {

@@ -31,6 +31,7 @@ void EventManager::Emit(CombatEvent event,
     case CombatEvent::DealDamage:
     case CombatEvent::Kill:
     case CombatEvent::Hit:
+    case CombatEvent::TurnStart:
       if (context->source)
         relevant_entities.push_back(context->source);
       break;

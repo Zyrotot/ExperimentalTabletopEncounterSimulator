@@ -425,7 +425,10 @@ std::shared_ptr<Entity> CreateExampleCharacter() {
 
 void SaveCharacterToJSON(const entities::EntityConfig &character_config, const std::string &filename) {
     std::string buffer;
-    glz::write_file_json(character_config, filename, buffer);
+    auto error = glz::write_file_json(character_config, filename, buffer);
+    if (error.ec != glz::error_code::none) {
+      return;
+    }
 }
 
 }  // namespace factory

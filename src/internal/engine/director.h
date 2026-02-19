@@ -1,13 +1,14 @@
 // -----------------------------------------------------------------------------
-// | @file      ai_director.h
+// | @file      director.h
 // | @author    Zyrotot
 // | @project   ETTES (2026)
 // -----------------------------------------------------------------------------
 
-#ifndef SRC_INTERNAL_ENGINE_AI_DIRECTOR_H_
-#define SRC_INTERNAL_ENGINE_AI_DIRECTOR_H_
+#ifndef SRC_INTERNAL_ENGINE_DIRECTOR_H_
+#define SRC_INTERNAL_ENGINE_DIRECTOR_H_
 
 #include <memory>
+#include <unordered_map>
 
 #include "internal/combat/combat_events.h"
 #include "internal/engine/combat_engine.h"
@@ -21,10 +22,10 @@ class Logger;
 
 namespace engine {
 
-class AIDirector : public combat::IAttackQueue {
+class Director : public combat::IAttackQueue {
  public:
-  AIDirector(Encounter* encounter, CombatEngine* engine);
-  ~AIDirector() override;
+  Director(Encounter* encounter, CombatEngine* engine);
+  ~Director() override;
 
   void RunEncounter();
 
@@ -36,12 +37,15 @@ class AIDirector : public combat::IAttackQueue {
   std::shared_ptr<entities::Entity> SelectTarget(
       std::shared_ptr<entities::Entity> attacker) const;
 
+  static constexpr int kMaxAdjacentAttackers = 8;
+
   Encounter* encounter_;
   CombatEngine* engine_;
   std::shared_ptr<logging::Logger> logger_;
+  std::unordered_map<const entities::Entity*, int> attacks_this_round_;
 };
 
 }  // namespace engine
 }  // namespace internal
 
-#endif  // SRC_INTERNAL_ENGINE_AI_DIRECTOR_H_
+#endif  // SRC_INTERNAL_ENGINE_DIRECTOR_H_

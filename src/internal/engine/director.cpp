@@ -1,11 +1,13 @@
 // -----------------------------------------------------------------------------
-// | @file      ai_director.cpp
+// | @file      director.cpp
 // | @author    Zyrotot
 // | @project   ETTES (2026)
 // -----------------------------------------------------------------------------
 
-#include "internal/engine/ai_director.h"
+#include "internal/engine/director.h"
 
+#include "internal/combat/combat_events.h"
+#include "internal/combat/event_manager.h"
 #include "internal/entities/entity.h"
 #include "internal/logging/log_manager.h"
 #include "internal/logging/logger.h"
@@ -13,17 +15,18 @@
 namespace internal {
 namespace engine {
 
-AIDirector::AIDirector(Encounter* encounter, CombatEngine* engine)
+Director::Director(Encounter* encounter, CombatEngine* engine)
     : encounter_(encounter),
       engine_(engine),
       logger_(logging::LogManager::GetLogger("director")) {
 }
 
-AIDirector::~AIDirector() {
+Director::~Director() {
 }
 
-void AIDirector::RunEncounter() {
+void Director::RunEncounter() {
   while (!encounter_->IsOver()) {
+    attacks_this_round_.clear();
     for (const auto& entity : encounter_->GetSideA()) {
       if (encounter_->IsOver()) break;
       if (!entity || !entity->IsAlive()) continue;
@@ -47,7 +50,7 @@ void AIDirector::RunEncounter() {
   }
 }
 
-void AIDirector::RunTurn(std::shared_ptr<entities::Entity> entity) {
+void Director::RunTurn(std::shared_ptr<entities::Entity> entity) {
   if (!entity || !entity->IsAlive()) {
     return;
   }
@@ -58,14 +61,27 @@ void AIDirector::RunTurn(std::shared_ptr<entities::Entity> entity) {
     return;
   }
 
+  if (attacks_this_round_[target.get()] >= kMaxAdjacentAttackers) {
+    logger_->Info("{} cannot attack {} - adjacency limit of {} reached",
+                  entity->GetName(), target->GetName(), kMaxAdjacentAttackers);
+    return;
+  }
+  attacks_this_round_[target.get()]++;
+
   logger_->Info("--- {}'s turn ---", entity->GetName());
+
+  // TODO(zyrotot): improve this, this is temporary
+  auto context = std::make_shared<combat::CombatEventContext>();
+  context->source = entity;
+  combat::EventManager::Emit(combat::CombatEvent::TurnStart, context);
+
   engine_->QueueAttack(
       {entity, target, 0});  // TODO(zyrotot): support multiple attack sequences
 
   engine_->Flush(this);
 }
 
-void AIDirector::QueueAttack(combat::QueuedAttack attack) {
+void Director::QueueAttack(combat::QueuedAttack attack) {
   if (!attack.target || !attack.target->IsAlive()) {
     if (attack.attacker) {
       attack.target = SelectTarget(attack.attacker);
@@ -78,10 +94,19 @@ void AIDirector::QueueAttack(combat::QueuedAttack attack) {
     return;
   }
 
+  if (attacks_this_round_[attack.target.get()] >= kMaxAdjacentAttackers) {
+    logger_->Info(
+        "Queued attack by {} on {} dropped - adjacency limit of {} reached",
+        attack.attacker ? attack.attacker->GetName() : "unknown",
+        attack.target->GetName(), kMaxAdjacentAttackers);
+    return;
+  }
+  attacks_this_round_[attack.target.get()]++;
+
   engine_->QueueAttack(std::move(attack));
 }
 
-std::shared_ptr<entities::Entity> AIDirector::SelectTarget(
+std::shared_ptr<entities::Entity> Director::SelectTarget(
     std::shared_ptr<entities::Entity> attacker) const {
   return encounter_->GetFirstLivingEnemyOf(attacker.get());
 }

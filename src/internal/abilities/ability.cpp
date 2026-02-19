@@ -82,16 +82,18 @@ Ability CreateTrespassar() {
   Ability ability;
   ability.name = "Trespassar";
   ability.is_active = true;
+  ability.stack_count = 1;
 
   combat::Effect effect;
   effect.name = "Trespassar";
   effect.source = "Ability: Trespassar";
   effect.trigger = combat::CombatEvent::Kill;
   effect.on_event = [](std::shared_ptr<combat::CombatEventContext> context) {
-    if (!context || !context->source || !context->target)
+    if (!context || !context->source) {
       return;
-    if (!context->target->IsAlive()) {
-      context->source->IncrementAbilityStack("Trespassar");
+    }
+    if (context->source->GetAbilityStack("Trespassar") > 0) {
+      context->source->DecrementAbilityStack("Trespassar");
       if (context->attack_queue) {
         context->attack_queue->QueueAttack(
             {context->source, context->target,
@@ -101,6 +103,21 @@ Ability CreateTrespassar() {
   };
 
   ability.effects.push_back(effect);
+
+  combat::Effect recharge_effect;
+  recharge_effect.name = "Trespassar";
+  recharge_effect.source = "Recharge: Trespassar";
+  recharge_effect.trigger = combat::CombatEvent::TurnStart;
+  recharge_effect.on_event =
+      [](std::shared_ptr<combat::CombatEventContext> context) {
+        if (!context || !context->source) {
+          return;
+        }
+        context->source->SetAbilityStack("Trespassar", 1);
+      };
+
+  ability.effects.push_back(recharge_effect);
+
   return ability;
 }
 

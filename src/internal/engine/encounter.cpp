@@ -14,50 +14,58 @@ namespace engine {
 Encounter::Encounter(std::vector<std::shared_ptr<entities::IEntity>> side_a,
                      std::vector<std::shared_ptr<entities::IEntity>> side_b)
     : side_a_(std::move(side_a)), side_b_(std::move(side_b)) {
+  for (const auto& e : side_a_) {
+    if (e) {
+      side_map_[e->GetId()] = 0;
+    }
+  }
+  for (const auto& e : side_b_) {
+    if (e) {
+      side_map_[e->GetId()] = 1;
+    }
+  }
 }
 
 int Encounter::FindSideOf(const entities::IEntity* entity) const {
-  for (const auto& e : side_a_) {
-    if (e.get() == entity) return 0;
+  if (!entity) {
+    return -1;
   }
-  for (const auto& e : side_b_) {
-    if (e.get() == entity) return 1;
-  }
-  return -1;
+  auto it = side_map_.find(entity->GetId());
+  return (it != side_map_.end()) ? it->second : -1;
 }
 
-std::vector<std::shared_ptr<entities::IEntity>> Encounter::GetLivingEnemiesOf(
-    const entities::IEntity* entity) const {
-  int side = FindSideOf(entity);
-  const auto& enemies = (side == 0) ? side_b_ : side_a_;
-
+std::vector<std::shared_ptr<entities::IEntity>> Encounter::CollectLiving(
+    int side,
+    bool first_only) const {
+  const auto& source = (side == 0) ? side_a_ : side_b_;
   std::vector<std::shared_ptr<entities::IEntity>> living;
-  for (const auto& e : enemies) {
+  for (const auto& e : source) {
     if (e && e->IsAlive()) {
       living.push_back(e);
+      if (first_only)
+        return living;
     }
   }
   return living;
 }
 
+std::vector<std::shared_ptr<entities::IEntity>> Encounter::GetLivingEnemiesOf(
+    const entities::IEntity* entity) const {
+  int side = FindSideOf(entity);
+  return CollectLiving(side == 0 ? 1 : 0);
+}
+
 std::shared_ptr<entities::IEntity> Encounter::GetFirstLivingEnemyOf(
     const entities::IEntity* entity) const {
-  auto living = GetLivingEnemiesOf(entity);
+  int side = FindSideOf(entity);
+  auto living = CollectLiving(side == 0 ? 1 : 0, true);
   return living.empty() ? nullptr : living.front();
 }
 
 std::vector<std::shared_ptr<entities::IEntity>> Encounter::GetLivingAlliesOf(
     const entities::IEntity* entity) const {
   int side = FindSideOf(entity);
-  const auto& allies = (side == 0) ? side_a_ : side_b_;
-
-  std::vector<std::shared_ptr<entities::IEntity>> living;
-  for (const auto& e : allies) {
-    if (e && e->IsAlive() && e.get() != entity) {
-      living.push_back(e);
-    }
-  }
-  return living;
+  return CollectLiving(side, entity);
 }
 
 bool Encounter::HasLivingEntitiesOnSideA() const {

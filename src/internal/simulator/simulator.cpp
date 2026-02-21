@@ -22,27 +22,10 @@
 #include "internal/factory/i_factory.h"
 #include "internal/logging/log_manager.h"
 
-#define MAX_WAVES 75
+constexpr int MAX_WAVES = 75;
 
 namespace internal {
 namespace simulator {
-
-namespace {
-
-constexpr const char* kSimLoggers[] = {"attack", "entity", "engine",
-                                       "director"};
-
-void SetLoggers(logging::LogLevel level) {
-  for (const auto* name : kSimLoggers) {
-    logging::LogManager::GetLogger(name)->SetLogLevel(level);
-  }
-}
-
-}  // namespace
-
-// -----------------------------------------------------------------------------
-// SimulationResults
-// -----------------------------------------------------------------------------
 
 void SimulationResults::Print() const {
   std::cout
@@ -67,10 +50,6 @@ void SimulationResults::Print() const {
       << "============================================================\n\n";
 }
 
-// -----------------------------------------------------------------------------
-// Simulator
-// -----------------------------------------------------------------------------
-
 Simulator::Simulator(std::unique_ptr<factory::IFactory> entity_factory,
                      std::shared_ptr<dice_rolls::Roller> roller)
     : entity_factory_(std::move(entity_factory)),
@@ -80,8 +59,6 @@ Simulator::Simulator(std::unique_ptr<factory::IFactory> entity_factory,
 
 SimulationResults Simulator::Run(int num_simulations,
                                  unsigned int num_threads) const {
-  SetLoggers(logging::LogLevel::err);
-
   if (num_threads == 0) {
     num_threads = std::max(
         1u, static_cast<unsigned int>(std::thread::hardware_concurrency()));

@@ -8,6 +8,7 @@
 #define SRC_INTERNAL_ENGINE_ENCOUNTER_H_
 
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 namespace internal {
@@ -42,8 +43,12 @@ class Encounter {
  private:
   int FindSideOf(const entities::IEntity* entity) const;
 
+  std::vector<std::shared_ptr<entities::IEntity>> CollectLiving(
+      int side, bool first_only = false) const;
+
   std::vector<std::shared_ptr<entities::IEntity>> side_a_;
   std::vector<std::shared_ptr<entities::IEntity>> side_b_;
+  std::unordered_map<uint32_t, int> side_map_;
 };
 
 }  // namespace engine

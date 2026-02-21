@@ -8,11 +8,6 @@
 
 #include <memory>
 
-#include "internal/rules/resistances.h"
-
-#define GLZ_USE_STD_FORMAT_FLOAT 0
-#include <glaze/glaze.hpp>
-
 #include "internal/abilities/ability.h"
 #include "internal/combat/attack.h"
 #include "internal/dice_rolls/roller.h"
@@ -20,31 +15,36 @@
 #include "internal/items/enchantment_library.h"
 #include "internal/items/weapon.h"
 #include "internal/rules/damage_types.h"
+#include "internal/rules/resistances.h"
+
+#define GLZ_USE_STD_FORMAT_FLOAT 0
+#include <glaze/glaze.hpp>
 
 namespace internal {
 namespace factory {
 
 using dice_rolls::Dice;
 using dice_rolls::Term;
-using entities::Entity;
 using entities::EntityConfig;
 using items::Enchantment;
 using items::Weapon;
 
 Factory::Factory(std::string player_filename, Monster monster_type)
     : player_filename_(std::move(player_filename)),
-      monster_type_(monster_type) {
+      monster_type_(monster_type),
+      player_config_(GetCharacterFromJSON(player_filename_)),
+      monster_config_(MonsterFactory(monster_type_)) {
 }
 
 std::shared_ptr<entities::IEntity> Factory::CreatePlayer() const {
-  return GetCharacterFromJSON(player_filename_);
+  return std::make_shared<entities::Entity>(player_config_);
 }
 
 std::shared_ptr<entities::IEntity> Factory::CreateMonster() const {
-  return MonsterFactory(monster_type_);
+  return std::make_shared<entities::Entity>(monster_config_);
 }
 
-std::shared_ptr<Entity> Factory::MonsterFactory(Monster monsterType) const {
+EntityConfig Factory::MonsterFactory(Monster monsterType) const {
   switch (monsterType) {
     case Uktril: {
       std::shared_ptr<Weapon> pinca = std::make_shared<Weapon>(Weapon{
@@ -122,7 +122,7 @@ std::shared_ptr<Entity> Factory::MonsterFactory(Monster monsterType) const {
           .alignment = rules::Alignment::ChaoticEvil,
       };
 
-      return std::make_shared<Entity>(uktril_config);
+      return uktril_config;
     }
     case Geraktril: {
       std::shared_ptr<Weapon> pinca = std::make_shared<Weapon>(
@@ -188,7 +188,7 @@ std::shared_ptr<Entity> Factory::MonsterFactory(Monster monsterType) const {
           .alignment = rules::Alignment::ChaoticEvil,
       };
 
-      return std::make_shared<Entity>(geraktril_config);
+      return geraktril_config;
     }
     case Reishid: {
       std::shared_ptr<Weapon> adaga = std::make_shared<Weapon>(Weapon{
@@ -269,7 +269,7 @@ std::shared_ptr<Entity> Factory::MonsterFactory(Monster monsterType) const {
           .alignment = rules::Alignment::ChaoticEvil,
       };
 
-      return std::make_shared<Entity>(reishid_config);
+      return reishid_config;
     }
     case Custom:
       return GetCharacterFromJSON("custom_monster.json");
@@ -278,7 +278,7 @@ std::shared_ptr<Entity> Factory::MonsterFactory(Monster monsterType) const {
   }
 }
 
-std::shared_ptr<Entity> Factory::GetCharacterFromJSON(
+EntityConfig Factory::GetCharacterFromJSON(
     const std::string& filename) const {
   auto config = LoadCharacterFromJSON(filename);
 
@@ -310,7 +310,7 @@ std::shared_ptr<Entity> Factory::GetCharacterFromJSON(
     }
   }
 
-  return std::make_shared<Entity>(config);
+  return config;
 }
 
 EntityConfig Factory::LoadCharacterFromJSON(const std::string& filename) const {
@@ -369,7 +369,7 @@ abilities::Ability Factory::RebuildAbilityFromName(const std::string& name,
   return abilities::Ability{};
 }
 
-std::shared_ptr<Entity> Factory::CreateExampleCharacter() const {
+EntityConfig Factory::CreateExampleCharacter() const {
   std::shared_ptr<Weapon> machado = std::make_shared<Weapon>(Weapon{
       .name = "Machado",
       .attack_bonus = 2,
@@ -441,10 +441,10 @@ std::shared_ptr<Entity> Factory::CreateExampleCharacter() const {
 
   SaveCharacterToJSON(character_config, "resources/example_character.json");
 
-  return std::make_shared<Entity>(character_config);
+  return character_config;
 }
 
-std::shared_ptr<Entity> Factory::CreateCustomEnemy() const {
+EntityConfig Factory::CreateCustomEnemy() const {
   std::shared_ptr<Weapon> machado = std::make_shared<Weapon>(Weapon{
       .name = "Machandejante",
       .attack_bonus = 2,
@@ -522,7 +522,7 @@ std::shared_ptr<Entity> Factory::CreateCustomEnemy() const {
 
   SaveCharacterToJSON(character_config, "resources/custom_monster.json");
 
-  return std::make_shared<Entity>(character_config);
+  return character_config;
 }
 
 void Factory::SaveCharacterToJSON(

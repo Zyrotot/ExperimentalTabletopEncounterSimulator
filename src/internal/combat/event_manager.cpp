@@ -49,15 +49,15 @@ void EventManager::Emit(CombatEvent event,
       continue;
     }
 
-    for (const auto& effect : entity->GetActiveEffects()) {
-      if (!effect.is_active) {
+    for (const auto* effect : entity->GetActiveEffects()) {
+      if (!effect->is_active) {
         continue;
       }
 
-      if (effect.trigger == event && effect.on_event) {
-        logger->Debug("Triggering {} effect from {} for {}", effect.name,
-                      effect.source, entity->GetName());
-        effect.on_event(context);
+      if (effect->trigger == event && effect->on_event) {
+        logger->Debug("Triggering {} effect from {} for {}", effect->name,
+                      effect->source, entity->GetName());
+        effect->on_event(context);
       }
     }
   }

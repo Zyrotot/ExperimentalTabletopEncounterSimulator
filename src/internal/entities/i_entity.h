@@ -23,6 +23,7 @@ class IEntity {
  public:
   virtual ~IEntity() = default;
 
+  virtual uint32_t GetId() const = 0;
   virtual const std::string& GetName() const = 0;
   virtual const Stats& GetCurrentStats() const = 0;
 
@@ -49,7 +50,7 @@ class IEntity {
   virtual void RemoveDR(int amount, bool from_bonus = true) = 0;
   virtual void ClearAllDR(bool from_bonus = true) = 0;
 
-  virtual const std::vector<combat::Effect>& GetActiveEffects() const = 0;
+  virtual const std::vector<const combat::Effect*>& GetActiveEffects() const = 0;
   virtual void BuildActiveEffects() = 0;
 };
 

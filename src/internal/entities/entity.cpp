@@ -6,17 +6,22 @@
 
 #include "internal/entities/entity.h"
 
+#include <atomic>
+
 #include "internal/items/weapon.h"
 #include "internal/logging/log_manager.h"
 
 namespace internal {
 namespace entities {
 
+std::atomic<uint32_t> Entity::next_id_{0};
+
 using combat::AttackSequence;
 using items::Weapon;
 
 Entity::Entity(const EntityConfig& config)
-    : name_(config.name),
+    : id_(next_id_.fetch_add(1)),
+      name_(config.name),
       starting_stats_(config.starting_stats),
       current_stats_(config.starting_stats),
       equipped_weapons_(config.equipped_weapons),
@@ -25,9 +30,16 @@ Entity::Entity(const EntityConfig& config)
       alignment_(config.alignment),
       logger_(internal::logging::LogManager::GetLogger("entity")) {
   BuildActiveEffects();
+  for (auto& ability : abilities_) {
+    ability_index_[ability.name] = &ability;
+  }
 }
 
 Entity::~Entity() {
+}
+
+uint32_t Entity::GetId() const {
+  return id_;
 }
 
 const std::string& Entity::GetName() const {
@@ -66,47 +78,35 @@ const std::vector<abilities::Ability>& Entity::GetAbilities() const {
 }
 
 bool Entity::HasAbility(const std::string& ability_name) const {
-  for (const auto& ability : abilities_) {
-    if (ability.name == ability_name) {
-      return true;
-    }
-  }
-  return false;
+  return ability_index_.count(ability_name) > 0;
 }
 
 int Entity::GetAbilityStack(const std::string& ability_name) const {
-  for (const auto& ability : abilities_) {
-    if (ability.name == ability_name) {
-      return ability.stack_count;
-    }
+  auto it = ability_index_.find(ability_name);
+  if (it == ability_index_.end()) {
+    return 0;
   }
-  return 0;
+  return it->second->stack_count;
 }
 
 void Entity::IncrementAbilityStack(const std::string& ability_name) {
-  for (auto& ability : abilities_) {
-    if (ability.name == ability_name) {
-      ability.stack_count++;
-      break;
-    }
+  auto it = ability_index_.find(ability_name);
+  if (it != ability_index_.end()) {
+    it->second->stack_count++;
   }
 }
 
 void Entity::DecrementAbilityStack(const std::string& ability_name) {
-  for (auto& ability : abilities_) {
-    if (ability.name == ability_name && ability.stack_count > 0) {
-      ability.stack_count--;
-      break;
-    }
+  auto it = ability_index_.find(ability_name);
+  if (it != ability_index_.end() && it->second->stack_count > 0) {
+    it->second->stack_count--;
   }
 }
 
 void Entity::SetAbilityStack(const std::string& ability_name, int value) {
-  for (auto& ability : abilities_) {
-    if (ability.name == ability_name) {
-      ability.stack_count = value;
-      break;
-    }
+  auto it = ability_index_.find(ability_name);
+  if (it != ability_index_.end()) {
+    it->second->stack_count = value;
   }
 }
 
@@ -166,7 +166,7 @@ void Entity::AddTempHP(int amount) {
   }
 }
 
-const std::vector<combat::Effect>& Entity::GetActiveEffects() const {
+const std::vector<const combat::Effect*>& Entity::GetActiveEffects() const {
   return active_effects_;
 }
 
@@ -178,7 +178,7 @@ void Entity::BuildActiveEffects() {
       continue;
 
     for (const auto& effect : ability.effects) {
-      active_effects_.push_back(effect);
+      active_effects_.push_back(&effect);
     }
   }
 
@@ -188,7 +188,7 @@ void Entity::BuildActiveEffects() {
 
     for (const auto& enchantment : weapon->enchantments) {
       for (const auto& effect : enchantment.effects) {
-        active_effects_.push_back(effect);
+        active_effects_.push_back(&effect);
       }
     }
   }

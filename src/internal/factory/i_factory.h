@@ -9,12 +9,9 @@
 
 #include <memory>
 
+#include "internal/entities/i_entity.h"
+
 namespace internal {
-
-namespace entities {
-class IEntity;
-}  // namespace entities
-
 namespace factory {
 
 class IFactory {

@@ -10,7 +10,7 @@
 #include <memory>
 #include <string>
 
-#include "internal/entities/entity.h"
+#include "internal/entities/entity_config.h"
 #include "internal/factory/i_factory.h"
 
 namespace internal {
@@ -31,14 +31,14 @@ class Factory : public IFactory {
   std::shared_ptr<entities::IEntity> CreateMonster() const override;
 
  private:
-  std::shared_ptr<entities::Entity> MonsterFactory(Monster monsterType) const;
-  std::shared_ptr<entities::Entity> GetCharacterFromJSON(
+  entities::EntityConfig MonsterFactory(Monster monsterType) const;
+  entities::EntityConfig GetCharacterFromJSON(
       const std::string& filename) const;
 
   entities::EntityConfig LoadCharacterFromJSON(const std::string& filename) const;
 
-  std::shared_ptr<entities::Entity> CreateExampleCharacter() const;
-  std::shared_ptr<entities::Entity> CreateCustomEnemy() const;
+  entities::EntityConfig CreateExampleCharacter() const;
+  entities::EntityConfig CreateCustomEnemy() const;
 
   void SaveCharacterToJSON(const entities::EntityConfig& character,
                            const std::string& filename) const;
@@ -49,6 +49,9 @@ class Factory : public IFactory {
 
   std::string player_filename_;
   Monster monster_type_;
+
+  entities::EntityConfig player_config_;
+  entities::EntityConfig monster_config_;
 };
 
 }  // namespace factory

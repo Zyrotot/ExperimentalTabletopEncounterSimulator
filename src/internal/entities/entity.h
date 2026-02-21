@@ -7,13 +7,17 @@
 #ifndef SRC_INTERNAL_ENTITIES_ENTITY_H_
 #define SRC_INTERNAL_ENTITIES_ENTITY_H_
 
+#include <atomic>
+#include <cstdint>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "internal/abilities/ability.h"
 #include "internal/combat/attack.h"
 #include "internal/combat/effect.h"
+#include "internal/entities/entity_config.h"
 #include "internal/entities/i_entity.h"
 #include "internal/entities/stats.h"
 #include "internal/logging/logger.h"
@@ -31,23 +35,12 @@ struct Weapon;
 
 namespace entities {
 
-struct EntityConfig {
-  std::string name;
-
-  Stats starting_stats;
-
-  std::vector<std::shared_ptr<items::Weapon>> equipped_weapons;
-  std::vector<combat::AttackSequence> attack_sequences;
-  std::vector<abilities::Ability> abilities;
-
-  rules::Alignment alignment;
-};
-
 class Entity : public IEntity {
  public:
   explicit Entity(const EntityConfig& config);
   ~Entity() override;
 
+  uint32_t GetId() const override;
   const std::string& GetName() const override;
   const Stats& GetCurrentStats() const override;
   const Stats& GetStartingStats() const;
@@ -60,7 +53,7 @@ class Entity : public IEntity {
   bool HasAbility(const std::string& ability_name) const override;
   int GetAbilityStack(const std::string& ability_name) const override;
 
-  const std::vector<combat::Effect>& GetActiveEffects() const override;
+  const std::vector<const combat::Effect*>& GetActiveEffects() const override;
   void BuildActiveEffects() override;
 
   void IncrementAbilityStack(const std::string& ability_name) override;
@@ -82,6 +75,7 @@ class Entity : public IEntity {
   void ClearAllDR(bool from_bonus = true) override;
 
  protected:
+  uint32_t id_;
   std::string name_;
 
   Stats starting_stats_;
@@ -93,9 +87,12 @@ class Entity : public IEntity {
 
   rules::Alignment alignment_;
 
-  std::vector<combat::Effect> active_effects_;
+  std::vector<const combat::Effect*> active_effects_;
+  std::unordered_map<std::string, abilities::Ability*> ability_index_;
 
   std::shared_ptr<logging::Logger> logger_;
+
+  static std::atomic<uint32_t> next_id_;
 };
 
 }  // namespace entities

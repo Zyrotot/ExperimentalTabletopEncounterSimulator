@@ -25,6 +25,7 @@ class StdMt19937Engine : public IRandomEngine {
 
  private:
   std::mt19937 rng_;
+  std::uniform_int_distribution<> dist_;
 };
 
 }  // namespace dice_rolls

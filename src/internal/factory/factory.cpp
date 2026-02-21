@@ -7,6 +7,7 @@
 #include "internal/factory/factory.h"
 
 #include <memory>
+#include "internal/rules/resistances.h"
 
 #define GLZ_USE_STD_FORMAT_FLOAT 0
 #include <glaze/glaze.hpp>
@@ -257,14 +258,13 @@ std::shared_ptr<Entity> MonsterFactory(Monster monsterType) {
       return std::make_shared<Entity>(reishid_config);
     }
     case Custom:
-      return std::make_shared<Entity>(
-          LoadCharacterFromJSON("resources/custom_monster.json"));
+      return GetCharacterFromJSON("custom_monster.json");
     default:
       return MonsterFactory(Monster::Uktril);
   }
 }
 
-std::shared_ptr<Entity> GetPlayer(const std::string& filename) {
+std::shared_ptr<Entity> GetCharacterFromJSON(const std::string& filename) {
   auto config = LoadCharacterFromJSON(filename);
 
   for (auto& weapon : config.equipped_weapons) {
@@ -280,6 +280,7 @@ std::shared_ptr<Entity> GetPlayer(const std::string& filename) {
     rebuilt_abilities.push_back(
         RebuildAbilityFromName(ability.name, ability.stack_count));
   }
+
   config.abilities = rebuilt_abilities;
 
   for (auto& attack_sequence : config.attack_sequences) {
@@ -374,10 +375,11 @@ std::shared_ptr<Entity> CreateExampleCharacter() {
                       .hp = 160,
                       .armour_class = 21,
                       .fortification = 0,
-                      .attack_bonuses = entities::AttackBonuses{
-                          .attack_bonus = 19,
-                          .damage_bonus = 21,
-                      },
+                      .attack_bonuses =
+                          entities::AttackBonuses{
+                              .attack_bonus = 19,
+                              .damage_bonus = 21,
+                          },
                       .resistances = entities::Resistances{},
                   },
               .bonus_stats =
@@ -388,33 +390,37 @@ std::shared_ptr<Entity> CreateExampleCharacter() {
                   },
           },
       .equipped_weapons = {machado},
-      .attack_sequences = std::vector<combat::AttackSequence>{
-          combat::AttackSequence{
-              .name = "Normal Attack",
-              .attacks = std::vector<combat::AttackMove>{
-                  combat::AttackMove{.weapon = machado,
-                                      .attack_modifier = 0,
-                                      .damage_modifier = 0},
+      .attack_sequences =
+          std::vector<combat::AttackSequence>{
+              combat::AttackSequence{
+                  .name = "Normal Attack",
+                  .attacks =
+                      std::vector<combat::AttackMove>{
+                          combat::AttackMove{.weapon = machado,
+                                             .attack_modifier = 0,
+                                             .damage_modifier = 0},
+                      },
+                  .attack_modifier = 0,
+                  .damage_modifier = 0,
               },
-              .attack_modifier = 0,
-              .damage_modifier = 0,
-          },
-          combat::AttackSequence{
-              .name = "Powerful Attack",
-              .attacks = std::vector<combat::AttackMove>{
-                  combat::AttackMove{.weapon = machado,
-                                      .attack_modifier = 0,
-                                      .damage_modifier = 0},
+              combat::AttackSequence{
+                  .name = "Powerful Attack",
+                  .attacks =
+                      std::vector<combat::AttackMove>{
+                          combat::AttackMove{.weapon = machado,
+                                             .attack_modifier = 0,
+                                             .damage_modifier = 0},
+                      },
+                  .attack_modifier = -2,
+                  .damage_modifier = 4,
               },
-              .attack_modifier = -2,
-              .damage_modifier = 4,
           },
-      },
-      .abilities = std::vector<abilities::Ability>{
-          abilities::CreateErosao(),
-          abilities::CreateRigidezRaivosa(),
-          abilities::CreateTrespassar(),
-      },
+      .abilities =
+          std::vector<abilities::Ability>{
+              abilities::CreateErosao(),
+              abilities::CreateRigidezRaivosa(),
+              abilities::CreateTrespassar(),
+          },
       .alignment = rules::Alignment::ChaoticNeutral,
   };
 
@@ -423,12 +429,94 @@ std::shared_ptr<Entity> CreateExampleCharacter() {
   return std::make_shared<Entity>(character_config);
 }
 
-void SaveCharacterToJSON(const entities::EntityConfig &character_config, const std::string &filename) {
-    std::string buffer;
-    auto error = glz::write_file_json(character_config, filename, buffer);
-    if (error.ec != glz::error_code::none) {
-      return;
-    }
+std::shared_ptr<Entity> CreateCustomEnemy() {
+  std::shared_ptr<Weapon> machado = std::make_shared<Weapon>(Weapon{
+      .name = "Machandejante",
+      .attack_bonus = 2,
+      .damage = Term{.dice_groups = {Dice{.count = 3, .sides = 6}}, .bonus = 1},
+      .damage_type = rules::DamageType::Slash,
+      .damage_modifier = rules::DamageModifier::None,
+      .crit_range = 20,
+      .crit_multiplier = 3,
+      .enchantments = {internal::items::CreateFlamingExplosionEnchantment()},
+  });
+
+  auto character_config =
+      entities::EntityConfig{
+          .name = "Darius Magnus",
+          .starting_stats =
+              entities::Stats{
+                  .base_stats =
+                      entities::BaseStats{
+                          .hp = 130,
+                          .armour_class = 27,
+                          .fortification = 0,
+                          .attack_bonuses =
+                              entities::AttackBonuses{
+                                  .attack_bonus = 18,
+                                  .damage_bonus = 26,
+                              },
+                          .resistances =
+                              entities::Resistances{
+                                  .damage_reductions =
+                                      std::vector<rules::DamageReduction>{
+                                          rules::DamageReduction{
+                                              .bypass_modifiers =
+                                                  rules::DamageModifier::None,
+                                              .amount = 13,
+                                          },
+                                      }}},
+                  .bonus_stats =
+                      entities::BonusStats{
+                          .temporary_hp = 0,
+                          .ac_bonus = 0,
+                          .bonus_resistances = entities::Resistances{},
+                      },
+              },
+          .equipped_weapons = {machado},
+          .attack_sequences =
+              std::vector<combat::AttackSequence>{
+                  combat::AttackSequence{
+                      .name = "Normal Attack",
+                      .attacks =
+                          std::vector<combat::AttackMove>{
+                              combat::AttackMove{
+                                  .weapon = machado,
+                                  .attack_modifier = 0,
+                                  .damage_modifier = 0},
+                          },
+                      .attack_modifier = 0,
+                      .damage_modifier = 0,
+                  },
+                  combat::AttackSequence{
+                      .name = "Powerful Attack",
+                      .attacks =
+                          std::vector<combat::AttackMove>{
+                              combat::AttackMove{
+                                  .weapon = machado,
+                                  .attack_modifier = 0,
+                                  .damage_modifier = 0},
+                          },
+                      .attack_modifier = -2,
+                      .damage_modifier = 4,
+                  },
+              },
+          .abilities = std::vector<abilities::Ability>{},
+          .alignment = rules::Alignment::LawfulGood,
+      };
+
+  SaveCharacterToJSON(character_config, "resources/custom_monster.json");
+
+  return std::make_shared<Entity>(character_config);
+}
+
+void SaveCharacterToJSON(const entities::EntityConfig& character_config,
+                         const std::string& filename) {
+  std::string buffer;
+  auto error = glz::write_file_json(character_config, filename, buffer);
+  if (error.ec != glz::error_code::none) {
+    return;
+  }
 }
 
 }  // namespace factory

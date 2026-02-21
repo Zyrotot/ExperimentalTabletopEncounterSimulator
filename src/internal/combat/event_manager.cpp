@@ -9,7 +9,6 @@
 #include "internal/combat/combat_context.h"
 #include "internal/entities/i_entity.h"
 #include "internal/logging/log_manager.h"
-#include "internal/logging/logger.h"
 
 namespace internal {
 namespace combat {

@@ -7,7 +7,6 @@
 #ifndef SRC_INTERNAL_COMBAT_ATTACK_H_
 #define SRC_INTERNAL_COMBAT_ATTACK_H_
 
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -18,7 +17,7 @@ namespace internal {
 namespace combat {
 
 struct AttackMove {
-  std::shared_ptr<items::Weapon> weapon;
+  items::Weapon weapon;
 
   int attack_modifier = 0;
   int damage_modifier = 0;

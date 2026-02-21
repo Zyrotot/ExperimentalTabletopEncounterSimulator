@@ -12,14 +12,11 @@ namespace combat {
 using dice_rolls::Term;
 
 int AttackMove::GetAttackModifier() const {
-  return attack_modifier + (weapon ? weapon->attack_bonus : 0);
+  return attack_modifier + weapon.attack_bonus;
 }
 
 Term AttackMove::GetAttackDamage() const {
-  if (!weapon) {
-    return Term{.bonus = damage_modifier};
-  }
-  Term total_damage = weapon->damage;
+  Term total_damage = weapon.damage;
   total_damage.AddModifier(damage_modifier);
 
   return total_damage;

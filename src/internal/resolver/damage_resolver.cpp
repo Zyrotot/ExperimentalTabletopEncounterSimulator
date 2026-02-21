@@ -49,7 +49,7 @@ void DamageResolver::ApplySingleAttack(size_t result_index) {
   }
 
   auto modifications =
-      combat::EventManager::Emit(combat::CombatEvent::TakeDamage, context_);
+      combat::EmitCombatEvent(combat::CombatEvent::TakeDamage, context_);
 
   for (const auto& mod : modifications) {
     if (mod.negate_all) {
@@ -64,7 +64,7 @@ void DamageResolver::ApplySingleAttack(size_t result_index) {
     total_damage += dmg_instance.amount;
   }
 
-  combat::EventManager::Emit(combat::CombatEvent::DealDamage, context_);
+  combat::EmitCombatEvent(combat::CombatEvent::DealDamage, context_);
 
   if (total_damage > 0) {
     logger_->info("Total damage applied: {}", total_damage);
@@ -75,7 +75,7 @@ void DamageResolver::ApplySingleAttack(size_t result_index) {
     if (!is_alive) {
       logger_->info("{} killed {}!", context_->source->GetName(),
                     context_->target->GetName());
-      combat::EventManager::Emit(combat::CombatEvent::Kill, context_);
+      combat::EmitCombatEvent(combat::CombatEvent::Kill, context_);
     }
   }
 }

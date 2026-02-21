@@ -14,7 +14,7 @@
 namespace internal {
 namespace combat {
 
-std::vector<DamageModification> EventManager::Emit(
+std::vector<DamageModification> EmitCombatEvent(
     CombatEvent event, CombatEventContext* context) {
   if (!context) {
     return {};

@@ -38,7 +38,7 @@ class Director : public combat::IAttackQueue {
 
   Encounter* encounter_;
   CombatEngine* engine_;
-  std::shared_ptr<logging::Logger> logger_;
+  logging::Logger* logger_;
   std::unordered_map<const entities::IEntity*, int> attacks_this_round_;
 };
 

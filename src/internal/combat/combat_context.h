@@ -30,7 +30,7 @@ struct CombatEventContext {
   std::shared_ptr<entities::IEntity> source;
   std::shared_ptr<entities::IEntity> target;
 
-  std::shared_ptr<dice_rolls::Roller> roller;
+  dice_rolls::Roller* roller = nullptr;
   std::vector<AttackResult> results;
   size_t current_index = 0;
 

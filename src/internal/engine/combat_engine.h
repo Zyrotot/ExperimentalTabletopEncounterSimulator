@@ -35,7 +35,7 @@ class CombatEngine {
 
   void QueueAttack(combat::QueuedAttack attack);
 
-  std::vector<std::shared_ptr<combat::CombatEventContext>> Flush(
+  std::vector<std::unique_ptr<combat::CombatEventContext>> Flush(
       combat::IAttackQueue* context_queue);
 
  private:
@@ -43,10 +43,10 @@ class CombatEngine {
       std::shared_ptr<entities::IEntity> attacker,
       std::shared_ptr<entities::IEntity> defender, int attack_sequence_index,
       combat::IAttackQueue* context_queue,
-      std::vector<std::shared_ptr<combat::CombatEventContext>>* out_contexts);
+      std::vector<std::unique_ptr<combat::CombatEventContext>>* out_contexts);
 
   std::shared_ptr<dice_rolls::Roller> roller_;
-  std::shared_ptr<logging::Logger> logger_;
+  logging::Logger* logger_;
   std::deque<combat::QueuedAttack> attack_queue_;
 };
 

@@ -15,7 +15,7 @@
 namespace internal {
 namespace logging {
 
-std::shared_ptr<Logger> LogManager::GetLogger(const std::string& name) {
+Logger* LogManager::GetLogger(const std::string& name) {
   static std::mutex creation_mutex;
   std::lock_guard<std::mutex> lock(creation_mutex);
 
@@ -27,7 +27,7 @@ std::shared_ptr<Logger> LogManager::GetLogger(const std::string& name) {
   if (name != "simulator") {
     spd->set_level(spdlog::level::err);
   }
-  return spd;
+  return spd.get();
 }
 
 }  // namespace logging

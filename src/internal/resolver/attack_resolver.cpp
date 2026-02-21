@@ -37,21 +37,21 @@ AttackResolver::AttackResolver(std::shared_ptr<IEntity> attacker,
 AttackResolver::~AttackResolver() {
 }
 
-std::shared_ptr<CombatEventContext> AttackResolver::ResolveAttack() {
-  auto context = std::make_shared<CombatEventContext>();
+std::unique_ptr<CombatEventContext> AttackResolver::ResolveAttack() {
+  auto context = std::make_unique<CombatEventContext>();
   context->source = attacker_;
   context->target = defender_;
-  context->roller = roller_;
+  context->roller = roller_.get();
 
   for (const auto& attack_move : attack_sequence_.attacks) {
-    ResolveAttackMove(attack_move, context);
+    ResolveAttackMove(attack_move, context.get());
   }
   return context;
 }
 
 void AttackResolver::ResolveSingleAttack(
     size_t move_index,
-    std::shared_ptr<CombatEventContext> context) {
+    CombatEventContext* context) {
   if (move_index >= attack_sequence_.attacks.size()) {
     return;
   }
@@ -60,7 +60,7 @@ void AttackResolver::ResolveSingleAttack(
 
 void AttackResolver::ResolveAttackMove(
     const AttackMove& attack_move,
-    std::shared_ptr<CombatEventContext> context) {
+    CombatEventContext* context) {
   AttackResult current_result{.attack = &attack_move,
                               .d20_roll = 0,
                               .total_attack_roll = 0,
@@ -132,7 +132,7 @@ DamageInstance AttackResolver::CalculateBaseDamage(
 
 void AttackResolver::GatherDamageFromSources(
     const AttackMove& attack_move,
-    std::shared_ptr<CombatEventContext> context, AttackResult* result) {
+    CombatEventContext* context, AttackResult* result) {
   for (const auto& enchantment : attack_move.weapon.enchantments) {
     for (const auto& source : enchantment.damage_sources) {
       DamageInstance dmg = source.contribute(*context);

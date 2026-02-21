@@ -25,10 +25,6 @@
 
 namespace internal {
 
-namespace logging {
-class Logger;
-}  // namespace logging
-
 namespace items {
 struct Weapon;
 }  // namespace items

@@ -14,6 +14,7 @@
 #include "internal/combat/attack_queue.h"
 #include "internal/combat/attack_result.h"
 #include "internal/combat/combat_context.h"
+#include "internal/logging/logger.h"
 
 namespace internal {
 
@@ -24,10 +25,6 @@ class IEntity;
 namespace dice_rolls {
 class Roller;
 }  // namespace dice_rolls
-
-namespace logging {
-class Logger;
-}  // namespace logging
 
 namespace engine {
 

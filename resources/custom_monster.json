@@ -1,64 +1,109 @@
 {
-    "name": "Character",
+    "name": "Darius Magnus",
     "starting_stats": {
         "base_stats": {
-            "hp": 160,
-            "armour_class": 21,
+            "hp": 130,
+            "armour_class": 27,
             "fortification": 0,
             "attack_bonuses": {
-                "attack_bonus": 19,
-                "damage_bonus": 21
+                "attack_bonus": 18,
+                "damage_bonus": 26
             },
-            "damage_reductions": [],
-            "energy_resistances": [],
-            "immunity": {},
-            "weaknesses": []
+            "resistances": {
+                "damage_reductions": [
+                    {
+                        "bypass_types": 0,
+                        "bypass_modifiers": 0,
+                        "amount": 13
+                    }
+                ],
+                "energy_resistances": [],
+                "immunity": {
+                    "immune_types": 0,
+                    "immune_categories": 0
+                },
+                "weaknesses": []
+            }
         },
         "bonus_stats": {
             "temporary_hp": 0,
-            "ac_bonus": 0
+            "ac_bonus": 0,
+            "bonus_resistances": {
+                "damage_reductions": [],
+                "energy_resistances": [],
+                "immunity": {
+                    "immune_types": 0,
+                    "immune_categories": 0
+                },
+                "weaknesses": []
+            }
         }
     },
     "equipped_weapons": [
         {
-            "name": "Machado",
+            "name": "Machandejante",
             "attack_bonus": 2,
             "damage": {
                 "dice_groups": [
                     {
-                        "count": 4,
-                        "sides": 8
+                        "count": 3,
+                        "sides": 6
                     }
                 ],
-                "bonus": 0
+                "bonus": 1
             },
             "damage_type": 1,
             "damage_modifier": 0,
             "crit_range": 20,
-            "crit_multiplier": 3
+            "crit_multiplier": 3,
+            "enchantments": [
+                {
+                    "name": "Flaming Explosion",
+                    "damage_sources": [
+                        {
+                            "name": "Flaming Explosion",
+                            "contribute": "std::function<internal::rules::DamageInstance(std::shared_ptr<internal::combat::CombatEventContext>)>"
+                        }
+                    ],
+                    "effects": []
+                }
+            ]
         }
     ],
     "attack_sequences": [
         {
+            "name": "Normal Attack",
             "attacks": [
                 {
                     "weapon": {
-            "name": "Machado",
-            "attack_bonus": 2,
-            "damage": {
-                "dice_groups": [
-                    {
-                        "count": 4,
-                        "sides": 8
-                    }
-                ],
-                "bonus": 0
-            },
-            "damage_type": 1,
-            "damage_modifier": 0,
-            "crit_range": 20,
-            "crit_multiplier": 3
-        },
+                        "name": "Machandejante",
+                        "attack_bonus": 2,
+                        "damage": {
+                            "dice_groups": [
+                                {
+                                    "count": 3,
+                                    "sides": 6
+                                }
+                            ],
+                            "bonus": 1
+                        },
+                        "damage_type": 1,
+                        "damage_modifier": 0,
+                        "crit_range": 20,
+                        "crit_multiplier": 3,
+                        "enchantments": [
+                            {
+                                "name": "Flaming Explosion",
+                                "damage_sources": [
+                                    {
+                                        "name": "Flaming Explosion",
+                                        "contribute": "std::function<internal::rules::DamageInstance(std::shared_ptr<internal::combat::CombatEventContext>)>"
+                                    }
+                                ],
+                                "effects": []
+                            }
+                        ]
+                    },
                     "attack_modifier": 0,
                     "damage_modifier": 0,
                     "crit_range_bonus": 0,
@@ -67,7 +112,50 @@
             ],
             "attack_modifier": 0,
             "damage_modifier": 0
+        },
+        {
+            "name": "Powerful Attack",
+            "attacks": [
+                {
+                    "weapon": {
+                        "name": "Machandejante",
+                        "attack_bonus": 2,
+                        "damage": {
+                            "dice_groups": [
+                                {
+                                    "count": 3,
+                                    "sides": 6
+                                }
+                            ],
+                            "bonus": 1
+                        },
+                        "damage_type": 1,
+                        "damage_modifier": 0,
+                        "crit_range": 20,
+                        "crit_multiplier": 3,
+                        "enchantments": [
+                            {
+                                "name": "Flaming Explosion",
+                                "damage_sources": [
+                                    {
+                                        "name": "Flaming Explosion",
+                                        "contribute": "std::function<internal::rules::DamageInstance(std::shared_ptr<internal::combat::CombatEventContext>)>"
+                                    }
+                                ],
+                                "effects": []
+                            }
+                        ]
+                    },
+                    "attack_modifier": 0,
+                    "damage_modifier": 0,
+                    "crit_range_bonus": 0,
+                    "crit_multiplier_bonus": 0
+                }
+            ],
+            "attack_modifier": -2,
+            "damage_modifier": 4
         }
     ],
-    "alignment": 34
+    "abilities": [],
+    "alignment": 9
 }

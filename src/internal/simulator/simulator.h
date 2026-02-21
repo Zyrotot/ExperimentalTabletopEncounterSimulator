@@ -42,10 +42,13 @@ class Simulator {
   Simulator(std::string player_filename, factory::Monster monster_type,
             std::shared_ptr<dice_rolls::Roller> roller);
 
-  SimulationResults Run(int num_simulations) const;
+  SimulationResults Run(int num_simulations,
+                        unsigned int num_threads = 0) const;
 
  private:
-  int RunOnce() const;
+  bool RunWave(int wave, std::shared_ptr<dice_rolls::Roller> roller) const;
+
+  int RunOnce(std::shared_ptr<dice_rolls::Roller> roller) const;
 
   std::string player_filename_;
   factory::Monster monster_type_;

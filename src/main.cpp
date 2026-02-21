@@ -16,7 +16,7 @@ int main() {
       internal::factory::Monster::Geraktril,
       roller);
 
-  auto results = sim.Run(1);
+  auto results = sim.Run(100);
   results.Print();
 
   return 0;

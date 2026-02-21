@@ -7,68 +7,42 @@
 #ifndef SRC_INTERNAL_LOGGING_LOGGER_H_
 #define SRC_INTERNAL_LOGGING_LOGGER_H_
 
-#include <sstream>
+#include <spdlog/logger.h>
+
+#include <memory>
 #include <string>
+#include <utility>
 
 namespace internal {
 namespace logging {
 
-enum class LogLevel { DEBUG, INFO, WARNING, ERROR };
-
-// Simple formatting helper
-namespace detail {
-inline void FormatImpl(std::ostringstream& oss, const std::string& fmt,
-                       size_t pos) {
-  // Base case: append remaining string
-  oss << fmt.substr(pos);
-}
-
-template <typename T, typename... Args>
-void FormatImpl(std::ostringstream& oss, const std::string& fmt, size_t pos,
-                const T& value, const Args&... args) {
-  size_t placeholder = fmt.find("{}", pos);
-  if (placeholder == std::string::npos) {
-    oss << fmt.substr(pos);
-    return;
-  }
-  oss << fmt.substr(pos, placeholder - pos);
-  oss << value;
-  FormatImpl(oss, fmt, placeholder + 2, args...);
-}
-
-template <typename... Args>
-std::string Format(const std::string& fmt, const Args&... args) {
-  std::ostringstream oss;
-  FormatImpl(oss, fmt, 0, args...);
-  return oss.str();
-}
-}  // namespace detail
+using LogLevel = spdlog::level::level_enum;
 
 class Logger {
  public:
-  void Debug(const std::string& message);
-  void Info(const std::string& message);
-  void Warning(const std::string& message);
-  void Error(const std::string& message);
+  void Debug(const std::string& msg);
+  void Info(const std::string& msg);
+  void Warning(const std::string& msg);
+  void Error(const std::string& msg);
 
   template <typename... Args>
-  void Debug(const std::string& fmt, const Args&... args) {
-    Log(LogLevel::DEBUG, detail::Format(fmt, args...));
+  void Debug(spdlog::format_string_t<Args...> fmt, Args&&... args) {
+    spd_->debug(fmt, std::forward<Args>(args)...);
   }
 
   template <typename... Args>
-  void Info(const std::string& fmt, const Args&... args) {
-    Log(LogLevel::INFO, detail::Format(fmt, args...));
+  void Info(spdlog::format_string_t<Args...> fmt, Args&&... args) {
+    spd_->info(fmt, std::forward<Args>(args)...);
   }
 
   template <typename... Args>
-  void Warning(const std::string& fmt, const Args&... args) {
-    Log(LogLevel::WARNING, detail::Format(fmt, args...));
+  void Warning(spdlog::format_string_t<Args...> fmt, Args&&... args) {
+    spd_->warn(fmt, std::forward<Args>(args)...);
   }
 
   template <typename... Args>
-  void Error(const std::string& fmt, const Args&... args) {
-    Log(LogLevel::ERROR, detail::Format(fmt, args...));
+  void Error(spdlog::format_string_t<Args...> fmt, Args&&... args) {
+    spd_->error(fmt, std::forward<Args>(args)...);
   }
 
   const std::string& GetName() const;
@@ -77,13 +51,9 @@ class Logger {
 
  private:
   friend class LogManager;
-  explicit Logger(const std::string& name);
+  explicit Logger(std::shared_ptr<spdlog::logger> spd);
 
-  void Log(LogLevel level, const std::string& message);
-  const char* LogLevelToString(LogLevel level) const;
-
-  std::string name_;
-  LogLevel min_level_ = LogLevel::INFO;
+  std::shared_ptr<spdlog::logger> spd_;
 };
 
 }  // namespace logging

@@ -1,13 +1,15 @@
 // -----------------------------------------------------------------------------
-// | @file      event_manager.h
+// | @file      effect.h
 // | @author    Zyrotot
 // | @project   ETTES (2026)
 // -----------------------------------------------------------------------------
 
-#ifndef SRC_INTERNAL_COMBAT_EVENT_MANAGER_H_
-#define SRC_INTERNAL_COMBAT_EVENT_MANAGER_H_
+#ifndef SRC_INTERNAL_COMBAT_EFFECT_H_
+#define SRC_INTERNAL_COMBAT_EFFECT_H_
 
+#include <functional>
 #include <memory>
+#include <string>
 
 #include "internal/combat/combat_event_types.h"
 
@@ -16,13 +18,15 @@ namespace combat {
 
 class CombatEventContext;
 
-class EventManager {
- public:
-  static void Emit(CombatEvent event,
-                   std::shared_ptr<CombatEventContext> context);
+struct Effect {
+  std::string name;
+  std::string source;
+  CombatEvent trigger;
+  std::function<void(std::shared_ptr<CombatEventContext>)> on_event;
+  bool is_active = true;
 };
 
 }  // namespace combat
 }  // namespace internal
 
-#endif  // SRC_INTERNAL_COMBAT_EVENT_MANAGER_H_
+#endif  // SRC_INTERNAL_COMBAT_EFFECT_H_

@@ -18,8 +18,8 @@
 #include "internal/engine/combat_engine.h"
 #include "internal/engine/director.h"
 #include "internal/engine/encounter.h"
-#include "internal/entities/entity.h"
-#include "internal/factory/factory.h"
+#include "internal/entities/i_entity.h"
+#include "internal/factory/i_factory.h"
 #include "internal/logging/log_manager.h"
 
 #define MAX_WAVES 75
@@ -71,10 +71,9 @@ void SimulationResults::Print() const {
 // Simulator
 // -----------------------------------------------------------------------------
 
-Simulator::Simulator(std::string player_filename, factory::Monster monster_type,
+Simulator::Simulator(std::unique_ptr<factory::IFactory> entity_factory,
                      std::shared_ptr<dice_rolls::Roller> roller)
-    : player_filename_(std::move(player_filename)),
-      monster_type_(monster_type),
+    : entity_factory_(std::move(entity_factory)),
       roller_(std::move(roller)),
       logger_(logging::LogManager::GetLogger("simulator")) {
 }
@@ -165,12 +164,12 @@ SimulationResults Simulator::Run(int num_simulations,
 
 bool Simulator::RunWave(int wave,
                         std::shared_ptr<dice_rolls::Roller> roller) const {
-  auto player = factory::GetCharacterFromJSON(player_filename_);
+  auto player = entity_factory_->CreatePlayer();
 
-  std::vector<std::shared_ptr<entities::Entity>> enemies;
+  std::vector<std::shared_ptr<entities::IEntity>> enemies;
   enemies.reserve(static_cast<std::size_t>(wave));
   for (int i = 0; i < wave; ++i) {
-    enemies.push_back(factory::MonsterFactory(monster_type_));
+    enemies.push_back(entity_factory_->CreateMonster());
   }
 
   engine::CombatEngine combat_engine(roller);

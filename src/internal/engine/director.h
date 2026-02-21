@@ -10,7 +10,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include "internal/combat/combat_events.h"
+#include "internal/combat/attack_queue.h"
 #include "internal/engine/combat_engine.h"
 #include "internal/engine/encounter.h"
 
@@ -29,20 +29,20 @@ class Director : public combat::IAttackQueue {
 
   void RunEncounter();
 
-  void RunTurn(std::shared_ptr<entities::Entity> entity);
+  void RunTurn(std::shared_ptr<entities::IEntity> entity);
 
   void QueueAttack(combat::QueuedAttack attack) override;
 
  private:
-  std::shared_ptr<entities::Entity> SelectTarget(
-      std::shared_ptr<entities::Entity> attacker) const;
+  std::shared_ptr<entities::IEntity> SelectTarget(
+      std::shared_ptr<entities::IEntity> attacker) const;
 
   static constexpr int kMaxAdjacentAttackers = 8;
 
   Encounter* encounter_;
   CombatEngine* engine_;
   std::shared_ptr<logging::Logger> logger_;
-  std::unordered_map<const entities::Entity*, int> attacks_this_round_;
+  std::unordered_map<const entities::IEntity*, int> attacks_this_round_;
 };
 
 }  // namespace engine

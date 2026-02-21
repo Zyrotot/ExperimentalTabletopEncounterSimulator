@@ -11,12 +11,14 @@
 #include <memory>
 #include <vector>
 
-#include "internal/combat/combat_events.h"
+#include "internal/combat/attack_queue.h"
+#include "internal/combat/attack_result.h"
+#include "internal/combat/combat_context.h"
 
 namespace internal {
 
 namespace entities {
-class Entity;
+class IEntity;
 }  // namespace entities
 
 namespace dice_rolls {
@@ -41,8 +43,8 @@ class CombatEngine {
 
  private:
   void ProcessAttack(
-      std::shared_ptr<entities::Entity> attacker,
-      std::shared_ptr<entities::Entity> defender, int attack_sequence_index,
+      std::shared_ptr<entities::IEntity> attacker,
+      std::shared_ptr<entities::IEntity> defender, int attack_sequence_index,
       combat::IAttackQueue* context_queue,
       std::vector<std::shared_ptr<combat::CombatEventContext>>* out_contexts);
 

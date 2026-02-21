@@ -6,9 +6,8 @@
 
 #include "internal/engine/director.h"
 
-#include "internal/combat/combat_events.h"
 #include "internal/combat/event_manager.h"
-#include "internal/entities/entity.h"
+#include "internal/entities/i_entity.h"
 #include "internal/logging/log_manager.h"
 #include "internal/logging/logger.h"
 
@@ -50,7 +49,7 @@ void Director::RunEncounter() {
   }
 }
 
-void Director::RunTurn(std::shared_ptr<entities::Entity> entity) {
+void Director::RunTurn(std::shared_ptr<entities::IEntity> entity) {
   if (!entity || !entity->IsAlive()) {
     return;
   }
@@ -106,8 +105,8 @@ void Director::QueueAttack(combat::QueuedAttack attack) {
   engine_->QueueAttack(std::move(attack));
 }
 
-std::shared_ptr<entities::Entity> Director::SelectTarget(
-    std::shared_ptr<entities::Entity> attacker) const {
+std::shared_ptr<entities::IEntity> Director::SelectTarget(
+    std::shared_ptr<entities::IEntity> attacker) const {
   return encounter_->GetFirstLivingEnemyOf(attacker.get());
 }
 

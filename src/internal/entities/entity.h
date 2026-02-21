@@ -13,7 +13,8 @@
 
 #include "internal/abilities/ability.h"
 #include "internal/combat/attack.h"
-#include "internal/combat/combat_events.h"
+#include "internal/combat/effect.h"
+#include "internal/entities/i_entity.h"
 #include "internal/entities/stats.h"
 #include "internal/logging/logger.h"
 #include "internal/rules/alignment.h"
@@ -42,43 +43,43 @@ struct EntityConfig {
   rules::Alignment alignment;
 };
 
-class Entity {
+class Entity : public IEntity {
  public:
   explicit Entity(const EntityConfig& config);
-  virtual ~Entity();
+  ~Entity() override;
 
-  const std::string& GetName() const;
-  const Stats& GetCurrentStats() const;
+  const std::string& GetName() const override;
+  const Stats& GetCurrentStats() const override;
   const Stats& GetStartingStats() const;
   const std::vector<combat::AttackSequence>& GetAttackSequences() const;
-  const combat::AttackSequence& GetAttackSequence(const int& index) const;
+  const combat::AttackSequence& GetAttackSequence(int index) const override;
   const std::vector<std::shared_ptr<items::Weapon>>& GetEquippedWeapons() const;
-  const rules::Alignment& GetAlignment() const;
+  const rules::Alignment& GetAlignment() const override;
 
   const std::vector<abilities::Ability>& GetAbilities() const;
-  bool HasAbility(const std::string& ability_name) const;
-  int GetAbilityStack(const std::string& ability_name) const;
+  bool HasAbility(const std::string& ability_name) const override;
+  int GetAbilityStack(const std::string& ability_name) const override;
 
-  const std::vector<combat::Effect>& GetActiveEffects() const;
-  void BuildActiveEffects();
+  const std::vector<combat::Effect>& GetActiveEffects() const override;
+  void BuildActiveEffects() override;
 
-  void IncrementAbilityStack(const std::string& ability_name);
-  void DecrementAbilityStack(const std::string& ability_name);
-  void SetAbilityStack(const std::string& ability_name, int value);
+  void IncrementAbilityStack(const std::string& ability_name) override;
+  void DecrementAbilityStack(const std::string& ability_name) override;
+  void SetAbilityStack(const std::string& ability_name, int value) override;
 
-  int GetEffectiveAC() const;
-  int GetFortification() const;
+  int GetEffectiveAC() const override;
+  int GetFortification() const override;
 
-  Resistances GetResistances() const;
+  Resistances GetResistances() const override;
 
-  void TakeDamage(int damage);
-  void Heal(int amount);
-  void AddTempHP(int amount);
-  bool IsAlive() const;
+  void TakeDamage(int damage) override;
+  void Heal(int amount) override;
+  void AddTempHP(int amount) override;
+  bool IsAlive() const override;
 
-  void AddDR(const rules::DamageReduction& dr, bool is_bonus = true);
-  void RemoveDR(int amount, bool from_bonus = true);
-  void ClearAllDR(bool from_bonus = true);
+  void AddDR(const rules::DamageReduction& dr, bool is_bonus = true) override;
+  void RemoveDR(int amount, bool from_bonus = true) override;
+  void ClearAllDR(bool from_bonus = true) override;
 
  protected:
   std::string name_;

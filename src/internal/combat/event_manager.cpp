@@ -6,7 +6,8 @@
 
 #include "internal/combat/event_manager.h"
 
-#include "internal/entities/entity.h"
+#include "internal/combat/combat_context.h"
+#include "internal/entities/i_entity.h"
 #include "internal/logging/log_manager.h"
 #include "internal/logging/logger.h"
 
@@ -21,7 +22,7 @@ void EventManager::Emit(CombatEvent event,
 
   auto logger = logging::LogManager::GetLogger("events");
 
-  std::vector<std::shared_ptr<entities::Entity>> relevant_entities;
+  std::vector<std::shared_ptr<entities::IEntity>> relevant_entities;
 
   switch (event) {
     case CombatEvent::TakeDamage:

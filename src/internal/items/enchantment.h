@@ -12,13 +12,17 @@
 #include <string>
 #include <vector>
 
-#include "internal/combat/combat_events.h"
+#include "internal/combat/effect.h"
 #include "internal/rules/damage_types.h"
 
 namespace internal {
 
 namespace dice_rolls {
 class Roller;
+}
+
+namespace combat {
+class CombatEventContext;
 }
 
 namespace items {

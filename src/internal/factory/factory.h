@@ -11,6 +11,7 @@
 #include <string>
 
 #include "internal/entities/entity.h"
+#include "internal/factory/i_factory.h"
 
 namespace internal {
 namespace factory {
@@ -22,20 +23,33 @@ enum Monster {
   Custom = 4,
 };
 
-std::shared_ptr<entities::Entity> MonsterFactory(Monster monsterType);
-std::shared_ptr<entities::Entity> GetCharacterFromJSON(const std::string& filename);
+class Factory : public IFactory {
+ public:
+  Factory(std::string player_filename, Monster monster_type);
 
-entities::EntityConfig LoadCharacterFromJSON(const std::string& filename);
+  std::shared_ptr<entities::IEntity> CreatePlayer() const override;
+  std::shared_ptr<entities::IEntity> CreateMonster() const override;
 
-std::shared_ptr<entities::Entity> CreateExampleCharacter();
-void SaveCharacterToJSON(const entities::EntityConfig& character,
-                         const std::string& filename);
+ private:
+  std::shared_ptr<entities::Entity> MonsterFactory(Monster monsterType) const;
+  std::shared_ptr<entities::Entity> GetCharacterFromJSON(
+      const std::string& filename) const;
 
-items::Enchantment RebuildEnchantmentFromName(const std::string& name);
-abilities::Ability RebuildAbilityFromName(const std::string& name,
-                                          int stack_count = 0);
+  entities::EntityConfig LoadCharacterFromJSON(const std::string& filename) const;
 
-std::shared_ptr<entities::Entity> CreateCustomEnemy();
+  std::shared_ptr<entities::Entity> CreateExampleCharacter() const;
+  std::shared_ptr<entities::Entity> CreateCustomEnemy() const;
+
+  void SaveCharacterToJSON(const entities::EntityConfig& character,
+                           const std::string& filename) const;
+
+  items::Enchantment RebuildEnchantmentFromName(const std::string& name) const;
+  abilities::Ability RebuildAbilityFromName(const std::string& name,
+                                            int stack_count = 0) const;
+
+  std::string player_filename_;
+  Monster monster_type_;
+};
 
 }  // namespace factory
 }  // namespace internal

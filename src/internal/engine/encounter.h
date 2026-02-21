@@ -12,38 +12,38 @@
 
 namespace internal {
 namespace entities {
-class Entity;
+class IEntity;
 }  // namespace entities
 
 namespace engine {
 
 class Encounter {
  public:
-  Encounter(std::vector<std::shared_ptr<entities::Entity>> side_a,
-            std::vector<std::shared_ptr<entities::Entity>> side_b);
+  Encounter(std::vector<std::shared_ptr<entities::IEntity>> side_a,
+            std::vector<std::shared_ptr<entities::IEntity>> side_b);
 
-  std::vector<std::shared_ptr<entities::Entity>> GetLivingEnemiesOf(
-      const entities::Entity* entity) const;
+  std::vector<std::shared_ptr<entities::IEntity>> GetLivingEnemiesOf(
+      const entities::IEntity* entity) const;
 
-  std::shared_ptr<entities::Entity> GetFirstLivingEnemyOf(
-      const entities::Entity* entity) const;
+  std::shared_ptr<entities::IEntity> GetFirstLivingEnemyOf(
+      const entities::IEntity* entity) const;
 
-  std::vector<std::shared_ptr<entities::Entity>> GetLivingAlliesOf(
-      const entities::Entity* entity) const;
+  std::vector<std::shared_ptr<entities::IEntity>> GetLivingAlliesOf(
+      const entities::IEntity* entity) const;
 
   bool HasLivingEntitiesOnSideA() const;
   bool HasLivingEntitiesOnSideB() const;
 
   bool IsOver() const;
 
-  const std::vector<std::shared_ptr<entities::Entity>>& GetSideA() const;
-  const std::vector<std::shared_ptr<entities::Entity>>& GetSideB() const;
+  const std::vector<std::shared_ptr<entities::IEntity>>& GetSideA() const;
+  const std::vector<std::shared_ptr<entities::IEntity>>& GetSideB() const;
 
  private:
-  int FindSideOf(const entities::Entity* entity) const;
+  int FindSideOf(const entities::IEntity* entity) const;
 
-  std::vector<std::shared_ptr<entities::Entity>> side_a_;
-  std::vector<std::shared_ptr<entities::Entity>> side_b_;
+  std::vector<std::shared_ptr<entities::IEntity>> side_a_;
+  std::vector<std::shared_ptr<entities::IEntity>> side_b_;
 };
 
 }  // namespace engine

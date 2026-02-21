@@ -11,10 +11,10 @@
 int main() {
   auto roller = std::make_shared<internal::dice_rolls::Roller>();
 
-  internal::simulator::Simulator sim(
-      "character.json",
-      internal::factory::Monster::Geraktril,
-      roller);
+  auto entity_factory = std::make_unique<internal::factory::Factory>(
+      "character.json", internal::factory::Monster::Reishid);
+
+  internal::simulator::Simulator sim(std::move(entity_factory), roller);
 
   auto results = sim.Run(100);
   results.Print();

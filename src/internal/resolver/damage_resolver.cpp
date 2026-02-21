@@ -7,7 +7,7 @@
 #include "internal/resolver/damage_resolver.h"
 
 #include "internal/combat/event_manager.h"
-#include "internal/entities/entity.h"  // IWYU pragma: keep
+#include "internal/entities/i_entity.h"  // IWYU pragma: keep
 #include "internal/entities/stats.h"
 #include "internal/logging/log_manager.h"
 #include "internal/rules/resistances.h"

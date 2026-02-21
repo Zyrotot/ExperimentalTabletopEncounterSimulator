@@ -10,6 +10,7 @@
 #include <spdlog/spdlog.h>
 
 #include <mutex>  // NOLINT
+#include "spdlog/common.h"
 
 namespace internal {
 namespace logging {
@@ -23,7 +24,10 @@ std::shared_ptr<Logger> LogManager::GetLogger(const std::string& name) {
     spd = spdlog::stdout_color_mt(name);
     spd->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] [%n] %v");
   }
-  return std::shared_ptr<Logger>(new Logger(spd));
+  if (name != "simulator") {
+    spd->set_level(spdlog::level::err);
+  }
+  return spd;
 }
 
 }  // namespace logging

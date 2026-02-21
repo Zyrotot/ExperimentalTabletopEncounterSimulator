@@ -16,7 +16,7 @@ int main() {
 
   internal::simulator::Simulator sim(std::move(entity_factory), roller);
 
-  auto results = sim.Run(100);
+  auto results = sim.Run(1000);
   results.Print();
 
   return 0;

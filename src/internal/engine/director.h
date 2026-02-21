@@ -13,12 +13,9 @@
 #include "internal/combat/attack_queue.h"
 #include "internal/engine/combat_engine.h"
 #include "internal/engine/encounter.h"
+#include "internal/logging/logger.h"
 
 namespace internal {
-
-namespace logging {
-class Logger;
-}  // namespace logging
 
 namespace engine {
 

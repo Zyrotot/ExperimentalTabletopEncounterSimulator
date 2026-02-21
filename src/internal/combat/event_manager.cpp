@@ -55,7 +55,7 @@ void EventManager::Emit(CombatEvent event,
       }
 
       if (effect->trigger == event && effect->on_event) {
-        logger->Debug("Triggering {} effect from {} for {}", effect->name,
+        logger->debug("Triggering {} effect from {} for {}", effect->name,
                       effect->source, entity->GetName());
         effect->on_event(context);
       }

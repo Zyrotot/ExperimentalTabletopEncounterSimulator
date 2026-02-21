@@ -13,6 +13,7 @@
 #include "internal/combat/attack_result.h"
 #include "internal/combat/combat_context.h"
 #include "internal/items/enchantment.h"
+#include "internal/logging/logger.h"
 #include "internal/rules/damage_types.h"
 
 namespace internal {
@@ -24,10 +25,6 @@ class IEntity;
 namespace dice_rolls {
 class Roller;
 }  // namespace dice_rolls
-
-namespace logging {
-class Logger;
-}  // namespace logging
 
 namespace resolver {
 

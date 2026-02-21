@@ -11,11 +11,9 @@
 
 #include "internal/combat/combat_context.h"
 #include "internal/entities/stats.h"
+#include "internal/logging/logger.h"
 
 namespace internal {
-namespace logging {
-class Logger;
-}  // namespace logging
 
 namespace resolver {
 

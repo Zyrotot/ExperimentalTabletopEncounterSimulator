@@ -75,7 +75,7 @@ void AttackResolver::ResolveAttackMove(
   current_result.total_attack_roll =
       current_result.d20_roll + CalculateTotalAttackModifier(attack_move);
 
-  combat::EventManager::Emit(CombatEvent::AttackRoll, context);
+  combat::EmitCombatEvent(CombatEvent::AttackRoll, context);
 
   int defender_ac = defender_->GetEffectiveAC();
   logger_->info("{} rolls {} vs AC {}", attacker_->GetName(),
@@ -89,10 +89,10 @@ void AttackResolver::ResolveAttackMove(
     current_result.is_crit = current_result.crit_multiplier > 1;
 
     if (current_result.is_crit) {
-      combat::EventManager::Emit(CombatEvent::CriticalHit, context);
+      combat::EmitCombatEvent(CombatEvent::CriticalHit, context);
     }
 
-    combat::EventManager::Emit(CombatEvent::Hit, context);
+    combat::EmitCombatEvent(CombatEvent::Hit, context);
 
     DamageInstance base_dmg =
         CalculateBaseDamage(attack_move, current_result.crit_multiplier);
@@ -107,7 +107,7 @@ void AttackResolver::ResolveAttackMove(
     logger_->info("Hit! Total damage: {}", total_damage);
   } else {
     logger_->info("Miss!");
-    combat::EventManager::Emit(CombatEvent::Miss, context);
+    combat::EmitCombatEvent(CombatEvent::Miss, context);
   }
 
   context->results.push_back(current_result);

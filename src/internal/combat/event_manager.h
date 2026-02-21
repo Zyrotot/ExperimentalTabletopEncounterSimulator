@@ -17,11 +17,8 @@ namespace combat {
 
 class CombatEventContext;
 
-class EventManager {
- public:
-  static std::vector<DamageModification> Emit(
-      CombatEvent event, CombatEventContext* context);
-};
+std::vector<DamageModification> EmitCombatEvent(
+    CombatEvent event, CombatEventContext* context);
 
 }  // namespace combat
 }  // namespace internal

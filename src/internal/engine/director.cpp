@@ -69,9 +69,9 @@ void Director::RunTurn(std::shared_ptr<entities::IEntity> entity) {
   logger_->info("--- {}'s turn ---", entity->GetName());
 
   // TODO(zyrotot): improve this, this is temporary
-  auto context = std::make_shared<combat::CombatEventContext>();
-  context->source = entity;
-  combat::EventManager::Emit(combat::CombatEvent::TurnStart, context);
+  combat::CombatEventContext context;
+  context.source = entity;
+  combat::EventManager::Emit(combat::CombatEvent::TurnStart, &context);
 
   engine_->QueueAttack(
       {entity, target, 0});  // TODO(zyrotot): support multiple attack sequences

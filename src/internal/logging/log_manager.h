@@ -7,7 +7,6 @@
 #ifndef SRC_INTERNAL_LOGGING_LOG_MANAGER_H_
 #define SRC_INTERNAL_LOGGING_LOG_MANAGER_H_
 
-#include <memory>
 #include <string>
 
 #include "internal/logging/logger.h"
@@ -17,7 +16,7 @@ namespace logging {
 
 class LogManager {
  public:
-  static std::shared_ptr<Logger> GetLogger(const std::string& name);
+  static Logger* GetLogger(const std::string& name);
 
   LogManager()  = delete;
   ~LogManager() = delete;

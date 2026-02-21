@@ -7,7 +7,6 @@
 #ifndef SRC_INTERNAL_COMBAT_EVENT_MANAGER_H_
 #define SRC_INTERNAL_COMBAT_EVENT_MANAGER_H_
 
-#include <memory>
 #include <vector>
 
 #include "internal/combat/combat_event_types.h"
@@ -21,7 +20,7 @@ class CombatEventContext;
 class EventManager {
  public:
   static std::vector<DamageModification> Emit(
-      CombatEvent event, const std::shared_ptr<CombatEventContext>& context);
+      CombatEvent event, CombatEventContext* context);
 };
 
 }  // namespace combat

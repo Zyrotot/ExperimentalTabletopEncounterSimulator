@@ -9,7 +9,6 @@
 
 #include <atomic>
 #include <cstdint>
-#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -25,10 +24,6 @@
 
 namespace internal {
 
-namespace items {
-struct Weapon;
-}  // namespace items
-
 namespace entities {
 
 class Entity : public IEntity {
@@ -42,7 +37,7 @@ class Entity : public IEntity {
   const Stats& GetStartingStats() const;
   const std::vector<combat::AttackSequence>& GetAttackSequences() const;
   const combat::AttackSequence& GetAttackSequence(int index) const override;
-  const std::vector<std::shared_ptr<items::Weapon>>& GetEquippedWeapons() const;
+  const std::vector<items::Weapon>& GetEquippedWeapons() const;
   const rules::Alignment& GetAlignment() const override;
 
   const std::vector<abilities::Ability>& GetAbilities() const;
@@ -77,7 +72,7 @@ class Entity : public IEntity {
   Stats starting_stats_;
   Stats current_stats_;
 
-  std::vector<std::shared_ptr<items::Weapon>> equipped_weapons_;
+  std::vector<items::Weapon> equipped_weapons_;
   std::vector<combat::AttackSequence> attack_sequences_;
   std::vector<abilities::Ability> abilities_;
 
@@ -86,7 +81,7 @@ class Entity : public IEntity {
   std::vector<const combat::Effect*> active_effects_;
   std::unordered_map<std::string, abilities::Ability*> ability_index_;
 
-  std::shared_ptr<logging::Logger> logger_;
+  logging::Logger* logger_;
 
   static std::atomic<uint32_t> next_id_;
 };

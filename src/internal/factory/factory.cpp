@@ -47,7 +47,7 @@ std::shared_ptr<entities::IEntity> Factory::CreateMonster() const {
 EntityConfig Factory::MonsterFactory(Monster monsterType) const {
   switch (monsterType) {
     case Uktril: {
-      std::shared_ptr<Weapon> pinca = std::make_shared<Weapon>(Weapon{
+      Weapon pinca{
           .name = "pinca",
           .attack_bonus = 1,
           .damage =
@@ -57,18 +57,17 @@ EntityConfig Factory::MonsterFactory(Monster monsterType) const {
           .damage_type = rules::DamageType::Slash,
           .crit_range = 20,
           .crit_multiplier = 2,
-      });
+      };
 
-      std::shared_ptr<Weapon> garra = std::make_shared<Weapon>(
-          Weapon{.name = "garra",
-                 .attack_bonus = 0,
-                 .damage =
-                     Term{
-                         .dice_groups = {Dice{.count = 1, .sides = 4}},
-                     },
-                 .damage_type = rules::DamageType::Slash,
-                 .crit_range = 20,
-                 .crit_multiplier = 2});
+      Weapon garra{.name = "garra",
+                   .attack_bonus = 0,
+                   .damage =
+                       Term{
+                           .dice_groups = {Dice{.count = 1, .sides = 4}},
+                       },
+                   .damage_type = rules::DamageType::Slash,
+                   .crit_range = 20,
+                   .crit_multiplier = 2};
 
       auto uktril_config = entities::EntityConfig{
           .name = "Uktril",
@@ -108,10 +107,10 @@ EntityConfig Factory::MonsterFactory(Monster monsterType) const {
                       .attacks =
                           std::vector<combat::AttackMove>{
                               combat::AttackMove{
-                                  .weapon = *pinca,
+                                  .weapon = pinca,
                               },
                               combat::AttackMove{
-                                  .weapon = *garra,
+                                  .weapon = garra,
                               },
                           },
                       .attack_modifier = 0,
@@ -125,21 +124,19 @@ EntityConfig Factory::MonsterFactory(Monster monsterType) const {
       return uktril_config;
     }
     case Geraktril: {
-      std::shared_ptr<Weapon> pinca = std::make_shared<Weapon>(
-          Weapon{.name = "pinca",
-                 .attack_bonus = 1,
-                 .damage = Term{.dice_groups = {Dice{.count = 1, .sides = 8}}},
-                 .damage_type = rules::DamageType::Slash,
-                 .crit_range = 20,
-                 .crit_multiplier = 2});
+      Weapon pinca{.name = "pinca",
+                   .attack_bonus = 1,
+                   .damage = Term{.dice_groups = {Dice{.count = 1, .sides = 8}}},
+                   .damage_type = rules::DamageType::Slash,
+                   .crit_range = 20,
+                   .crit_multiplier = 2};
 
-      std::shared_ptr<Weapon> garra = std::make_shared<Weapon>(
-          Weapon{.name = "garra",
-                 .attack_bonus = 0,
-                 .damage = Term{.dice_groups = {Dice{.count = 1, .sides = 4}}},
-                 .damage_type = rules::DamageType::Slash,
-                 .crit_range = 20,
-                 .crit_multiplier = 2});
+      Weapon garra{.name = "garra",
+                   .attack_bonus = 0,
+                   .damage = Term{.dice_groups = {Dice{.count = 1, .sides = 4}}},
+                   .damage_type = rules::DamageType::Slash,
+                   .crit_range = 20,
+                   .crit_multiplier = 2};
 
       auto geraktril_config = entities::EntityConfig{
           .name = "Geraktril",
@@ -178,8 +175,8 @@ EntityConfig Factory::MonsterFactory(Monster monsterType) const {
                       .name = "Multiple Attacks",
                       .attacks =
                           std::vector<combat::AttackMove>{
-                              combat::AttackMove{.weapon = *pinca},
-                              combat::AttackMove{.weapon = *garra},
+                              combat::AttackMove{.weapon = pinca},
+                              combat::AttackMove{.weapon = garra},
                           },
                       .attack_modifier = 0,
                       .damage_modifier = 0,
@@ -191,7 +188,7 @@ EntityConfig Factory::MonsterFactory(Monster monsterType) const {
       return geraktril_config;
     }
     case Reishid: {
-      std::shared_ptr<Weapon> adaga = std::make_shared<Weapon>(Weapon{
+      Weapon adaga{
           .name = "adaga",
           .attack_bonus = 4,
           .damage =
@@ -200,25 +197,25 @@ EntityConfig Factory::MonsterFactory(Monster monsterType) const {
           .damage_modifier = rules::DamageModifier::Magic,
           .crit_range = 19,
           .crit_multiplier = 2,
-          .enchantments = {internal::items::CreateProfaneEnchantment()}});
+          .enchantments = {internal::items::CreateProfaneEnchantment()}};
 
-      std::shared_ptr<Weapon> mordida = std::make_shared<Weapon>(Weapon{
+      Weapon mordida{
           .name = "mordida",
           .attack_bonus = 0,
           .damage =
               Term{.dice_groups = {Dice{.count = 1, .sides = 4}}, .bonus = 4},
           .damage_type = rules::DamageType::Pierce,
           .crit_range = 20,
-          .crit_multiplier = 2});
+          .crit_multiplier = 2};
 
-      std::shared_ptr<Weapon> garra = std::make_shared<Weapon>(Weapon{
+      Weapon garra{
           .name = "garra",
           .attack_bonus = 0,
           .damage =
               Term{.dice_groups = {Dice{.count = 1, .sides = 4}}, .bonus = 0},
           .damage_type = rules::DamageType::Slash,
           .crit_range = 20,
-          .crit_multiplier = 2});
+          .crit_multiplier = 2};
 
       auto reishid_config = entities::EntityConfig{
           .name = "Reishid",
@@ -257,9 +254,9 @@ EntityConfig Factory::MonsterFactory(Monster monsterType) const {
                       .name = "Multiple Attacks",
                       .attacks =
                           std::vector<combat::AttackMove>{
-                              combat::AttackMove{.weapon = *adaga},
-                              combat::AttackMove{.weapon = *mordida},
-                              combat::AttackMove{.weapon = *garra},
+                              combat::AttackMove{.weapon = adaga},
+                              combat::AttackMove{.weapon = mordida},
+                              combat::AttackMove{.weapon = garra},
                           },
                       .attack_modifier = 0,
                       .damage_modifier = 0,
@@ -284,10 +281,10 @@ EntityConfig Factory::GetCharacterFromJSON(
 
   for (auto& weapon : config.equipped_weapons) {
     std::vector<Enchantment> rebuilt_enchantments;
-    for (const auto& ench : weapon->enchantments) {
+    for (const auto& ench : weapon.enchantments) {
       rebuilt_enchantments.push_back(RebuildEnchantmentFromName(ench.name));
     }
-    weapon->enchantments = rebuilt_enchantments;
+    weapon.enchantments = rebuilt_enchantments;
   }
 
   std::vector<abilities::Ability> rebuilt_abilities;
@@ -301,8 +298,8 @@ EntityConfig Factory::GetCharacterFromJSON(
   for (auto& attack_sequence : config.attack_sequences) {
     for (auto& attack_move : attack_sequence.attacks) {
       for (const auto& equipped_weapon : config.equipped_weapons) {
-        if (attack_move.weapon.name == equipped_weapon->name) {
-          attack_move.weapon = *equipped_weapon;
+        if (attack_move.weapon.name == equipped_weapon.name) {
+          attack_move.weapon = equipped_weapon;
         }
       }
     }
@@ -368,7 +365,7 @@ abilities::Ability Factory::RebuildAbilityFromName(const std::string& name,
 }
 
 EntityConfig Factory::CreateExampleCharacter() const {
-  std::shared_ptr<Weapon> machado = std::make_shared<Weapon>(Weapon{
+  Weapon machado{
       .name = "Machado",
       .attack_bonus = 2,
       .damage = Term{.dice_groups = {Dice{.count = 4, .sides = 8}}, .bonus = 0},
@@ -377,7 +374,7 @@ EntityConfig Factory::CreateExampleCharacter() const {
       .crit_range = 20,
       .crit_multiplier = 3,
       .enchantments = {internal::items::CreateVampiricEnchantment()},
-  });
+  };
 
   auto character_config = entities::EntityConfig{
       .name = "Character",
@@ -409,7 +406,7 @@ EntityConfig Factory::CreateExampleCharacter() const {
                   .name = "Normal Attack",
                   .attacks =
                       std::vector<combat::AttackMove>{
-                          combat::AttackMove{.weapon = *machado,
+                          combat::AttackMove{.weapon = machado,
                                              .attack_modifier = 0,
                                              .damage_modifier = 0},
                       },
@@ -420,7 +417,7 @@ EntityConfig Factory::CreateExampleCharacter() const {
                   .name = "Powerful Attack",
                   .attacks =
                       std::vector<combat::AttackMove>{
-                          combat::AttackMove{.weapon = *machado,
+                          combat::AttackMove{.weapon = machado,
                                              .attack_modifier = 0,
                                              .damage_modifier = 0},
                       },
@@ -443,7 +440,7 @@ EntityConfig Factory::CreateExampleCharacter() const {
 }
 
 EntityConfig Factory::CreateCustomEnemy() const {
-  std::shared_ptr<Weapon> machado = std::make_shared<Weapon>(Weapon{
+  Weapon machado{
       .name = "Machandejante",
       .attack_bonus = 2,
       .damage = Term{.dice_groups = {Dice{.count = 3, .sides = 6}}, .bonus = 1},
@@ -452,7 +449,7 @@ EntityConfig Factory::CreateCustomEnemy() const {
       .crit_range = 20,
       .crit_multiplier = 3,
       .enchantments = {internal::items::CreateFlamingExplosionEnchantment()},
-  });
+  };
 
   auto character_config =
       entities::EntityConfig{
@@ -494,7 +491,7 @@ EntityConfig Factory::CreateCustomEnemy() const {
                       .attacks =
                           std::vector<combat::AttackMove>{
                               combat::AttackMove{
-                                  .weapon = *machado,
+                                  .weapon = machado,
                                   .attack_modifier = 0,
                                   .damage_modifier = 0},
                           },
@@ -506,7 +503,7 @@ EntityConfig Factory::CreateCustomEnemy() const {
                       .attacks =
                           std::vector<combat::AttackMove>{
                               combat::AttackMove{
-                                  .weapon = *machado,
+                                  .weapon = machado,
                                   .attack_modifier = 0,
                                   .damage_modifier = 0},
                           },

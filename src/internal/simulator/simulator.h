@@ -51,7 +51,7 @@ class Simulator {
 
   std::unique_ptr<factory::IFactory> entity_factory_;
   std::shared_ptr<dice_rolls::Roller> roller_;
-  std::shared_ptr<logging::Logger> logger_;
+  logging::Logger* logger_;
 };
 
 }  // namespace simulator

@@ -7,8 +7,6 @@
 #ifndef SRC_INTERNAL_RESOLVER_DAMAGE_RESOLVER_H_
 #define SRC_INTERNAL_RESOLVER_DAMAGE_RESOLVER_H_
 
-#include <memory>
-
 #include "internal/combat/combat_context.h"
 #include "internal/entities/stats.h"
 #include "internal/logging/logger.h"
@@ -19,7 +17,7 @@ namespace resolver {
 
 class DamageResolver {
  public:
-  explicit DamageResolver(std::shared_ptr<combat::CombatEventContext> context);
+  explicit DamageResolver(combat::CombatEventContext* context);
   ~DamageResolver();
 
   void ApplyDamage();
@@ -30,8 +28,8 @@ class DamageResolver {
                                        entities::Resistances* resistances);
 
  private:
-  std::shared_ptr<combat::CombatEventContext> context_;
-  std::shared_ptr<logging::Logger> logger_;
+  combat::CombatEventContext* context_;
+  logging::Logger* logger_;
 };
 
 }  // namespace resolver

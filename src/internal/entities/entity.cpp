@@ -65,7 +65,7 @@ const AttackSequence& Entity::GetAttackSequence(int index) const {
   return attack_sequences_[static_cast<size_t>(index)];
 }
 
-const std::vector<std::shared_ptr<Weapon>>& Entity::GetEquippedWeapons() const {
+const std::vector<Weapon>& Entity::GetEquippedWeapons() const {
   return equipped_weapons_;
 }
 
@@ -183,10 +183,7 @@ void Entity::BuildActiveEffects() {
   }
 
   for (const auto& weapon : equipped_weapons_) {
-    if (!weapon)
-      continue;
-
-    for (const auto& enchantment : weapon->enchantments) {
+    for (const auto& enchantment : weapon.enchantments) {
       for (const auto& effect : enchantment.effects) {
         active_effects_.push_back(&effect);
       }

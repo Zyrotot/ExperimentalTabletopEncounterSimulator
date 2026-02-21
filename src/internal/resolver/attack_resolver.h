@@ -36,20 +36,20 @@ class AttackResolver {
                  std::shared_ptr<dice_rolls::Roller> roller);
   ~AttackResolver();
 
-  std::shared_ptr<combat::CombatEventContext> ResolveAttack();
+  std::unique_ptr<combat::CombatEventContext> ResolveAttack();
 
   void ResolveSingleAttack(size_t move_index,
-                           std::shared_ptr<combat::CombatEventContext> context);
+                           combat::CombatEventContext* context);
 
  protected:
   void ResolveAttackMove(const combat::AttackMove& attack_move,
-                         std::shared_ptr<combat::CombatEventContext> context);
+                         combat::CombatEventContext* context);
 
   rules::DamageInstance CalculateBaseDamage(
       const combat::AttackMove& attack_move, int crit_multiplier);
   void GatherDamageFromSources(
       const combat::AttackMove& attack_move,
-      std::shared_ptr<combat::CombatEventContext> context,
+      combat::CombatEventContext* context,
       combat::AttackResult* result);
 
   dice_rolls::Term CalculateTotalDamage(const combat::AttackMove& attack_move);
@@ -62,7 +62,7 @@ class AttackResolver {
   std::shared_ptr<entities::IEntity> defender_;
   combat::AttackSequence attack_sequence_;
   std::shared_ptr<dice_rolls::Roller> roller_;
-  std::shared_ptr<logging::Logger> logger_;
+  logging::Logger* logger_;
 };
 
 }  // namespace resolver

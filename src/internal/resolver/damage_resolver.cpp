@@ -16,10 +16,9 @@
 namespace internal {
 namespace resolver {
 
-using combat::CombatEventContext;
 using entities::Resistances;
 
-DamageResolver::DamageResolver(std::shared_ptr<CombatEventContext> context)
+DamageResolver::DamageResolver(combat::CombatEventContext* context)
     : context_(context), logger_(logging::LogManager::GetLogger("attack")) {
 }
 

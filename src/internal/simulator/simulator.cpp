@@ -7,9 +7,12 @@
 #include "internal/simulator/simulator.h"
 
 #include <algorithm>
+#include <barrier>  // NOLINT
+#include <future>   // NOLINT
 #include <iomanip>
 #include <iostream>
 #include <numeric>
+#include <thread>  // NOLINT
 
 #include "internal/dice_rolls/roller.h"
 #include "internal/engine/combat_engine.h"
@@ -19,7 +22,7 @@
 #include "internal/factory/factory.h"
 #include "internal/logging/log_manager.h"
 
-#define MAX_WAVES 100
+#define MAX_WAVES 75
 
 namespace internal {
 namespace simulator {
@@ -76,17 +79,78 @@ Simulator::Simulator(std::string player_filename, factory::Monster monster_type,
       logger_(logging::LogManager::GetLogger("simulator")) {
 }
 
-SimulationResults Simulator::Run(int num_simulations) const {
-  SetLoggers(logging::LogLevel::ERROR);
+SimulationResults Simulator::Run(int num_simulations,
+                                 unsigned int num_threads) const {
+  SetLoggers(logging::LogLevel::err);
+
+  if (num_threads == 0) {
+    num_threads = std::max(
+        1u, static_cast<unsigned int>(std::thread::hardware_concurrency()));
+  }
+  num_threads =
+      std::min(num_threads, static_cast<unsigned int>(num_simulations));
+
+  const int base = num_simulations / static_cast<int>(num_threads);
+  const int remainder = num_simulations % static_cast<int>(num_threads);
+
+  std::barrier sync_point(static_cast<std::ptrdiff_t>(num_threads));
+
+  std::vector<std::future<std::vector<int>>> futures;
+  futures.reserve(num_threads);
+
+  for (unsigned int t = 0; t < num_threads; ++t) {
+    const int count = base + (static_cast<int>(t) < remainder ? 1 : 0);
+
+    futures.emplace_back(
+        std::async(std::launch::async, [this, count, &sync_point]() {
+          struct SimState {
+            int waves_cleared = 0;
+            bool alive = true;
+          };
+
+          auto local_roller = std::make_shared<dice_rolls::Roller>();
+          std::vector<SimState> states(static_cast<std::size_t>(count));
+
+          for (int wave = 1; wave <= MAX_WAVES; ++wave) {
+            for (auto& state : states) {
+              if (!state.alive)
+                continue;
+
+              if (RunWave(wave, local_roller)) {
+                state.waves_cleared = wave;
+                if (wave == MAX_WAVES) {
+                  logger_->Info("Wave cap ({}) reached — character wins!",
+                                MAX_WAVES);
+                } else {
+                  logger_->Info("Wave {} cleared.", wave);
+                }
+              } else {
+                state.alive = false;
+                logger_->Info("Lost on wave {}.", wave);
+              }
+            }
+
+            sync_point.arrive_and_wait();
+          }
+
+          std::vector<int> results;
+          results.reserve(static_cast<std::size_t>(count));
+          for (const auto& state : states) {
+            results.push_back(state.waves_cleared);
+          }
+          return results;
+        }));
+  }
 
   SimulationResults results;
   results.num_simulations = num_simulations;
   results.max_waves_cleared.reserve(static_cast<std::size_t>(num_simulations));
 
-  for (int i = 0; i < num_simulations; ++i) {
-    const int cleared = RunOnce();
-    results.max_waves_cleared.push_back(cleared);
-    results.wave_distribution[cleared]++;
+  for (auto& f : futures) {
+    for (const int v : f.get()) {
+      results.max_waves_cleared.push_back(v);
+      results.wave_distribution[v]++;
+    }
   }
 
   const auto& waves = results.max_waves_cleared;
@@ -99,25 +163,30 @@ SimulationResults Simulator::Run(int num_simulations) const {
   return results;
 }
 
-int Simulator::RunOnce() const {
+bool Simulator::RunWave(int wave,
+                        std::shared_ptr<dice_rolls::Roller> roller) const {
+  auto player = factory::GetCharacterFromJSON(player_filename_);
+
+  std::vector<std::shared_ptr<entities::Entity>> enemies;
+  enemies.reserve(static_cast<std::size_t>(wave));
+  for (int i = 0; i < wave; ++i) {
+    enemies.push_back(factory::MonsterFactory(monster_type_));
+  }
+
+  engine::CombatEngine combat_engine(roller);
+  engine::Encounter encounter({player}, std::move(enemies));
+  engine::Director director(&encounter, &combat_engine);
+
+  director.RunEncounter();
+
+  return encounter.HasLivingEntitiesOnSideA();
+}
+
+int Simulator::RunOnce(std::shared_ptr<dice_rolls::Roller> roller) const {
   int waves_cleared = 0;
 
   for (int wave = 1; wave <= MAX_WAVES; ++wave) {
-    auto player = factory::GetPlayer(player_filename_);
-
-    std::vector<std::shared_ptr<entities::Entity>> enemies;
-    enemies.reserve(static_cast<std::size_t>(wave));
-    for (int i = 0; i < wave; ++i) {
-      enemies.push_back(factory::MonsterFactory(monster_type_));
-    }
-
-    engine::CombatEngine combat_engine(roller_);
-    engine::Encounter encounter({player}, std::move(enemies));
-    engine::Director director(&encounter, &combat_engine);
-
-    director.RunEncounter();
-
-    if (encounter.HasLivingEntitiesOnSideA()) {
+    if (RunWave(wave, roller)) {
       waves_cleared = wave;
       if (wave == MAX_WAVES) {
         logger_->Info("Wave cap ({}) reached — character wins!", MAX_WAVES);

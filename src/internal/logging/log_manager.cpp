@@ -6,29 +6,24 @@
 
 #include "internal/logging/log_manager.h"
 
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
+
+#include <mutex>  // NOLINT
+
 namespace internal {
 namespace logging {
 
-LogManager& LogManager::Instance() {
-  static LogManager instance;
-  return instance;
-}
-
 std::shared_ptr<Logger> LogManager::GetLogger(const std::string& name) {
-  return Instance().GetLoggerInternal(name);
-}
+  static std::mutex creation_mutex;
+  std::lock_guard<std::mutex> lock(creation_mutex);
 
-std::shared_ptr<Logger> LogManager::GetLoggerInternal(const std::string& name) {
-  std::lock_guard<std::mutex> lock(mutex_);
-
-  auto it = loggers_.find(name);
-  if (it != loggers_.end()) {
-    return it->second;
+  auto spd = spdlog::get(name);
+  if (!spd) {
+    spd = spdlog::stdout_color_mt(name);
+    spd->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] [%n] %v");
   }
-
-  auto logger = std::shared_ptr<Logger>(new Logger(name));
-  loggers_[name] = logger;
-  return logger;
+  return std::shared_ptr<Logger>(new Logger(spd));
 }
 
 }  // namespace logging

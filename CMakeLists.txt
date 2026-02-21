@@ -12,6 +12,9 @@ option(ENABLE_COVERAGE "Enable code coverage"   OFF)
 
 # ── External Dependencies ────────────────────────────────────────────────────
 add_subdirectory(external/json)   # Glaze (header-only, provides glaze::glaze)
+add_subdirectory(external/spdlog) # spdlog (thread-safe logging)
+
+find_package(Threads REQUIRED)
 
 # ── Core Library ─────────────────────────────────────────────────────────────
 # Auto-discover sources so new .cpp files are picked up automatically.
@@ -19,7 +22,7 @@ file(GLOB_RECURSE ETTES_CORE_SOURCES CONFIGURE_DEPENDS src/internal/*.cpp)
 
 add_library(ettes_core ${ETTES_CORE_SOURCES})
 target_include_directories(ettes_core PUBLIC src)
-target_link_libraries(ettes_core PUBLIC glaze::glaze)
+target_link_libraries(ettes_core PUBLIC glaze::glaze Threads::Threads spdlog::spdlog)
 
 # ── Main Executable ─────────────────────────────────────────────────────────
 add_executable(ETTES src/main.cpp)

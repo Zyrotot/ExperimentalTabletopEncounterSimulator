@@ -1,20 +1,26 @@
 {
-    "name": "Character",
+    "name": "Uktril",
     "starting_stats": {
         "base_stats": {
-            "hp": 160,
-            "armour_class": 21,
-            "fortification": 0,
+            "hp": 60,
+            "armour_class": 22,
+            "fortification": 100,
             "attack_bonuses": {
-                "attack_bonus": 19,
-                "damage_bonus": 21
+                "attack_bonus": 12,
+                "damage_bonus": 8
             },
             "resistances": {
-                "damage_reductions": [],
+                "damage_reductions": [
+                    {
+                        "bypass_types": 0,
+                        "bypass_modifiers": 1,
+                        "amount": 5
+                    }
+                ],
                 "energy_resistances": [],
                 "immunity": {
                     "immune_types": 0,
-                    "immune_categories": 0
+                    "immune_categories": 2
                 },
                 "weaknesses": []
             }
@@ -35,12 +41,12 @@
     },
     "equipped_weapons": [
         {
-            "name": "Machado",
-            "attack_bonus": 2,
+            "name": "pinca",
+            "attack_bonus": 1,
             "damage": {
                 "dice_groups": [
                     {
-                        "count": 4,
+                        "count": 1,
                         "sides": 8
                     }
                 ],
@@ -49,20 +55,41 @@
             "damage_type": 1,
             "damage_modifier": 0,
             "crit_range": 20,
-            "crit_multiplier": 3,
-            "enchantments": [
-                {
-                    "name": "Vampiric"
-                }
-            ]
+            "crit_multiplier": 2,
+            "enchantments": []
+        },
+        {
+            "name": "garra",
+            "attack_bonus": 0,
+            "damage": {
+                "dice_groups": [
+                    {
+                        "count": 1,
+                        "sides": 4
+                    }
+                ],
+                "bonus": 0
+            },
+            "damage_type": 1,
+            "damage_modifier": 0,
+            "crit_range": 20,
+            "crit_multiplier": 2,
+            "enchantments": []
         }
     ],
     "attack_sequences": [
         {
-            "name": "Normal Attack",
+            "name": "Multiple Attacks",
             "attacks": [
                 {
-                    "weapon_ref": "Machado",
+                    "weapon_ref": "pinca",
+                    "attack_modifier": 0,
+                    "damage_modifier": 0,
+                    "crit_range_bonus": 0,
+                    "crit_multiplier_bonus": 0
+                },
+                {
+                    "weapon_ref": "garra",
                     "attack_modifier": 0,
                     "damage_modifier": 0,
                     "crit_range_bonus": 0,
@@ -71,38 +98,8 @@
             ],
             "attack_modifier": 0,
             "damage_modifier": 0
-        },
-        {
-            "name": "Powerful Attack",
-            "attacks": [
-                {
-                    "weapon_ref": "Machado",
-                    "attack_modifier": 0,
-                    "damage_modifier": 0,
-                    "crit_range_bonus": 0,
-                    "crit_multiplier_bonus": 0
-                }
-            ],
-            "attack_modifier": -2,
-            "damage_modifier": 4
         }
     ],
-    "abilities": [
-        {
-            "name": "Erosion",
-            "stack_count": 0,
-            "is_active": true
-        },
-        {
-            "name": "Rigidez Raivosa",
-            "stack_count": 0,
-            "is_active": true
-        },
-        {
-            "name": "Trespassar",
-            "stack_count": 1,
-            "is_active": true
-        }
-    ],
-    "alignment": 34
+    "abilities": [],
+    "alignment": 36
 }

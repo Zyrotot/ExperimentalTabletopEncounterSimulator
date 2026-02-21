@@ -27,12 +27,9 @@ Enchantment CreateFlamingEnchantment() {
 
   DamageSource source;
   source.name = "Flaming";
-  source.contribute = [](std::shared_ptr<combat::CombatEventContext> ctx) {
-    if (!ctx)
-      return rules::DamageInstance{};
-
+  source.contribute = [](const combat::CombatEventContext& ctx) {
     return rules::DamageInstance{
-        .amount = ctx->roller->Roll(dice_rolls::Term{.dice_groups = {{1, 6}}}),
+        .amount = ctx.roller->Roll(dice_rolls::Term{.dice_groups = {{1, 6}}}),
         .types = static_cast<uint16_t>(rules::DamageType::Fire),
         .modifiers = 0};
   };
@@ -47,12 +44,9 @@ Enchantment CreateDissonantEnchantment() {
 
   DamageSource source;
   source.name = "Dissonant";
-  source.contribute = [](std::shared_ptr<combat::CombatEventContext> ctx) {
-    if (!ctx)
-      return rules::DamageInstance{};
-
+  source.contribute = [](const combat::CombatEventContext& ctx) {
     return rules::DamageInstance{
-        .amount = ctx->roller->Roll(dice_rolls::Term{.dice_groups = {{2, 6}}}),
+        .amount = ctx.roller->Roll(dice_rolls::Term{.dice_groups = {{2, 6}}}),
         .types = static_cast<uint16_t>(rules::DamageType::Negative),
         .modifiers = 0};
   };
@@ -62,18 +56,18 @@ Enchantment CreateDissonantEnchantment() {
   effect.name = "Dissonant (self-damage)";
   effect.source = "Weapon Enchantment: Dissonant";
   effect.trigger = combat::CombatEvent::Hit;
-  effect.on_event = [](std::shared_ptr<combat::CombatEventContext> ctx) {
-    if (!ctx || !ctx->source || !ctx->roller)
+  effect.on_event = [](const combat::CombatEventContext& ctx) {
+    if (!ctx.source || !ctx.roller)
       return;
 
     rules::DamageInstance self_damage = {
-        .amount = ctx->roller->Roll(dice_rolls::Term{.dice_groups = {{1, 6}}}),
+        .amount = ctx.roller->Roll(dice_rolls::Term{.dice_groups = {{1, 6}}}),
         .types = static_cast<uint16_t>(rules::DamageType::Negative),
         .modifiers = 0};
-    entities::Resistances target_resistances = ctx->source->GetResistances();
+    entities::Resistances target_resistances = ctx.source->GetResistances();
     resolver::DamageResolver::ApplyResistancesToDamage(&self_damage,
                                                        &target_resistances);
-    ctx->source->TakeDamage(self_damage.amount);
+    ctx.source->TakeDamage(self_damage.amount);
   };
   ench.effects.push_back(effect);
 
@@ -86,19 +80,19 @@ Enchantment CreateFlamingExplosionEnchantment() {
 
   DamageSource source;
   source.name = "Flaming Explosion";
-  source.contribute = [](std::shared_ptr<combat::CombatEventContext> ctx) {
-    if (!ctx || ctx->results.empty()) {
+  source.contribute = [](const combat::CombatEventContext& ctx) {
+    if (ctx.results.empty()) {
       return rules::DamageInstance{};
     }
 
-    auto& result = ctx->results.back();
+    const auto& result = ctx.results.back();
     int damage;
     if (result.is_crit) {
       int dice = std::min(result.crit_multiplier - 1, 3);
-      damage = ctx->roller->Roll(
+      damage = ctx.roller->Roll(
           dice_rolls::Term{.dice_groups = {{dice, 10}, {1, 6}}});
     } else {
-      damage = ctx->roller->Roll(dice_rolls::Term{.dice_groups = {{1, 6}}});
+      damage = ctx.roller->Roll(dice_rolls::Term{.dice_groups = {{1, 6}}});
     }
     return rules::DamageInstance{
         .amount = damage,
@@ -118,15 +112,11 @@ Enchantment CreateVampiricEnchantment() {
   effect.name = "Vampiric";
   effect.source = "Weapon Enchantment: Vampiric";
   effect.trigger = combat::CombatEvent::DealDamage;
-  effect.on_event = [](std::shared_ptr<combat::CombatEventContext> ctx) {
-    if (!ctx) {
+  effect.on_event = [](const combat::CombatEventContext& ctx) {
+    if (ctx.current_index >= ctx.results.size()) {
       return;
     }
-
-    if (ctx->current_index >= ctx->results.size()) {
-      return;
-    }
-    auto current_result = ctx->results[ctx->current_index];
+    const auto current_result = ctx.results[ctx.current_index];
 
     int total_damage = 0;
     for (const auto& dmg : current_result.damage_instances) {
@@ -134,8 +124,8 @@ Enchantment CreateVampiricEnchantment() {
     }
 
     int temp_hp = total_damage / 2;
-    if (ctx->source) {
-      ctx->source->AddTempHP(temp_hp);
+    if (ctx.source) {
+      ctx.source->AddTempHP(temp_hp);
     }
   };
   ench.effects.push_back(effect);
@@ -151,11 +141,11 @@ Enchantment CreateDrainingEnchantment() {
   effect.name = "Draining";
   effect.source = "Weapon Enchantment: Draining";
   effect.trigger = combat::CombatEvent::Hit;
-  effect.on_event = [](std::shared_ptr<combat::CombatEventContext> ctx) {
-    if (!ctx || !ctx->source)
+  effect.on_event = [](const combat::CombatEventContext& ctx) {
+    if (!ctx.source)
       return;
 
-    ctx->source->Heal(1);
+    ctx.source->Heal(1);
   };
   ench.effects.push_back(effect);
 
@@ -168,15 +158,14 @@ Enchantment CreateProfaneEnchantment() {
 
   DamageSource source;
   source.name = "Profane";
-  source.contribute = [](std::shared_ptr<combat::CombatEventContext> ctx) {
-    if (!ctx || !ctx->target)
+  source.contribute = [](const combat::CombatEventContext& ctx) {
+    if (!ctx.target)
       return rules::DamageInstance{};
 
-    if (static_cast<uint16_t>(ctx->target->GetAlignment()) &
+    if (static_cast<uint16_t>(ctx.target->GetAlignment()) &
         static_cast<uint16_t>(rules::Alignment::Good)) {
       return rules::DamageInstance{
-          .amount =
-              ctx->roller->Roll(dice_rolls::Term{.dice_groups = {{2, 6}}}),
+          .amount = ctx.roller->Roll(dice_rolls::Term{.dice_groups = {{2, 6}}}),
           .types = 0,
           .modifiers = static_cast<uint16_t>(rules::DamageModifier::Evil)};
     }
@@ -186,7 +175,6 @@ Enchantment CreateProfaneEnchantment() {
 
   return ench;
 }
-
 
 }  // namespace items
 }  // namespace internal

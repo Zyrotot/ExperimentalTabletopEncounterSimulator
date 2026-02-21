@@ -8,7 +8,6 @@
 #define SRC_INTERNAL_ITEMS_ENCHANTMENT_H_
 
 #include <functional>
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -29,7 +28,7 @@ namespace items {
 
 struct DamageSource {
   std::string name;
-  std::function<rules::DamageInstance(std::shared_ptr<combat::CombatEventContext>)>
+  std::function<rules::DamageInstance(const combat::CombatEventContext&)>
       contribute;
 };
 

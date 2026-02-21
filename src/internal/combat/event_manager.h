@@ -8,8 +8,10 @@
 #define SRC_INTERNAL_COMBAT_EVENT_MANAGER_H_
 
 #include <memory>
+#include <vector>
 
 #include "internal/combat/combat_event_types.h"
+#include "internal/combat/damage_modification.h"
 
 namespace internal {
 namespace combat {
@@ -18,8 +20,8 @@ class CombatEventContext;
 
 class EventManager {
  public:
-  static void Emit(CombatEvent event,
-                   std::shared_ptr<CombatEventContext> context);
+  static std::vector<DamageModification> Emit(
+      CombatEvent event, const std::shared_ptr<CombatEventContext>& context);
 };
 
 }  // namespace combat

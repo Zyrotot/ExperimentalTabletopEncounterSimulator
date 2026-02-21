@@ -108,10 +108,10 @@ EntityConfig Factory::MonsterFactory(Monster monsterType) const {
                       .attacks =
                           std::vector<combat::AttackMove>{
                               combat::AttackMove{
-                                  .weapon = pinca,
+                                  .weapon = *pinca,
                               },
                               combat::AttackMove{
-                                  .weapon = garra,
+                                  .weapon = *garra,
                               },
                           },
                       .attack_modifier = 0,
@@ -178,8 +178,8 @@ EntityConfig Factory::MonsterFactory(Monster monsterType) const {
                       .name = "Multiple Attacks",
                       .attacks =
                           std::vector<combat::AttackMove>{
-                              combat::AttackMove{.weapon = pinca},
-                              combat::AttackMove{.weapon = garra},
+                              combat::AttackMove{.weapon = *pinca},
+                              combat::AttackMove{.weapon = *garra},
                           },
                       .attack_modifier = 0,
                       .damage_modifier = 0,
@@ -257,9 +257,9 @@ EntityConfig Factory::MonsterFactory(Monster monsterType) const {
                       .name = "Multiple Attacks",
                       .attacks =
                           std::vector<combat::AttackMove>{
-                              combat::AttackMove{.weapon = adaga},
-                              combat::AttackMove{.weapon = mordida},
-                              combat::AttackMove{.weapon = garra},
+                              combat::AttackMove{.weapon = *adaga},
+                              combat::AttackMove{.weapon = *mordida},
+                              combat::AttackMove{.weapon = *garra},
                           },
                       .attack_modifier = 0,
                       .damage_modifier = 0,
@@ -300,11 +300,9 @@ EntityConfig Factory::GetCharacterFromJSON(
 
   for (auto& attack_sequence : config.attack_sequences) {
     for (auto& attack_move : attack_sequence.attacks) {
-      if (attack_move.weapon) {
-        for (const auto& equipped_weapon : config.equipped_weapons) {
-          if (attack_move.weapon->name == equipped_weapon->name) {
-            attack_move.weapon = equipped_weapon;
-          }
+      for (const auto& equipped_weapon : config.equipped_weapons) {
+        if (attack_move.weapon.name == equipped_weapon->name) {
+          attack_move.weapon = *equipped_weapon;
         }
       }
     }
@@ -411,7 +409,7 @@ EntityConfig Factory::CreateExampleCharacter() const {
                   .name = "Normal Attack",
                   .attacks =
                       std::vector<combat::AttackMove>{
-                          combat::AttackMove{.weapon = machado,
+                          combat::AttackMove{.weapon = *machado,
                                              .attack_modifier = 0,
                                              .damage_modifier = 0},
                       },
@@ -422,7 +420,7 @@ EntityConfig Factory::CreateExampleCharacter() const {
                   .name = "Powerful Attack",
                   .attacks =
                       std::vector<combat::AttackMove>{
-                          combat::AttackMove{.weapon = machado,
+                          combat::AttackMove{.weapon = *machado,
                                              .attack_modifier = 0,
                                              .damage_modifier = 0},
                       },
@@ -496,7 +494,7 @@ EntityConfig Factory::CreateCustomEnemy() const {
                       .attacks =
                           std::vector<combat::AttackMove>{
                               combat::AttackMove{
-                                  .weapon = machado,
+                                  .weapon = *machado,
                                   .attack_modifier = 0,
                                   .damage_modifier = 0},
                           },
@@ -508,7 +506,7 @@ EntityConfig Factory::CreateCustomEnemy() const {
                       .attacks =
                           std::vector<combat::AttackMove>{
                               combat::AttackMove{
-                                  .weapon = machado,
+                                  .weapon = *machado,
                                   .attack_modifier = 0,
                                   .damage_modifier = 0},
                           },

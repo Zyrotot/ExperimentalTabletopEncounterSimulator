@@ -9,7 +9,6 @@
 #include "internal/dice_rolls/roller.h"
 #include "internal/entities/i_entity.h"
 #include "internal/logging/log_manager.h"
-#include "internal/logging/logger.h"
 #include "internal/resolver/attack_resolver.h"
 #include "internal/resolver/damage_resolver.h"
 

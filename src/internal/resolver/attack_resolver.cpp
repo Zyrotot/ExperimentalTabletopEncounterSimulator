@@ -10,7 +10,6 @@
 #include "internal/dice_rolls/roller.h"
 #include "internal/entities/i_entity.h"
 #include "internal/logging/log_manager.h"
-#include "internal/logging/logger.h"
 
 namespace internal {
 namespace resolver {
@@ -124,11 +123,9 @@ DamageInstance AttackResolver::CalculateBaseDamage(
 
   DamageInstance instance{.amount = damage, .types = 0, .modifiers = 0};
 
-  if (attack_move.weapon) {
-    instance.types |= static_cast<uint16_t>(attack_move.weapon->damage_type);
-    instance.modifiers |=
-        static_cast<uint16_t>(attack_move.weapon->damage_modifier);
-  }
+  instance.types |= static_cast<uint16_t>(attack_move.weapon.damage_type);
+  instance.modifiers |=
+      static_cast<uint16_t>(attack_move.weapon.damage_modifier);
 
   return instance;
 }
@@ -136,11 +133,7 @@ DamageInstance AttackResolver::CalculateBaseDamage(
 void AttackResolver::GatherDamageFromSources(
     const AttackMove& attack_move,
     std::shared_ptr<CombatEventContext> context, AttackResult* result) {
-  if (!attack_move.weapon) {
-    return;
-  }
-
-  for (const auto& enchantment : attack_move.weapon->enchantments) {
+  for (const auto& enchantment : attack_move.weapon.enchantments) {
     for (const auto& source : enchantment.damage_sources) {
       DamageInstance dmg = source.contribute(context);
       if (dmg.amount > 0) {
@@ -173,12 +166,8 @@ int AttackResolver::CalculateTotalAttackModifier(
 int AttackResolver::CheckCriticalHit(const AttackMove& attack_move,
                                      const int& attack_roll,
                                      const int& fortification) {
-  if (!attack_move.weapon) {
-    return 1;
-  }
-
   int crit_threshold =
-      attack_move.weapon->crit_range - attack_move.crit_range_bonus;
+      attack_move.weapon.crit_range - attack_move.crit_range_bonus;
   if (attack_roll >= crit_threshold) {
     int fortification_roll = roller_->Roll(Term{.dice_groups = {{1, 100}}});
     if (fortification_roll <= fortification) {
@@ -187,7 +176,7 @@ int AttackResolver::CheckCriticalHit(const AttackMove& attack_move,
     }
 
     int multiplier =
-        attack_move.weapon->crit_multiplier + attack_move.crit_multiplier_bonus;
+        attack_move.weapon.crit_multiplier + attack_move.crit_multiplier_bonus;
     logger_->info("Critical hit! Multiplier: {}", multiplier);
     return multiplier;
   }

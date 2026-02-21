@@ -135,7 +135,7 @@ void AttackResolver::GatherDamageFromSources(
     std::shared_ptr<CombatEventContext> context, AttackResult* result) {
   for (const auto& enchantment : attack_move.weapon.enchantments) {
     for (const auto& source : enchantment.damage_sources) {
-      DamageInstance dmg = source.contribute(context);
+      DamageInstance dmg = source.contribute(*context);
       if (dmg.amount > 0) {
         result->damage_instances.push_back(dmg);
         logger_->debug("{} contributes {} damage", source.name, dmg.amount);

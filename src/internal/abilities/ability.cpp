@@ -6,8 +6,9 @@
 
 #include "internal/abilities/ability.h"
 
-#include "internal/entities/i_entity.h"  // IWYU pragma: keep
 #include "internal/combat/combat_context.h"
+#include "internal/combat/damage_modification.h"
+#include "internal/entities/i_entity.h"  // IWYU pragma: keep
 #include "internal/rules/resistances.h"
 
 namespace internal {
@@ -22,15 +23,15 @@ Ability CreateErosao() {
   effect.name = "Erosion";
   effect.source = "Ability: Erosion";
   effect.trigger = combat::CombatEvent::Hit;
-  effect.on_event = [](std::shared_ptr<combat::CombatEventContext> context) {
-    if (!context || !context->target)
+  effect.on_event = [](const combat::CombatEventContext& context) {
+    if (!context.target)
       return;
-    auto& bonus_dr = context->target->GetCurrentStats()
+    auto& bonus_dr = context.target->GetCurrentStats()
                          .bonus_stats.bonus_resistances.damage_reductions;
     if (!bonus_dr.empty()) {
-      context->target->RemoveDR(1, true);
+      context.target->RemoveDR(1, true);
     } else {
-      context->target->RemoveDR(1, false);
+      context.target->RemoveDR(1, false);
     }
   };
 
@@ -48,30 +49,28 @@ Ability CreateRigidezRaivosa() {
   take_damage_effect.name = "Rigidez Raivosa";
   take_damage_effect.source = "Ability: Rigidez Raivosa";
   take_damage_effect.trigger = combat::CombatEvent::TakeDamage;
-  take_damage_effect.on_event =
-      [](std::shared_ptr<combat::CombatEventContext> context) {
-        if (!context || !context->target)
-          return;
+  take_damage_effect.on_event = [](const combat::CombatEventContext& context) {
+    if (!context.target)
+      return;
 
-        rules::DamageReduction dr;
-        dr.amount = 1;
-        dr.bypass_types = rules::DamageType::None;
-        context->target->AddDR(dr, true);
-        context->target->IncrementAbilityStack("Rigidez Raivosa");
-      };
+    rules::DamageReduction dr;
+    dr.amount = 1;
+    dr.bypass_types = rules::DamageType::None;
+    context.target->AddDR(dr, true);
+    context.target->IncrementAbilityStack("Rigidez Raivosa");
+  };
 
   combat::Effect heal_effect;
   heal_effect.name = "Rigidez Raivosa";
   heal_effect.source = "Ability: Rigidez Raivosa";
   heal_effect.trigger = combat::CombatEvent::Heal;
-  heal_effect.on_event =
-      [](std::shared_ptr<combat::CombatEventContext> context) {
-        if (!context || !context->target || context->is_temp_hp)
-          return;
+  heal_effect.on_event = [](const combat::CombatEventContext& context) {
+    if (!context.target || context.is_temp_hp)
+      return;
 
-        context->target->ClearAllDR(true);
-        context->target->SetAbilityStack("Rigidez Raivosa", 0);
-      };
+    context.target->ClearAllDR(true);
+    context.target->SetAbilityStack("Rigidez Raivosa", 0);
+  };
 
   ability.effects.push_back(take_damage_effect);
   ability.effects.push_back(heal_effect);
@@ -88,15 +87,15 @@ Ability CreateTrespassar() {
   effect.name = "Trespassar";
   effect.source = "Ability: Trespassar";
   effect.trigger = combat::CombatEvent::Kill;
-  effect.on_event = [](std::shared_ptr<combat::CombatEventContext> context) {
-    if (!context || !context->source) {
+  effect.on_event = [](const combat::CombatEventContext& context) {
+    if (!context.source) {
       return;
     }
-    if (context->source->GetAbilityStack("Trespassar") > 0) {
-      context->source->DecrementAbilityStack("Trespassar");
-      if (context->attack_queue) {
-        context->attack_queue->QueueAttack(
-            {context->source, context->target,
+    if (context.source->GetAbilityStack("Trespassar") > 0) {
+      context.source->DecrementAbilityStack("Trespassar");
+      if (context.attack_queue) {
+        context.attack_queue->QueueAttack(
+            {context.source, context.target,
              0});  // TODO(zyrotot): support multiple attack sequences
       }
     }
@@ -108,13 +107,12 @@ Ability CreateTrespassar() {
   recharge_effect.name = "Trespassar";
   recharge_effect.source = "Recharge: Trespassar";
   recharge_effect.trigger = combat::CombatEvent::TurnStart;
-  recharge_effect.on_event =
-      [](std::shared_ptr<combat::CombatEventContext> context) {
-        if (!context || !context->source) {
-          return;
-        }
-        context->source->SetAbilityStack("Trespassar", 1);
-      };
+  recharge_effect.on_event = [](const combat::CombatEventContext& context) {
+    if (!context.source) {
+      return;
+    }
+    context.source->SetAbilityStack("Trespassar", 1);
+  };
 
   ability.effects.push_back(recharge_effect);
 
@@ -131,23 +129,21 @@ Ability CreateDuroDeFerir(int stacks) {
   effect.name = "Duro de Ferir";
   effect.source = "Ability: Duro de Ferir";
   effect.trigger = combat::CombatEvent::TakeDamage;
-  effect.on_event = [](std::shared_ptr<combat::CombatEventContext> context) {
-    if (!context || !context->target) {
-      return;
+  effect.on_damage = [](const combat::CombatEventContext& context)
+      -> combat::DamageModification {
+    if (!context.target) {
+      return {};
     }
 
-    if (context->current_index >= context->results.size()) {
-      return;
+    if (context.current_index >= context.results.size()) {
+      return {};
     }
 
-    auto& current_result = context->results[context->current_index];
-
-    if (context->target->GetAbilityStack("Duro de Ferir") > 0) {
-      for (auto& dmg : current_result.damage_instances) {
-        dmg.amount = 0;
-      }
-      context->target->DecrementAbilityStack("Duro de Ferir");
+    if (context.target->GetAbilityStack("Duro de Ferir") > 0) {
+      context.target->DecrementAbilityStack("Duro de Ferir");
+      return {.negate_all = true};
     }
+    return {};
   };
 
   ability.effects.push_back(effect);
@@ -164,18 +160,19 @@ Ability CreateDuroDeMatar(int stacks) {
   effect.name = "Duro de Matar";
   effect.source = "Ability: Duro de Matar";
   effect.trigger = combat::CombatEvent::TakeDamage;
-  effect.on_event = [](std::shared_ptr<combat::CombatEventContext> context) {
-    if (!context || !context->target) {
-      return;
+  effect.on_damage = [](const combat::CombatEventContext& context)
+      -> combat::DamageModification {
+    if (!context.target) {
+      return {};
     }
 
-    if (context->current_index >= context->results.size()) {
-      return;
+    if (context.current_index >= context.results.size()) {
+      return {};
     }
 
-    auto& current_result = context->results[context->current_index];
+    const auto& current_result = context.results[context.current_index];
 
-    if (context->target->GetAbilityStack("Duro de Matar") > 0) {
+    if (context.target->GetAbilityStack("Duro de Matar") > 0) {
       int total_damage = 0;
 
       for (const auto& dmg : current_result.damage_instances) {
@@ -183,16 +180,15 @@ Ability CreateDuroDeMatar(int stacks) {
       }
 
       int current_hp =
-          context->target->GetCurrentStats().base_stats.hp +
-          context->target->GetCurrentStats().bonus_stats.temporary_hp;
+          context.target->GetCurrentStats().base_stats.hp +
+          context.target->GetCurrentStats().bonus_stats.temporary_hp;
 
       if (total_damage >= current_hp) {
-        for (auto& dmg : current_result.damage_instances) {
-          dmg.amount = 0;
-        }
-        context->target->DecrementAbilityStack("Duro de Matar");
+        context.target->DecrementAbilityStack("Duro de Matar");
+        return {.negate_all = true};
       }
     }
+    return {};
   };
 
   ability.effects.push_back(effect);

@@ -6,8 +6,8 @@
 
 #include "internal/abilities/ability.h"
 
-#include "internal/entities/entity.h"  // IWYU pragma: keep
-#include "internal/entities/stats.h"
+#include "internal/entities/i_entity.h"  // IWYU pragma: keep
+#include "internal/combat/combat_context.h"
 #include "internal/rules/resistances.h"
 
 namespace internal {
@@ -140,7 +140,7 @@ Ability CreateDuroDeFerir(int stacks) {
       return;
     }
 
-    auto current_result = context->results[context->current_index];
+    auto& current_result = context->results[context->current_index];
 
     if (context->target->GetAbilityStack("Duro de Ferir") > 0) {
       for (auto& dmg : current_result.damage_instances) {
@@ -173,7 +173,7 @@ Ability CreateDuroDeMatar(int stacks) {
       return;
     }
 
-    auto current_result = context->results[context->current_index];
+    auto& current_result = context->results[context->current_index];
 
     if (context->target->GetAbilityStack("Duro de Matar") > 0) {
       int total_damage = 0;

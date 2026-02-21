@@ -7,6 +7,7 @@
 #include "internal/factory/factory.h"
 
 #include <memory>
+
 #include "internal/rules/resistances.h"
 
 #define GLZ_USE_STD_FORMAT_FLOAT 0
@@ -30,7 +31,20 @@ using entities::EntityConfig;
 using items::Enchantment;
 using items::Weapon;
 
-std::shared_ptr<Entity> MonsterFactory(Monster monsterType) {
+Factory::Factory(std::string player_filename, Monster monster_type)
+    : player_filename_(std::move(player_filename)),
+      monster_type_(monster_type) {
+}
+
+std::shared_ptr<entities::IEntity> Factory::CreatePlayer() const {
+  return GetCharacterFromJSON(player_filename_);
+}
+
+std::shared_ptr<entities::IEntity> Factory::CreateMonster() const {
+  return MonsterFactory(monster_type_);
+}
+
+std::shared_ptr<Entity> Factory::MonsterFactory(Monster monsterType) const {
   switch (monsterType) {
     case Uktril: {
       std::shared_ptr<Weapon> pinca = std::make_shared<Weapon>(Weapon{
@@ -264,7 +278,8 @@ std::shared_ptr<Entity> MonsterFactory(Monster monsterType) {
   }
 }
 
-std::shared_ptr<Entity> GetCharacterFromJSON(const std::string& filename) {
+std::shared_ptr<Entity> Factory::GetCharacterFromJSON(
+    const std::string& filename) const {
   auto config = LoadCharacterFromJSON(filename);
 
   for (auto& weapon : config.equipped_weapons) {
@@ -298,7 +313,7 @@ std::shared_ptr<Entity> GetCharacterFromJSON(const std::string& filename) {
   return std::make_shared<Entity>(config);
 }
 
-EntityConfig LoadCharacterFromJSON(const std::string& filename) {
+EntityConfig Factory::LoadCharacterFromJSON(const std::string& filename) const {
   std::string file_contents;
   {
     std::ifstream ifs("resources/" + filename, std::ios::binary);
@@ -315,7 +330,7 @@ EntityConfig LoadCharacterFromJSON(const std::string& filename) {
   return parsed;
 }
 
-Enchantment RebuildEnchantmentFromName(const std::string& name) {
+Enchantment Factory::RebuildEnchantmentFromName(const std::string& name) const {
   if (name == "FlamingWeapon") {
     return items::CreateFlamingEnchantment();
   } else if (name == "Vampiric") {
@@ -333,8 +348,8 @@ Enchantment RebuildEnchantmentFromName(const std::string& name) {
   return Enchantment{};
 }
 
-abilities::Ability RebuildAbilityFromName(const std::string& name,
-                                          int stack_count) {
+abilities::Ability Factory::RebuildAbilityFromName(const std::string& name,
+                                                   int stack_count) const {
   if (name == "Erosion") {
     return abilities::CreateErosao();
   } else if (name == "Rigidez Raivosa") {
@@ -354,7 +369,7 @@ abilities::Ability RebuildAbilityFromName(const std::string& name,
   return abilities::Ability{};
 }
 
-std::shared_ptr<Entity> CreateExampleCharacter() {
+std::shared_ptr<Entity> Factory::CreateExampleCharacter() const {
   std::shared_ptr<Weapon> machado = std::make_shared<Weapon>(Weapon{
       .name = "Machado",
       .attack_bonus = 2,
@@ -429,7 +444,7 @@ std::shared_ptr<Entity> CreateExampleCharacter() {
   return std::make_shared<Entity>(character_config);
 }
 
-std::shared_ptr<Entity> CreateCustomEnemy() {
+std::shared_ptr<Entity> Factory::CreateCustomEnemy() const {
   std::shared_ptr<Weapon> machado = std::make_shared<Weapon>(Weapon{
       .name = "Machandejante",
       .attack_bonus = 2,
@@ -510,8 +525,9 @@ std::shared_ptr<Entity> CreateCustomEnemy() {
   return std::make_shared<Entity>(character_config);
 }
 
-void SaveCharacterToJSON(const entities::EntityConfig& character_config,
-                         const std::string& filename) {
+void Factory::SaveCharacterToJSON(
+    const entities::EntityConfig& character_config,
+    const std::string& filename) const {
   std::string buffer;
   auto error = glz::write_file_json(character_config, filename, buffer);
   if (error.ec != glz::error_code::none) {

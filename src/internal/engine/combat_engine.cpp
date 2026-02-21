@@ -7,7 +7,7 @@
 #include "internal/engine/combat_engine.h"
 
 #include "internal/dice_rolls/roller.h"
-#include "internal/entities/entity.h"
+#include "internal/entities/i_entity.h"
 #include "internal/logging/log_manager.h"
 #include "internal/logging/logger.h"
 #include "internal/resolver/attack_resolver.h"
@@ -51,8 +51,8 @@ std::vector<std::shared_ptr<combat::CombatEventContext>> CombatEngine::Flush(
 }
 
 void CombatEngine::ProcessAttack(
-    std::shared_ptr<entities::Entity> attacker,
-    std::shared_ptr<entities::Entity> defender, int attack_sequence_index,
+    std::shared_ptr<entities::IEntity> attacker,
+    std::shared_ptr<entities::IEntity> defender, int attack_sequence_index,
     combat::IAttackQueue* context_queue,
     std::vector<std::shared_ptr<combat::CombatEventContext>>* out_contexts) {
   auto resolver = std::make_shared<resolver::AttackResolver>(

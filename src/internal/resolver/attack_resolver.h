@@ -10,14 +10,15 @@
 #include <memory>
 
 #include "internal/combat/attack.h"
-#include "internal/combat/combat_events.h"
+#include "internal/combat/attack_result.h"
+#include "internal/combat/combat_context.h"
 #include "internal/items/enchantment.h"
 #include "internal/rules/damage_types.h"
 
 namespace internal {
 
 namespace entities {
-class Entity;
+class IEntity;
 }  // namespace entities
 
 namespace dice_rolls {
@@ -32,8 +33,8 @@ namespace resolver {
 
 class AttackResolver {
  public:
-  AttackResolver(std::shared_ptr<entities::Entity> attacker,
-                 std::shared_ptr<entities::Entity> defender,
+  AttackResolver(std::shared_ptr<entities::IEntity> attacker,
+                 std::shared_ptr<entities::IEntity> defender,
                  const int& attack_sequence_index,
                  std::shared_ptr<dice_rolls::Roller> roller);
   ~AttackResolver();
@@ -60,8 +61,8 @@ class AttackResolver {
                        const int& attack_roll, const int& fortification);
 
  private:
-  std::shared_ptr<entities::Entity> attacker_;
-  std::shared_ptr<entities::Entity> defender_;
+  std::shared_ptr<entities::IEntity> attacker_;
+  std::shared_ptr<entities::IEntity> defender_;
   combat::AttackSequence attack_sequence_;
   std::shared_ptr<dice_rolls::Roller> roller_;
   std::shared_ptr<logging::Logger> logger_;

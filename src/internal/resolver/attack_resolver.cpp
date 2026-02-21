@@ -6,10 +6,9 @@
 
 #include "internal/resolver/attack_resolver.h"
 
-#include "internal/combat/combat_events.h"
 #include "internal/combat/event_manager.h"
 #include "internal/dice_rolls/roller.h"
-#include "internal/entities/entity.h"
+#include "internal/entities/i_entity.h"
 #include "internal/logging/log_manager.h"
 #include "internal/logging/logger.h"
 
@@ -22,11 +21,11 @@ using combat::CombatEvent;
 using combat::CombatEventContext;
 using dice_rolls::Roller;
 using dice_rolls::Term;
-using entities::Entity;
+using entities::IEntity;
 using rules::DamageInstance;
 
-AttackResolver::AttackResolver(std::shared_ptr<Entity> attacker,
-                               std::shared_ptr<Entity> defender,
+AttackResolver::AttackResolver(std::shared_ptr<IEntity> attacker,
+                               std::shared_ptr<IEntity> defender,
                                const int& attack_sequence_index,
                                std::shared_ptr<Roller> roller)
     : attacker_(attacker),

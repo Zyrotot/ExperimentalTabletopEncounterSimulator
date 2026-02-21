@@ -6,8 +6,6 @@
 
 #include "internal/entities/entity.h"
 
-#include <cstddef>
-
 #include "internal/items/weapon.h"
 #include "internal/logging/log_manager.h"
 
@@ -48,7 +46,7 @@ const std::vector<AttackSequence>& Entity::GetAttackSequences() const {
   return attack_sequences_;
 }
 
-const AttackSequence& Entity::GetAttackSequence(const int& index) const {
+const AttackSequence& Entity::GetAttackSequence(int index) const {
   if (index < 0 || static_cast<size_t>(index) >= attack_sequences_.size()) {
     return attack_sequences_[0];
   }

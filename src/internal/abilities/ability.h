@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include "internal/combat/combat_events.h"
+#include "internal/combat/effect.h"
 
 namespace internal {
 

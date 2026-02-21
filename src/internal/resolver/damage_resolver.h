@@ -9,7 +9,7 @@
 
 #include <memory>
 
-#include "internal/combat/combat_events.h"
+#include "internal/combat/combat_context.h"
 #include "internal/entities/stats.h"
 
 namespace internal {

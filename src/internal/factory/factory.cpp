@@ -6,7 +6,10 @@
 
 #include "internal/factory/factory.h"
 
+#include <fstream>
+#include <functional>
 #include <memory>
+#include <unordered_map>
 
 #include "internal/abilities/ability.h"
 #include "internal/combat/attack.h"
@@ -14,11 +17,40 @@
 #include "internal/entities/entity.h"
 #include "internal/items/enchantment_library.h"
 #include "internal/items/weapon.h"
+#include "internal/logging/log_manager.h"
 #include "internal/rules/damage_types.h"
 #include "internal/rules/resistances.h"
 
 #define GLZ_USE_STD_FORMAT_FLOAT 0
 #include <glaze/glaze.hpp>
+
+template <>
+struct glz::meta<internal::combat::Effect> {
+  using T = internal::combat::Effect;
+  static constexpr auto value =
+      glz::object("name", &T::name, "source", &T::source, "trigger",
+                  &T::trigger, "is_active", &T::is_active);
+};
+
+template <>
+struct glz::meta<internal::items::DamageSource> {
+  using T = internal::items::DamageSource;
+  static constexpr auto value = glz::object("name", &T::name);
+};
+
+template <>
+struct glz::meta<internal::items::Enchantment> {
+  using T = internal::items::Enchantment;
+  static constexpr auto value = glz::object("name", &T::name);
+};
+
+template <>
+struct glz::meta<internal::abilities::Ability> {
+  using T = internal::abilities::Ability;
+  static constexpr auto value =
+      glz::object("name", &T::name, "stack_count", &T::stack_count, "is_active",
+                  &T::is_active);
+};
 
 namespace internal {
 namespace factory {
@@ -28,6 +60,65 @@ using dice_rolls::Term;
 using entities::EntityConfig;
 using items::Enchantment;
 using items::Weapon;
+
+namespace {
+
+struct AttackMoveRef {
+  std::string weapon_ref;
+  int attack_modifier = 0;
+  int damage_modifier = 0;
+  int crit_range_bonus = 0;
+  int crit_multiplier_bonus = 0;
+};
+
+struct AttackSequenceRef {
+  std::string name;
+  std::vector<AttackMoveRef> attacks;
+  int attack_modifier = 0;
+  int damage_modifier = 0;
+};
+
+struct EntityConfigRef {
+  std::string name;
+  entities::Stats starting_stats;
+  std::vector<items::Weapon> equipped_weapons;
+  std::vector<AttackSequenceRef> attack_sequences;
+  std::vector<abilities::Ability> abilities;
+  rules::Alignment alignment;
+};
+
+const std::unordered_map<std::string, std::function<Enchantment()>>
+    kEnchantmentRegistry = {
+        {"FlamingWeapon", items::CreateFlamingEnchantment},
+        {"Vampiric", items::CreateVampiricEnchantment},
+        {"Profane", items::CreateProfaneEnchantment},
+        {"Dissonant", items::CreateDissonantEnchantment},
+        {"Flaming Explosion", items::CreateFlamingExplosionEnchantment},
+        {"Draining", items::CreateDrainingEnchantment},
+};
+
+const std::unordered_map<std::string, std::function<abilities::Ability(int)>>
+    kAbilityRegistry = {
+        {"Erosion", [](int) { return abilities::CreateErosao(); }},
+        {"Rigidez Raivosa",
+         [](int stacks) {
+           auto a = abilities::CreateRigidezRaivosa();
+           a.stack_count = stacks;
+           return a;
+         }},
+        {"Trespassar",
+         [](int stacks) {
+           auto a = abilities::CreateTrespassar();
+           a.stack_count = stacks;
+           return a;
+         }},
+        {"Duro de Ferir",
+         [](int stacks) { return abilities::CreateDuroDeFerir(stacks); }},
+        {"Duro de Matar",
+         [](int stacks) { return abilities::CreateDuroDeMatar(stacks); }},
+};
+
+}  // namespace
 
 Factory::Factory(std::string player_filename, Monster monster_type)
     : player_filename_(std::move(player_filename)),
@@ -46,237 +137,18 @@ std::shared_ptr<entities::IEntity> Factory::CreateMonster() const {
 
 EntityConfig Factory::MonsterFactory(Monster monsterType) const {
   switch (monsterType) {
-    case Uktril: {
-      Weapon pinca{
-          .name = "pinca",
-          .attack_bonus = 1,
-          .damage =
-              Term{
-                  .dice_groups = {Dice{.count = 1, .sides = 8}},
-              },
-          .damage_type = rules::DamageType::Slash,
-          .crit_range = 20,
-          .crit_multiplier = 2,
-      };
-
-      Weapon garra{.name = "garra",
-                   .attack_bonus = 0,
-                   .damage =
-                       Term{
-                           .dice_groups = {Dice{.count = 1, .sides = 4}},
-                       },
-                   .damage_type = rules::DamageType::Slash,
-                   .crit_range = 20,
-                   .crit_multiplier = 2};
-
-      auto uktril_config = entities::EntityConfig{
-          .name = "Uktril",
-          .starting_stats =
-              entities::Stats{
-                  .base_stats =
-                      entities::BaseStats{
-                          .hp = 60,
-                          .armour_class = 22,
-                          .fortification = 100,
-
-                          .attack_bonuses =
-                              entities::AttackBonuses{
-                                  .attack_bonus = 12,
-                                  .damage_bonus = 8,
-                              },
-                          .resistances =
-                              entities::Resistances{
-                                  .damage_reductions = {rules::DamageReduction{
-                                      .bypass_modifiers =
-                                          rules::DamageModifier::Magic,
-                                      .amount = 5,
-                                  }},
-                                  .immunity =
-                                      rules::Immunity{
-                                          .immune_categories =
-                                              rules::DamageCategory::Energy,
-                                      },
-                              },
-                      },
-              },
-          .equipped_weapons = {pinca, garra},
-          .attack_sequences =
-              std::vector<combat::AttackSequence>{
-                  combat::AttackSequence{
-                      .name = "Multiple Attacks",
-                      .attacks =
-                          std::vector<combat::AttackMove>{
-                              combat::AttackMove{
-                                  .weapon = pinca,
-                              },
-                              combat::AttackMove{
-                                  .weapon = garra,
-                              },
-                          },
-                      .attack_modifier = 0,
-                      .damage_modifier = 0,
-                  },
-              },
-          .abilities = {},
-          .alignment = rules::Alignment::ChaoticEvil,
-      };
-
-      return uktril_config;
-    }
-    case Geraktril: {
-      Weapon pinca{.name = "pinca",
-                   .attack_bonus = 1,
-                   .damage = Term{.dice_groups = {Dice{.count = 1, .sides = 8}}},
-                   .damage_type = rules::DamageType::Slash,
-                   .crit_range = 20,
-                   .crit_multiplier = 2};
-
-      Weapon garra{.name = "garra",
-                   .attack_bonus = 0,
-                   .damage = Term{.dice_groups = {Dice{.count = 1, .sides = 4}}},
-                   .damage_type = rules::DamageType::Slash,
-                   .crit_range = 20,
-                   .crit_multiplier = 2};
-
-      auto geraktril_config = entities::EntityConfig{
-          .name = "Geraktril",
-          .starting_stats =
-              entities::Stats{
-                  .base_stats =
-                      entities::BaseStats{
-                          .hp = 99,
-                          .armour_class = 25,
-                          .fortification = 100,
-
-                          .attack_bonuses =
-                              entities::AttackBonuses{
-                                  .attack_bonus = 16,
-                                  .damage_bonus = 10,
-                              },
-                          .resistances =
-                              entities::Resistances{
-                                  .damage_reductions = {rules::DamageReduction{
-                                      .bypass_modifiers =
-                                          rules::DamageModifier::Magic,
-                                      .amount = 10,
-                                  }},
-                                  .immunity =
-                                      rules::Immunity{
-                                          .immune_categories =
-                                              rules::DamageCategory::Energy,
-                                      },
-                              },
-                      },
-              },
-          .equipped_weapons = {pinca, garra},
-          .attack_sequences =
-              std::vector<combat::AttackSequence>{
-                  combat::AttackSequence{
-                      .name = "Multiple Attacks",
-                      .attacks =
-                          std::vector<combat::AttackMove>{
-                              combat::AttackMove{.weapon = pinca},
-                              combat::AttackMove{.weapon = garra},
-                          },
-                      .attack_modifier = 0,
-                      .damage_modifier = 0,
-                  }},
-          .abilities = {},
-          .alignment = rules::Alignment::ChaoticEvil,
-      };
-
-      return geraktril_config;
-    }
-    case Reishid: {
-      Weapon adaga{
-          .name = "adaga",
-          .attack_bonus = 4,
-          .damage =
-              Term{.dice_groups = {Dice{.count = 1, .sides = 4}}, .bonus = 4},
-          .damage_type = rules::DamageType::Pierce,
-          .damage_modifier = rules::DamageModifier::Magic,
-          .crit_range = 19,
-          .crit_multiplier = 2,
-          .enchantments = {internal::items::CreateProfaneEnchantment()}};
-
-      Weapon mordida{
-          .name = "mordida",
-          .attack_bonus = 0,
-          .damage =
-              Term{.dice_groups = {Dice{.count = 1, .sides = 4}}, .bonus = 4},
-          .damage_type = rules::DamageType::Pierce,
-          .crit_range = 20,
-          .crit_multiplier = 2};
-
-      Weapon garra{
-          .name = "garra",
-          .attack_bonus = 0,
-          .damage =
-              Term{.dice_groups = {Dice{.count = 1, .sides = 4}}, .bonus = 0},
-          .damage_type = rules::DamageType::Slash,
-          .crit_range = 20,
-          .crit_multiplier = 2};
-
-      auto reishid_config = entities::EntityConfig{
-          .name = "Reishid",
-          .starting_stats =
-              entities::Stats{
-                  .base_stats =
-                      entities::BaseStats{
-                          .hp = 143,
-                          .armour_class = 30,
-                          .fortification = 100,
-
-                          .attack_bonuses =
-                              entities::AttackBonuses{
-                                  .attack_bonus = 22,
-                                  .damage_bonus = 10,
-                              },
-                          .resistances =
-                              entities::Resistances{
-                                  .damage_reductions = {rules::DamageReduction{
-                                      .bypass_modifiers =
-                                          rules::DamageModifier::Magic,
-                                      .amount = 10,
-                                  }},
-                                  .immunity =
-                                      rules::Immunity{
-                                          .immune_categories =
-                                              rules::DamageCategory::Energy,
-                                      },
-                              },
-                      },
-              },
-          .equipped_weapons = {adaga, mordida, garra},
-          .attack_sequences =
-              std::vector<combat::AttackSequence>{
-                  combat::AttackSequence{
-                      .name = "Multiple Attacks",
-                      .attacks =
-                          std::vector<combat::AttackMove>{
-                              combat::AttackMove{.weapon = adaga},
-                              combat::AttackMove{.weapon = mordida},
-                              combat::AttackMove{.weapon = garra},
-                          },
-                      .attack_modifier = 0,
-                      .damage_modifier = 0,
-                  },
-              },
-          .abilities = {},
-          .alignment = rules::Alignment::ChaoticEvil,
-      };
-
-      return reishid_config;
-    }
+    case Uktril:
+      return GetCharacterFromJSON("uktril.json");
+    case Geraktril:
+      return GetCharacterFromJSON("geraktril.json");
+    case Reishid:
+      return GetCharacterFromJSON("reishid.json");
     case Custom:
       return GetCharacterFromJSON("custom_monster.json");
-    default:
-      return MonsterFactory(Monster::Uktril);
   }
 }
 
-EntityConfig Factory::GetCharacterFromJSON(
-    const std::string& filename) const {
+EntityConfig Factory::GetCharacterFromJSON(const std::string& filename) const {
   auto config = LoadCharacterFromJSON(filename);
 
   for (auto& weapon : config.equipped_weapons) {
@@ -309,58 +181,69 @@ EntityConfig Factory::GetCharacterFromJSON(
 }
 
 EntityConfig Factory::LoadCharacterFromJSON(const std::string& filename) const {
+  auto* logger = logging::LogManager::GetLogger("factory");
+  const std::string path = "resources/" + filename;
+
   std::string file_contents;
   {
-    std::ifstream ifs("resources/" + filename, std::ios::binary);
+    std::ifstream ifs(path, std::ios::binary);
+    if (!ifs.is_open()) {
+      logger->error("Failed to open file: {}", path);
+      return EntityConfig{};
+    }
     file_contents.assign(std::istreambuf_iterator<char>(ifs),
                          std::istreambuf_iterator<char>());
   }
 
-  EntityConfig parsed{};
+  EntityConfigRef parsed{};
   auto ec = glz::read_json(parsed, file_contents);
   if (ec) {
+    logger->error("Failed to parse JSON from {}: {}", path,
+                  glz::format_error(ec, file_contents));
     return EntityConfig{};
   }
 
-  return parsed;
+  EntityConfig config;
+  config.name = parsed.name;
+  config.starting_stats = parsed.starting_stats;
+  config.equipped_weapons = parsed.equipped_weapons;
+  config.abilities = parsed.abilities;
+  config.alignment = parsed.alignment;
+
+  for (const auto& seq_ref : parsed.attack_sequences) {
+    combat::AttackSequence seq;
+    seq.name = seq_ref.name;
+    seq.attack_modifier = seq_ref.attack_modifier;
+    seq.damage_modifier = seq_ref.damage_modifier;
+    for (const auto& move_ref : seq_ref.attacks) {
+      combat::AttackMove move;
+      move.weapon.name = move_ref.weapon_ref;
+      move.attack_modifier = move_ref.attack_modifier;
+      move.damage_modifier = move_ref.damage_modifier;
+      move.crit_range_bonus = move_ref.crit_range_bonus;
+      move.crit_multiplier_bonus = move_ref.crit_multiplier_bonus;
+      seq.attacks.push_back(move);
+    }
+    config.attack_sequences.push_back(seq);
+  }
+
+  return config;
 }
 
 Enchantment Factory::RebuildEnchantmentFromName(const std::string& name) const {
-  if (name == "FlamingWeapon") {
-    return items::CreateFlamingEnchantment();
-  } else if (name == "Vampiric") {
-    return items::CreateVampiricEnchantment();
-  } else if (name == "Profane") {
-    return items::CreateProfaneEnchantment();
-  } else if (name == "Dissonant") {
-    return items::CreateDissonantEnchantment();
-  } else if (name == "Flaming Explosion") {
-    return items::CreateFlamingExplosionEnchantment();
-  } else if (name == "Draining") {
-    return items::CreateDrainingEnchantment();
+  auto it = kEnchantmentRegistry.find(name);
+  if (it != kEnchantmentRegistry.end()) {
+    return it->second();
   }
-  // Unknown enchantment, return empty
   return Enchantment{};
 }
 
 abilities::Ability Factory::RebuildAbilityFromName(const std::string& name,
                                                    int stack_count) const {
-  if (name == "Erosion") {
-    return abilities::CreateErosao();
-  } else if (name == "Rigidez Raivosa") {
-    auto ability = abilities::CreateRigidezRaivosa();
-    ability.stack_count = stack_count;
-    return ability;
-  } else if (name == "Trespassar") {
-    auto ability = abilities::CreateTrespassar();
-    ability.stack_count = stack_count;
-    return ability;
-  } else if (name == "Duro de Ferir") {
-    return abilities::CreateDuroDeFerir(stack_count);
-  } else if (name == "Duro de Matar") {
-    return abilities::CreateDuroDeMatar(stack_count);
+  auto it = kAbilityRegistry.find(name);
+  if (it != kAbilityRegistry.end()) {
+    return it->second(stack_count);
   }
-  // Unknown ability, return empty
   return abilities::Ability{};
 }
 
@@ -523,10 +406,35 @@ EntityConfig Factory::CreateCustomEnemy() const {
 void Factory::SaveCharacterToJSON(
     const entities::EntityConfig& character_config,
     const std::string& filename) const {
+  EntityConfigRef json_config;
+  json_config.name = character_config.name;
+  json_config.starting_stats = character_config.starting_stats;
+  json_config.equipped_weapons = character_config.equipped_weapons;
+  json_config.abilities = character_config.abilities;
+  json_config.alignment = character_config.alignment;
+
+  for (const auto& seq : character_config.attack_sequences) {
+    AttackSequenceRef seq_ref;
+    seq_ref.name = seq.name;
+    seq_ref.attack_modifier = seq.attack_modifier;
+    seq_ref.damage_modifier = seq.damage_modifier;
+    for (const auto& move : seq.attacks) {
+      AttackMoveRef move_ref;
+      move_ref.weapon_ref = move.weapon.name;
+      move_ref.attack_modifier = move.attack_modifier;
+      move_ref.damage_modifier = move.damage_modifier;
+      move_ref.crit_range_bonus = move.crit_range_bonus;
+      move_ref.crit_multiplier_bonus = move.crit_multiplier_bonus;
+      seq_ref.attacks.push_back(move_ref);
+    }
+    json_config.attack_sequences.push_back(seq_ref);
+  }
+
   std::string buffer;
-  auto error = glz::write_file_json(character_config, filename, buffer);
+  auto error = glz::write_file_json(json_config, filename, buffer);
   if (error.ec != glz::error_code::none) {
-    return;
+    logging::LogManager::GetLogger("factory")->error(
+        "Failed to write JSON to {}", filename);
   }
 }
 

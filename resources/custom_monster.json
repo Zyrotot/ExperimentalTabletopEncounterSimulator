@@ -58,14 +58,7 @@
             "crit_multiplier": 3,
             "enchantments": [
                 {
-                    "name": "Flaming Explosion",
-                    "damage_sources": [
-                        {
-                            "name": "Flaming Explosion",
-                            "contribute": "std::function<internal::rules::DamageInstance(std::shared_ptr<internal::combat::CombatEventContext>)>"
-                        }
-                    ],
-                    "effects": []
+                    "name": "Flaming Explosion"
                 }
             ]
         }
@@ -75,35 +68,7 @@
             "name": "Normal Attack",
             "attacks": [
                 {
-                    "weapon": {
-                        "name": "Machandejante",
-                        "attack_bonus": 2,
-                        "damage": {
-                            "dice_groups": [
-                                {
-                                    "count": 3,
-                                    "sides": 6
-                                }
-                            ],
-                            "bonus": 1
-                        },
-                        "damage_type": 1,
-                        "damage_modifier": 0,
-                        "crit_range": 20,
-                        "crit_multiplier": 3,
-                        "enchantments": [
-                            {
-                                "name": "Flaming Explosion",
-                                "damage_sources": [
-                                    {
-                                        "name": "Flaming Explosion",
-                                        "contribute": "std::function<internal::rules::DamageInstance(std::shared_ptr<internal::combat::CombatEventContext>)>"
-                                    }
-                                ],
-                                "effects": []
-                            }
-                        ]
-                    },
+                    "weapon_ref": "Machandejante",
                     "attack_modifier": 0,
                     "damage_modifier": 0,
                     "crit_range_bonus": 0,
@@ -117,35 +82,7 @@
             "name": "Powerful Attack",
             "attacks": [
                 {
-                    "weapon": {
-                        "name": "Machandejante",
-                        "attack_bonus": 2,
-                        "damage": {
-                            "dice_groups": [
-                                {
-                                    "count": 3,
-                                    "sides": 6
-                                }
-                            ],
-                            "bonus": 1
-                        },
-                        "damage_type": 1,
-                        "damage_modifier": 0,
-                        "crit_range": 20,
-                        "crit_multiplier": 3,
-                        "enchantments": [
-                            {
-                                "name": "Flaming Explosion",
-                                "damage_sources": [
-                                    {
-                                        "name": "Flaming Explosion",
-                                        "contribute": "std::function<internal::rules::DamageInstance(std::shared_ptr<internal::combat::CombatEventContext>)>"
-                                    }
-                                ],
-                                "effects": []
-                            }
-                        ]
-                    },
+                    "weapon_ref": "Machandejante",
                     "attack_modifier": 0,
                     "damage_modifier": 0,
                     "crit_range_bonus": 0,

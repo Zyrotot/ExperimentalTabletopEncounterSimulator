@@ -27,8 +27,8 @@ class Factory : public IFactory {
  public:
   Factory(std::string player_filename, Monster monster_type);
 
-  std::shared_ptr<entities::IEntity> CreatePlayer() const override;
-  std::shared_ptr<entities::IEntity> CreateMonster() const override;
+  std::unique_ptr<entities::IEntity> CreatePlayer() const override;
+  std::unique_ptr<entities::IEntity> CreateMonster() const override;
 
  private:
   entities::EntityConfig MonsterFactory(Monster monster_type) const;

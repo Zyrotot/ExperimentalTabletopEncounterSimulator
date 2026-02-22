@@ -112,14 +112,17 @@ bool Simulator::RunWave(int wave,
                         std::shared_ptr<dice_rolls::Roller> roller) const {
   auto player = entity_factory_->CreatePlayer();
 
-  std::vector<std::shared_ptr<entities::IEntity>> enemies;
+  std::vector<std::unique_ptr<entities::IEntity>> enemies;
   enemies.reserve(static_cast<std::size_t>(wave));
   for (int i = 0; i < wave; ++i) {
     enemies.push_back(entity_factory_->CreateMonster());
   }
 
   engine::CombatEngine combat_engine(roller);
-  engine::Encounter encounter({player}, std::move(enemies));
+
+  std::vector<std::unique_ptr<entities::IEntity>> player_side;
+  player_side.push_back(std::move(player));
+  engine::Encounter encounter(std::move(player_side), std::move(enemies));
   engine::Director director(&encounter, &combat_engine);
 
   director.RunEncounter();

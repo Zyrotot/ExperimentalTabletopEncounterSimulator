@@ -127,12 +127,12 @@ Factory::Factory(std::string player_filename, Monster monster_type)
       monster_config_(MonsterFactory(monster_type_)) {
 }
 
-std::shared_ptr<entities::IEntity> Factory::CreatePlayer() const {
-  return std::make_shared<entities::Entity>(player_config_);
+std::unique_ptr<entities::IEntity> Factory::CreatePlayer() const {
+  return std::make_unique<entities::Entity>(player_config_);
 }
 
-std::shared_ptr<entities::IEntity> Factory::CreateMonster() const {
-  return std::make_shared<entities::Entity>(monster_config_);
+std::unique_ptr<entities::IEntity> Factory::CreateMonster() const {
+  return std::make_unique<entities::Entity>(monster_config_);
 }
 
 EntityConfig Factory::MonsterFactory(Monster monster_type) const {

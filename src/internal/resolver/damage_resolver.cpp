@@ -75,6 +75,29 @@ void DamageResolver::ApplySingleAttack(size_t result_index) {
       combat::EmitCombatEvent(combat::CombatEvent::Kill, context_);
     }
   }
+
+  if (context_->source && !context_->self_damage_instances.empty()) {
+    Resistances source_resistances = context_->source->GetResistances();
+    int total_self_damage = 0;
+    for (auto& dmg : context_->self_damage_instances) {
+      ApplyResistancesToDamage(&dmg, &source_resistances, logger_);
+      total_self_damage += dmg.amount;
+    }
+    context_->self_damage_instances.clear();
+
+    if (total_self_damage > 0) {
+      logger_->Info("{} takes {} self-damage", context_->source->GetName(),
+                    total_self_damage);
+      bool source_was_alive = context_->source->IsAlive();
+      context_->source->TakeDamage(total_self_damage);
+      if (source_was_alive && !context_->source->IsAlive()) {
+        logger_->Info("{} killed itself!", context_->source->GetName());
+        if (context_->attack_queue) {
+          context_->attack_queue->NotifyEntityDied(context_->source);
+        }
+      }
+    }
+  }
 }
 
 void DamageResolver::ApplyResistancesToDamage(

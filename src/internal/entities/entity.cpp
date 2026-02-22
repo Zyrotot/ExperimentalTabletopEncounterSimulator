@@ -31,8 +31,7 @@ Entity::Entity(const EntityConfig& config)
   ability_manager_.BuildActiveEffects();
 }
 
-Entity::~Entity() {
-}
+Entity::~Entity() = default;
 
 uint32_t Entity::GetId() const {
   return id_;

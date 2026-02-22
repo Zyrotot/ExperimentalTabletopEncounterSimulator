@@ -22,8 +22,7 @@ DamageResolver::DamageResolver(combat::CombatEventContext* context)
     : context_(context), logger_(logging::LogManager::GetLogger("attack")) {
 }
 
-DamageResolver::~DamageResolver() {
-}
+DamageResolver::~DamageResolver() = default;
 
 void DamageResolver::ApplySingleAttack(size_t result_index) {
   if (result_index >= context_->results.size()) {

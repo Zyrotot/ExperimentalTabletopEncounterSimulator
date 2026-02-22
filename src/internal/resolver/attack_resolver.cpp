@@ -28,8 +28,7 @@ AttackResolver::AttackResolver(const combat::AttackSequence& attack_sequence,
       context_(context) {
 }
 
-AttackResolver::~AttackResolver() {
-}
+AttackResolver::~AttackResolver() = default;
 
 void AttackResolver::ResolveSingleAttack(size_t move_index) {
   if (move_index >= attack_sequence_.attacks.size()) {

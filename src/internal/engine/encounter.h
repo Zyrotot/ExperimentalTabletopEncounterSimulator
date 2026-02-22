@@ -26,7 +26,7 @@ class Encounter {
   std::vector<std::shared_ptr<entities::IEntity>> GetLivingEnemiesOf(
       const entities::IEntity* entity) const;
 
-  std::shared_ptr<entities::IEntity> GetFirstLivingEnemyOf(
+  entities::IEntity* GetFirstLivingEnemyOf(
       const entities::IEntity* entity) const;
 
   std::vector<std::shared_ptr<entities::IEntity>> GetLivingAlliesOf(

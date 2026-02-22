@@ -47,6 +47,17 @@ enum class DamageModifier : uint16_t {
   RubySteel = 1 << 7,
 };
 
+constexpr uint16_t kPhysicalMask = static_cast<uint16_t>(DamageType::Slash) |
+                                   static_cast<uint16_t>(DamageType::Pierce) |
+                                   static_cast<uint16_t>(DamageType::Blunt);
+
+constexpr uint16_t kEnergyMask = static_cast<uint16_t>(DamageType::Fire) |
+                                 static_cast<uint16_t>(DamageType::Cold) |
+                                 static_cast<uint16_t>(DamageType::Acid) |
+                                 static_cast<uint16_t>(DamageType::Electric) |
+                                 static_cast<uint16_t>(DamageType::Positive) |
+                                 static_cast<uint16_t>(DamageType::Negative);
+
 enum class DamageCategory : uint16_t {
   None = 0,
   Physical = 1 << 0,
@@ -60,20 +71,15 @@ struct DamageInstance {
 };
 
 inline DamageCategory GetDamageCategory(DamageType type) {
-  switch (type) {
-    case DamageType::Slash:
-    case DamageType::Pierce:
-    case DamageType::Blunt:
-      return DamageCategory::Physical;
-    case DamageType::Fire:
-    case DamageType::Cold:
-    case DamageType::Acid:
-    case DamageType::Electric:
-      return DamageCategory::Energy;
-    case DamageType::None:
-    default:
-      return DamageCategory::None;
+  uint16_t raw = static_cast<uint16_t>(type);
+
+  if (raw & kPhysicalMask) {
+    return DamageCategory::Physical;
   }
+  if (raw & kEnergyMask) {
+    return DamageCategory::Energy;
+  }
+  return DamageCategory::None;
 }
 
 }  // namespace rules

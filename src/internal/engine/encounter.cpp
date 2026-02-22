@@ -55,11 +55,15 @@ std::vector<std::shared_ptr<entities::IEntity>> Encounter::GetLivingEnemiesOf(
   return CollectLiving(side == 0 ? 1 : 0);
 }
 
-std::shared_ptr<entities::IEntity> Encounter::GetFirstLivingEnemyOf(
+entities::IEntity* Encounter::GetFirstLivingEnemyOf(
     const entities::IEntity* entity) const {
-  int side = FindSideOf(entity);
-  auto living = CollectLiving(side == 0 ? 1 : 0, true);
-  return living.empty() ? nullptr : living.front();
+  const auto& source = (FindSideOf(entity) == 0) ? side_b_ : side_a_;
+  for (const auto& e : source) {
+    if (e && e->IsAlive()) {
+      return e.get();
+    }
+  }
+  return nullptr;
 }
 
 std::vector<std::shared_ptr<entities::IEntity>> Encounter::GetLivingAlliesOf(

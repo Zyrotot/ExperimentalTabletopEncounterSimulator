@@ -23,6 +23,22 @@ build-release: configure-release
 run: build
 	./$(BUILD_DIR)/$(APP)
 
+BENCH_DIR := build-bench
+BENCH_REPS := 3
+
+configure-bench:
+	cmake -S . -B $(BENCH_DIR) -G $(GEN) -DBUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release
+
+build-bench: configure-bench
+	cmake --build $(BENCH_DIR) --target $(APP)
+
+bench: build-bench
+	@echo "=== Benchmark ($(BENCH_REPS) runs, Release build) ==="
+	@for i in $$(seq 1 $(BENCH_REPS)); do \
+		echo "--- Run $$i ---"; \
+		./$(BENCH_DIR)/$(APP); \
+	done
+
 test: build-tests
 	./$(BUILD_DIR)/tests/ETTES_Tests
 

@@ -26,13 +26,12 @@ class Director : public combat::IAttackQueue {
 
   void RunEncounter();
 
-  void RunTurn(std::shared_ptr<entities::IEntity> entity);
+  void RunTurn(entities::IEntity* entity);
 
   void QueueAttack(combat::QueuedAttack attack) override;
 
  private:
-  std::shared_ptr<entities::IEntity> SelectTarget(
-      std::shared_ptr<entities::IEntity> attacker) const;
+  entities::IEntity* SelectTarget(entities::IEntity* attacker) const;
 
   static constexpr int kMaxAdjacentAttackers = 8;
 

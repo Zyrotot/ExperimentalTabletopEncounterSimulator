@@ -25,14 +25,22 @@ void Director::RunEncounter() {
   while (!encounter_->IsOver()) {
     attacks_this_round_.clear();
     for (const auto& entity : encounter_->GetSideA()) {
-      if (encounter_->IsOver()) break;
-      if (!entity || !entity->IsAlive()) continue;
-      RunTurn(entity);
+      if (encounter_->IsOver()) {
+        break;
+      }
+      if (!entity || !entity->IsAlive()) {
+        continue;
+      }
+      RunTurn(entity.get());
     }
     for (const auto& entity : encounter_->GetSideB()) {
-      if (encounter_->IsOver()) break;
-      if (!entity || !entity->IsAlive()) continue;
-      RunTurn(entity);
+      if (encounter_->IsOver()) {
+        break;
+      }
+      if (!entity || !entity->IsAlive()) {
+        continue;
+      }
+      RunTurn(entity.get());
     }
   }
 
@@ -47,7 +55,7 @@ void Director::RunEncounter() {
   }
 }
 
-void Director::RunTurn(std::shared_ptr<entities::IEntity> entity) {
+void Director::RunTurn(entities::IEntity* entity) {
   if (!entity || !entity->IsAlive()) {
     return;
   }
@@ -58,22 +66,22 @@ void Director::RunTurn(std::shared_ptr<entities::IEntity> entity) {
     return;
   }
 
-  if (attacks_this_round_[target.get()] >= kMaxAdjacentAttackers) {
+  // TODO(zyrotot): Add positioning and range, removing the arbitrary adjacency
+  // limit.
+  if (attacks_this_round_[target] >= kMaxAdjacentAttackers) {
     logger_->info("{} cannot attack {} - adjacency limit of {} reached",
                   entity->GetName(), target->GetName(), kMaxAdjacentAttackers);
     return;
   }
-  attacks_this_round_[target.get()]++;
+  attacks_this_round_[target]++;
 
   logger_->info("--- {}'s turn ---", entity->GetName());
 
-  // TODO(zyrotot): improve this, this is temporary
   combat::CombatEventContext context;
   context.source = entity;
   combat::EmitCombatEvent(combat::CombatEvent::TurnStart, &context);
 
-  engine_->QueueAttack(
-      {entity, target, 0});  // TODO(zyrotot): support multiple attack sequences
+  engine_->QueueAttack({entity, target, 0});
 
   engine_->Flush(this);
 }
@@ -91,21 +99,20 @@ void Director::QueueAttack(combat::QueuedAttack attack) {
     return;
   }
 
-  if (attacks_this_round_[attack.target.get()] >= kMaxAdjacentAttackers) {
+  if (attacks_this_round_[attack.target] >= kMaxAdjacentAttackers) {
     logger_->info(
         "Queued attack by {} on {} dropped - adjacency limit of {} reached",
         attack.attacker ? attack.attacker->GetName() : "unknown",
         attack.target->GetName(), kMaxAdjacentAttackers);
     return;
   }
-  attacks_this_round_[attack.target.get()]++;
+  attacks_this_round_[attack.target]++;
 
   engine_->QueueAttack(std::move(attack));
 }
 
-std::shared_ptr<entities::IEntity> Director::SelectTarget(
-    std::shared_ptr<entities::IEntity> attacker) const {
-  return encounter_->GetFirstLivingEnemyOf(attacker.get());
+entities::IEntity* Director::SelectTarget(entities::IEntity* attacker) const {
+  return encounter_->GetFirstLivingEnemyOf(attacker);
 }
 
 }  // namespace engine

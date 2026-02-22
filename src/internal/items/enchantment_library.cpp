@@ -13,6 +13,7 @@
 #include "internal/dice_rolls/roller.h"
 #include "internal/entities/i_entity.h"  // IWYU pragma: keep
 #include "internal/items/enchantment.h"
+#include "internal/logging/log_manager.h"
 #include "internal/resolver/damage_resolver.h"
 #include "internal/rules/alignment.h"
 #include "internal/rules/damage_types.h"
@@ -63,9 +64,12 @@ Enchantment CreateDissonantEnchantment() {
         .amount = ctx.roller->Roll(dice_rolls::Term{.dice_groups = {{1, 6}}}),
         .types = static_cast<uint16_t>(rules::DamageType::Negative),
         .modifiers = 0};
+    static logging::Logger* s_logger =
+        logging::LogManager::GetLogger("attack");
     entities::Resistances target_resistances = ctx.source->GetResistances();
     resolver::DamageResolver::ApplyResistancesToDamage(&self_damage,
-                                                       &target_resistances);
+                                                       &target_resistances,
+                                                       s_logger);
     ctx.source->TakeDamage(self_damage.amount);
   };
   ench.effects.push_back(effect);

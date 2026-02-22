@@ -38,7 +38,7 @@ void DamageResolver::ApplySingleAttack(size_t result_index) {
   Resistances remaining_resistances = context_->target->GetResistances();
 
   for (auto& dmg_instance : result.damage_instances) {
-    ApplyResistancesToDamage(&dmg_instance, &remaining_resistances);
+    ApplyResistancesToDamage(&dmg_instance, &remaining_resistances, logger_);
   }
 
   auto modifications =
@@ -74,8 +74,8 @@ void DamageResolver::ApplySingleAttack(size_t result_index) {
 }
 
 void DamageResolver::ApplyResistancesToDamage(
-    rules::DamageInstance* dmg_instance, Resistances* resistances) {
-  auto logger = logging::LogManager::GetLogger("attack");
+    rules::DamageInstance* dmg_instance, Resistances* resistances,
+    logging::Logger* logger) {
 
   if ((dmg_instance->types &
        static_cast<uint16_t>(resistances->immunity.immune_types)) != 0) {

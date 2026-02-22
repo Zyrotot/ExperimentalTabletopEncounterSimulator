@@ -7,7 +7,6 @@
 #ifndef SRC_INTERNAL_COMBAT_ATTACK_RESULT_H_
 #define SRC_INTERNAL_COMBAT_ATTACK_RESULT_H_
 
-#include <memory>
 #include <vector>
 
 #include "internal/rules/damage_types.h"
@@ -35,8 +34,8 @@ struct AttackResult {
 };
 
 struct QueuedAttack {
-  std::shared_ptr<entities::IEntity> attacker;
-  std::shared_ptr<entities::IEntity> target;
+  entities::IEntity* attacker = nullptr;
+  entities::IEntity* target = nullptr;
   int attack_sequence_index = 0;
 };
 

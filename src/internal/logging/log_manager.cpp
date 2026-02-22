@@ -23,9 +23,9 @@ Logger* LogManager::GetLogger(const std::string& name) {
   if (!spd) {
     spd = spdlog::stdout_color_mt(name);
     spd->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] [%n] %v");
-  }
-  if (name != "simulator") {
-    spd->set_level(spdlog::level::err);
+    if (name != "simulator") {
+      spd->set_level(spdlog::level::err);
+    }
   }
   return spd.get();
 }

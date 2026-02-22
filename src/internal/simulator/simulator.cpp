@@ -7,7 +7,6 @@
 #include "internal/simulator/simulator.h"
 
 #include <algorithm>
-#include <barrier>  // NOLINT
 #include <future>   // NOLINT
 #include <iomanip>
 #include <iostream>
@@ -69,8 +68,6 @@ SimulationResults Simulator::Run(int num_simulations,
   const int base = num_simulations / static_cast<int>(num_threads);
   const int remainder = num_simulations % static_cast<int>(num_threads);
 
-  std::barrier sync_point(static_cast<std::ptrdiff_t>(num_threads));
-
   std::vector<std::future<std::vector<int>>> futures;
   futures.reserve(num_threads);
 
@@ -78,41 +75,13 @@ SimulationResults Simulator::Run(int num_simulations,
     const int count = base + (static_cast<int>(t) < remainder ? 1 : 0);
 
     futures.emplace_back(
-        std::async(std::launch::async, [this, count, &sync_point]() {
-          struct SimState {
-            int waves_cleared = 0;
-            bool alive = true;
-          };
-
+        std::async(std::launch::async, [this, count]() {
           auto local_roller = std::make_shared<dice_rolls::Roller>();
-          std::vector<SimState> states(static_cast<std::size_t>(count));
-
-          for (int wave = 1; wave <= MAX_WAVES; ++wave) {
-            for (auto& state : states) {
-              if (!state.alive)
-                continue;
-
-              if (RunWave(wave, local_roller)) {
-                state.waves_cleared = wave;
-                if (wave == MAX_WAVES) {
-                  logger_->info("Wave cap ({}) reached — character wins!",
-                                MAX_WAVES);
-                } else {
-                  logger_->info("Wave {} cleared.", wave);
-                }
-              } else {
-                state.alive = false;
-                logger_->info("Lost on wave {}.", wave);
-              }
-            }
-
-            sync_point.arrive_and_wait();
-          }
-
           std::vector<int> results;
           results.reserve(static_cast<std::size_t>(count));
-          for (const auto& state : states) {
-            results.push_back(state.waves_cleared);
+
+          for (int sim = 0; sim < count; ++sim) {
+            results.push_back(RunOnce(local_roller));
           }
           return results;
         }));

@@ -22,46 +22,34 @@ std::vector<DamageModification> EmitCombatEvent(
 
   std::vector<DamageModification> modifications;
 
-  auto logger = logging::LogManager::GetLogger("events");
+  static logging::Logger* logger =
+      logging::LogManager::GetLogger("events");
 
-  std::vector<std::shared_ptr<entities::IEntity>> relevant_entities;
+  entities::IEntity* relevant_entity = nullptr;
 
   switch (event) {
     case CombatEvent::TakeDamage:
-      if (context->target)
-        relevant_entities.push_back(context->target);
+    case CombatEvent::Heal:
+      relevant_entity = context->target;
       break;
     case CombatEvent::DealDamage:
     case CombatEvent::Kill:
     case CombatEvent::Hit:
     case CombatEvent::TurnStart:
-      if (context->source)
-        relevant_entities.push_back(context->source);
-      break;
-    case CombatEvent::Heal:
-      if (context->target)
-        relevant_entities.push_back(context->target);
+      relevant_entity = context->source;
       break;
     default:
       break;
   }
 
-  for (const auto& entity : relevant_entities) {
-    if (!entity) {
-      continue;
-    }
-
-    for (const auto* effect : entity->GetActiveEffects()) {
-      if (!effect->is_active) {
-        continue;
-      }
-
-      if (effect->trigger != event) {
+  if (relevant_entity) {
+    for (const auto* effect : relevant_entity->GetActiveEffects()) {
+      if (!effect->is_active || effect->trigger != event) {
         continue;
       }
 
       logger->debug("Triggering {} effect from {} for {}", effect->name,
-                    effect->source, entity->GetName());
+                    effect->source, relevant_entity->GetName());
 
       if (effect->on_event) {
         effect->on_event(*context);

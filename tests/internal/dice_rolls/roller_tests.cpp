@@ -17,19 +17,12 @@ namespace dice_rolls {
 
 class RollerTest : public ::testing::Test {
  protected:
-  class TestableRoller : public Roller {
-   public:
-    explicit TestableRoller(std::shared_ptr<IRandomEngine> engine)
-        : Roller(engine) {
-    }
-  };
-
-  std::unique_ptr<TestableRoller> sut_;
+  std::unique_ptr<Roller> sut_;
 };
 
 TEST_F(RollerTest, SingleDieReturnsEngineValuePlusBonus) {
   auto mock = std::make_shared<MockRandomEngine>();
-  sut_ = std::make_unique<TestableRoller>(mock);
+  sut_ = std::make_unique<Roller>(mock);
   EXPECT_CALL(*mock, GetRand(6)).WillOnce(Return(3));
 
   Term term;
@@ -41,7 +34,7 @@ TEST_F(RollerTest, SingleDieReturnsEngineValuePlusBonus) {
 
 TEST_F(RollerTest, MultipleDiceSumsValues) {
   auto mock = std::make_shared<MockRandomEngine>();
-  sut_ = std::make_unique<TestableRoller>(mock);
+  sut_ = std::make_unique<Roller>(mock);
   EXPECT_CALL(*mock, GetRand(6)).WillOnce(Return(2)).WillOnce(Return(4));
 
   Term term;
@@ -54,7 +47,7 @@ TEST_F(RollerTest, MultipleDiceSumsValues) {
 
 TEST_F(RollerTest, UsesCorrectSidesForEachDie) {
   auto mock = std::make_shared<MockRandomEngine>();
-  sut_ = std::make_unique<TestableRoller>(mock);
+  sut_ = std::make_unique<Roller>(mock);
   EXPECT_CALL(*mock, GetRand(8)).WillOnce(Return(1));
   EXPECT_CALL(*mock, GetRand(10)).WillOnce(Return(2));
 

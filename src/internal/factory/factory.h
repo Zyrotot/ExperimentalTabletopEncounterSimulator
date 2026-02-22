@@ -31,7 +31,7 @@ class Factory : public IFactory {
   std::shared_ptr<entities::IEntity> CreateMonster() const override;
 
  private:
-  entities::EntityConfig MonsterFactory(Monster monsterType) const;
+  entities::EntityConfig MonsterFactory(Monster monster_type) const;
   entities::EntityConfig GetCharacterFromJSON(
       const std::string& filename) const;
 

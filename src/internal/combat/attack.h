@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include "internal/dice_rolls/roller.h"
+#include "internal/dice_rolls/term.h"
 #include "internal/items/weapon.h"
 
 namespace internal {

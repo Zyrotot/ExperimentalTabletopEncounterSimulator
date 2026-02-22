@@ -29,6 +29,27 @@ test: build-tests
 clean:
 	rm -rf $(BUILD_DIR)
 
+ASAN_DIR := build-asan
+TSAN_DIR := build-tsan
+
+configure-asan:
+	cmake -S . -B $(ASAN_DIR) -G $(GEN) -DBUILD_TESTS=ON -DENABLE_ASAN=ON -DCMAKE_BUILD_TYPE=Debug
+
+build-asan: configure-asan
+	cmake --build $(ASAN_DIR) --target ETTES_Tests
+
+test-asan: build-asan
+	./$(ASAN_DIR)/tests/ETTES_Tests
+
+configure-tsan:
+	cmake -S . -B $(TSAN_DIR) -G $(GEN) -DBUILD_TESTS=ON -DENABLE_TSAN=ON -DCMAKE_BUILD_TYPE=Debug
+
+build-tsan: configure-tsan
+	cmake --build $(TSAN_DIR) --target ETTES_Tests
+
+test-tsan: build-tsan
+	./$(TSAN_DIR)/tests/ETTES_Tests
+
 COVERAGE_DIR  := build-coverage
 COVERAGE_INFO := coverage.info
 COVERAGE_RPT  := coverage-report

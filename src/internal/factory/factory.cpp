@@ -13,7 +13,7 @@
 
 #include "internal/abilities/ability.h"
 #include "internal/combat/attack.h"
-#include "internal/dice_rolls/roller.h"
+#include "internal/dice_rolls/term.h"
 #include "internal/entities/entity.h"
 #include "internal/items/enchantment_library.h"
 #include "internal/items/weapon.h"
@@ -135,8 +135,8 @@ std::shared_ptr<entities::IEntity> Factory::CreateMonster() const {
   return std::make_shared<entities::Entity>(monster_config_);
 }
 
-EntityConfig Factory::MonsterFactory(Monster monsterType) const {
-  switch (monsterType) {
+EntityConfig Factory::MonsterFactory(Monster monster_type) const {
+  switch (monster_type) {
     case Uktril:
       return GetCharacterFromJSON("uktril.json");
     case Geraktril:
@@ -146,6 +146,7 @@ EntityConfig Factory::MonsterFactory(Monster monsterType) const {
     case Custom:
       return GetCharacterFromJSON("custom_monster.json");
   }
+  return EntityConfig{};
 }
 
 EntityConfig Factory::GetCharacterFromJSON(const std::string& filename) const {

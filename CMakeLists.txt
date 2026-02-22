@@ -9,6 +9,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # ── Options ──────────────────────────────────────────────────────────────────
 option(BUILD_TESTS     "Build unit tests"       OFF)
 option(ENABLE_COVERAGE "Enable code coverage"   OFF)
+option(ENABLE_ASAN     "Enable AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
+option(ENABLE_TSAN     "Enable ThreadSanitizer"                                 OFF)
 
 # ── External Dependencies ────────────────────────────────────────────────────
 add_subdirectory(external/json)   # Glaze (header-only, provides glaze::glaze)
@@ -38,6 +40,21 @@ if(ENABLE_COVERAGE)
     if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
         target_compile_options(ettes_core PUBLIC --coverage -O0 -g)
         target_link_options(ettes_core PUBLIC --coverage)
+    endif()
+endif()
+
+# ── Sanitizers ───────────────────────────────────────────────────────────────
+if(ENABLE_ASAN)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        target_compile_options(ettes_core PUBLIC -fsanitize=address,undefined -fno-omit-frame-pointer -g -O1)
+        target_link_options(ettes_core PUBLIC -fsanitize=address,undefined)
+    endif()
+endif()
+
+if(ENABLE_TSAN)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        target_compile_options(ettes_core PUBLIC -fsanitize=thread -fno-omit-frame-pointer -g -O1)
+        target_link_options(ettes_core PUBLIC -fsanitize=thread)
     endif()
 endif()
 

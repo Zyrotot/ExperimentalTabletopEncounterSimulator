@@ -19,8 +19,7 @@ CombatEngine::CombatEngine(std::shared_ptr<dice_rolls::Roller> roller)
     : roller_(roller), logger_(logging::LogManager::GetLogger("engine")) {
 }
 
-CombatEngine::~CombatEngine() {
-}
+CombatEngine::~CombatEngine() = default;
 
 void CombatEngine::QueueAttack(combat::QueuedAttack attack) {
   attack_queue_.push_back(std::move(attack));

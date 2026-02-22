@@ -19,8 +19,7 @@ Director::Director(Encounter* encounter, CombatEngine* engine)
       logger_(logging::LogManager::GetLogger("director")) {
 }
 
-Director::~Director() {
-}
+Director::~Director() = default;
 
 void Director::RunEncounter() {
   while (!encounter_->IsOver()) {

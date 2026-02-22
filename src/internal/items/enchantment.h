@@ -21,7 +21,7 @@ class Roller;
 }
 
 namespace combat {
-class CombatEventContext;
+struct CombatEventContext;
 }
 
 namespace items {

@@ -20,8 +20,6 @@ class DamageResolver {
   explicit DamageResolver(combat::CombatEventContext* context);
   ~DamageResolver();
 
-  void ApplyDamage();
-
   void ApplySingleAttack(size_t result_index);
 
   static void ApplyResistancesToDamage(rules::DamageInstance* dmg_instance,

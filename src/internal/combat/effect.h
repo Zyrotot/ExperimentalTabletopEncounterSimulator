@@ -16,7 +16,7 @@
 namespace internal {
 namespace combat {
 
-class CombatEventContext;
+struct CombatEventContext;
 
 struct Effect {
   std::string name;

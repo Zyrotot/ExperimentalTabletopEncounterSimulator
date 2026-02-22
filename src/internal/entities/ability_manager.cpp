@@ -9,10 +9,8 @@
 namespace internal {
 namespace entities {
 
-AbilityManager::AbilityManager(std::vector<abilities::Ability> abilities,
-                               const std::vector<items::Weapon>* equipped_weapons)
-    : abilities_(std::move(abilities)),
-      equipped_weapons_(equipped_weapons) {
+AbilityManager::AbilityManager(std::vector<abilities::Ability> abilities)
+    : abilities_(std::move(abilities)) {
   for (auto& ability : abilities_) {
     ability_index_[ability.name] = &ability;
   }
@@ -70,14 +68,6 @@ void AbilityManager::BuildActiveEffects() {
     }
     for (const auto& effect : ability.effects) {
       active_effects_.push_back(&effect);
-    }
-  }
-
-  for (const auto& weapon : *equipped_weapons_) {
-    for (const auto& enchantment : weapon.enchantments) {
-      for (const auto& effect : enchantment.effects) {
-        active_effects_.push_back(&effect);
-      }
     }
   }
 }

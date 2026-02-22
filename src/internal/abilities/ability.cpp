@@ -135,10 +135,6 @@ Ability CreateDuroDeFerir(int stacks) {
       return {};
     }
 
-    if (context.current_index >= context.results.size()) {
-      return {};
-    }
-
     if (context.target->GetAbilityStack("Duro de Ferir") > 0) {
       context.target->DecrementAbilityStack("Duro de Ferir");
       return {.negate_all = true};

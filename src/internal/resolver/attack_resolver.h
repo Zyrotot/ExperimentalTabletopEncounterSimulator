@@ -7,8 +7,6 @@
 #ifndef SRC_INTERNAL_RESOLVER_ATTACK_RESOLVER_H_
 #define SRC_INTERNAL_RESOLVER_ATTACK_RESOLVER_H_
 
-#include <memory>
-
 #include "internal/combat/attack.h"
 #include "internal/combat/attack_result.h"
 #include "internal/combat/combat_context.h"
@@ -18,39 +16,23 @@
 
 namespace internal {
 
-namespace entities {
-class IEntity;
-}  // namespace entities
-
-namespace dice_rolls {
-class Roller;
-}  // namespace dice_rolls
-
 namespace resolver {
 
 class AttackResolver {
  public:
-  AttackResolver(std::shared_ptr<entities::IEntity> attacker,
-                 std::shared_ptr<entities::IEntity> defender,
-                 const int& attack_sequence_index,
-                 std::shared_ptr<dice_rolls::Roller> roller);
+  AttackResolver(const combat::AttackSequence& attack_sequence,
+                 combat::CombatEventContext* context);
   ~AttackResolver();
 
-  std::unique_ptr<combat::CombatEventContext> ResolveAttack();
-
-  void ResolveSingleAttack(size_t move_index,
-                           combat::CombatEventContext* context);
+  void ResolveSingleAttack(size_t move_index);
 
  protected:
-  void ResolveAttackMove(const combat::AttackMove& attack_move,
-                         combat::CombatEventContext* context);
+  void ResolveAttackMove(const combat::AttackMove& attack_move);
 
   rules::DamageInstance CalculateBaseDamage(
       const combat::AttackMove& attack_move, int crit_multiplier);
-  void GatherDamageFromSources(
-      const combat::AttackMove& attack_move,
-      combat::CombatEventContext* context,
-      combat::AttackResult* result);
+  void GatherDamageFromSources(const combat::AttackMove& attack_move,
+                               combat::AttackResult* result);
 
   dice_rolls::Term CalculateTotalDamage(const combat::AttackMove& attack_move);
   int CalculateTotalAttackModifier(const combat::AttackMove& attack_move);
@@ -58,11 +40,9 @@ class AttackResolver {
                        const int& attack_roll, const int& fortification);
 
  private:
-  std::shared_ptr<entities::IEntity> attacker_;
-  std::shared_ptr<entities::IEntity> defender_;
   combat::AttackSequence attack_sequence_;
-  std::shared_ptr<dice_rolls::Roller> roller_;
   logging::Logger* logger_;
+  combat::CombatEventContext* context_;
 };
 
 }  // namespace resolver

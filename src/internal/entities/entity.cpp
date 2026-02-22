@@ -25,8 +25,7 @@ Entity::Entity(const EntityConfig& config)
       health_component_(&current_stats_.base_stats, &current_stats_.bonus_stats,
                         &starting_stats_.base_stats),
       combat_profile_(config.equipped_weapons, config.attack_sequences, logger_),
-      ability_manager_(config.abilities,
-                       &combat_profile_.GetEquippedWeapons()),
+      ability_manager_(config.abilities),
       defense_profile_(&current_stats_.base_stats, &current_stats_.bonus_stats,
                        logger_) {
   ability_manager_.BuildActiveEffects();

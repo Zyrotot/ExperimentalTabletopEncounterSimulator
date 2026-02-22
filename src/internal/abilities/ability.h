@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 
+#include "internal/abilities/ability_id.h"
 #include "internal/combat/effect.h"
 
 namespace ettes {
@@ -22,6 +23,7 @@ namespace abilities {
 
 struct Ability {
   std::string name;
+  AbilityId id = AbilityId::None;
   std::vector<combat::Effect> effects;
 
   int stack_count = 0;

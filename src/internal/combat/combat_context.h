@@ -8,7 +8,6 @@
 #define SRC_INTERNAL_COMBAT_COMBAT_CONTEXT_H_
 
 #include <cstddef>
-#include <memory>
 #include <vector>
 
 #include "internal/combat/attack_queue.h"
@@ -28,8 +27,8 @@ class Roller;
 namespace combat {
 
 struct CombatEventContext {
-  std::shared_ptr<entities::IEntity> source;
-  std::shared_ptr<entities::IEntity> target;
+  entities::IEntity* source = nullptr;
+  entities::IEntity* target = nullptr;
 
   dice_rolls::Roller* roller = nullptr;
   std::vector<AttackResult> results;
@@ -40,6 +39,7 @@ struct CombatEventContext {
 
   IAttackQueue* attack_queue = nullptr;
   std::vector<const Effect*> transient_effects = {};
+  mutable std::vector<rules::DamageInstance> self_damage_instances = {};
 };
 
 }  // namespace combat

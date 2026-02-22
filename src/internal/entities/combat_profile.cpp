@@ -24,7 +24,7 @@ const combat::AttackSequence& CombatProfile::GetAttackSequence(
   assert(!attack_sequences_.empty());
 
   if (index < 0 || static_cast<size_t>(index) >= attack_sequences_.size()) {
-    logger_->warn(
+    logger_->Warn(
         "GetAttackSequence called with invalid index {}; falling back to index "
         "0",
         index);

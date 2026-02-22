@@ -1,33 +1,57 @@
 APP := ETTES
-BUILD_DIR := build
+BUILD_RELEASE := build/release
+BUILD_DEBUG   := build/debug
 GEN := Ninja
 
+configure-debug:
+	cmake -S . -B $(BUILD_DEBUG) -G $(GEN) -DBUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Debug
+
+build-debug: configure-debug
+	cmake --build $(BUILD_DEBUG) --target $(APP)
+
+run-debug: build-debug
+	./$(BUILD_DEBUG)/$(APP)
+
 configure:
-	cmake -S . -B $(BUILD_DIR) -G $(GEN) -DBUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Debug
-
-configure-tests:
-	cmake -S . -B $(BUILD_DIR) -G $(GEN) -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
-
-configure-release:
-	cmake -S . -B $(BUILD_DIR) -G $(GEN) -DBUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release
+	cmake -S . -B $(BUILD_RELEASE) -G $(GEN) -DBUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release
 
 build: configure
-	cmake --build $(BUILD_DIR) --target $(APP)
-
-build-tests: configure-tests
-	cmake --build $(BUILD_DIR) --target ETTES_Tests
-
-build-release: configure-release
-	cmake --build $(BUILD_DIR) --target $(APP)
+	cmake --build $(BUILD_RELEASE) --target $(APP)
 
 run: build
-	./$(BUILD_DIR)/$(APP)
+	./$(BUILD_RELEASE)/$(APP)
+
+configure-tests:
+	cmake -S . -B $(BUILD_DEBUG) -G $(GEN) -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
+
+build-tests: configure-tests
+	cmake --build $(BUILD_DEBUG) --target ETTES_Tests
 
 test: build-tests
-	./$(BUILD_DIR)/tests/ETTES_Tests
+	./$(BUILD_DEBUG)/tests/ETTES_Tests
 
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf build
+
+# Benchmarks
+
+BENCH_DIR := build-bench
+BENCH_REPS := 3
+
+configure-bench:
+	cmake -S . -B $(BENCH_DIR) -G $(GEN) -DBUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release
+
+build-bench: configure-bench
+	cmake --build $(BENCH_DIR) --target $(APP)
+
+bench: build-bench
+	@echo "=== Benchmark ($(BENCH_REPS) runs, Release build) ==="
+	@for i in $$(seq 1 $(BENCH_REPS)); do \
+		echo "--- Run $$i ---"; \
+		./$(BENCH_DIR)/$(APP); \
+	done
+
+# Sanitizers
 
 ASAN_DIR := build-asan
 TSAN_DIR := build-tsan
@@ -49,6 +73,8 @@ build-tsan: configure-tsan
 
 test-tsan: build-tsan
 	./$(TSAN_DIR)/tests/ETTES_Tests
+
+# Code Coverage
 
 COVERAGE_DIR  := build-coverage
 COVERAGE_INFO := coverage.info

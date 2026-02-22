@@ -23,7 +23,8 @@ class DamageResolver {
   void ApplySingleAttack(size_t result_index);
 
   static void ApplyResistancesToDamage(rules::DamageInstance* dmg_instance,
-                                       entities::Resistances* resistances);
+                                       entities::Resistances* resistances,
+                                       logging::Logger* logger);
 
  private:
   combat::CombatEventContext* context_;

@@ -40,9 +40,8 @@ class CombatEngine {
 
  private:
   void ProcessAttack(
-      std::shared_ptr<entities::IEntity> attacker,
-      std::shared_ptr<entities::IEntity> defender, int attack_sequence_index,
-      combat::IAttackQueue* context_queue,
+      entities::IEntity* attacker, entities::IEntity* defender,
+      int attack_sequence_index, combat::IAttackQueue* context_queue,
       std::vector<std::unique_ptr<combat::CombatEventContext>>* out_contexts);
 
   std::shared_ptr<dice_rolls::Roller> roller_;

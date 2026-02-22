@@ -34,11 +34,11 @@ std::vector<std::unique_ptr<combat::CombatEventContext>> CombatEngine::Flush(
     attack_queue_.pop_front();
 
     if (!queued.attacker || !queued.target) {
-      logger_->warn("Skipping queued attack with null attacker or target");
+      logger_->Warn("Skipping queued attack with null attacker or target");
       continue;
     }
 
-    logger_->info("{} attacks {}", queued.attacker->GetName(),
+    logger_->Info("{} attacks {}", queued.attacker->GetName(),
                   queued.target->GetName());
     ProcessAttack(queued.attacker, queued.target, queued.attack_sequence_index,
                   context_queue, &out_contexts);
@@ -48,9 +48,8 @@ std::vector<std::unique_ptr<combat::CombatEventContext>> CombatEngine::Flush(
 }
 
 void CombatEngine::ProcessAttack(
-    std::shared_ptr<entities::IEntity> attacker,
-    std::shared_ptr<entities::IEntity> defender, int attack_sequence_index,
-    combat::IAttackQueue* context_queue,
+    entities::IEntity* attacker, entities::IEntity* defender,
+    int attack_sequence_index, combat::IAttackQueue* context_queue,
     std::vector<std::unique_ptr<combat::CombatEventContext>>* out_contexts) {
   auto context = std::make_unique<combat::CombatEventContext>();
   context->source = attacker;
@@ -60,14 +59,12 @@ void CombatEngine::ProcessAttack(
 
   const auto& sequence = attacker->GetAttackSequence(attack_sequence_index);
 
-  auto resolver =
-      std::make_shared<resolver::AttackResolver>(sequence, context.get());
-  auto damage_resolver =
-      std::make_shared<resolver::DamageResolver>(context.get());
+  resolver::AttackResolver resolver(sequence, context.get());
+  resolver::DamageResolver damage_resolver(context.get());
 
   for (size_t i = 0; i < sequence.attacks.size(); ++i) {
-    resolver->ResolveSingleAttack(i);
-    damage_resolver->ApplySingleAttack(context->results.size() - 1);
+    resolver.ResolveSingleAttack(i);
+    damage_resolver.ApplySingleAttack(context->results.size() - 1);
   }
 
   out_contexts->push_back(std::move(context));

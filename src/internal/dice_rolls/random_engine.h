@@ -7,7 +7,7 @@
 #ifndef SRC_INTERNAL_DICE_ROLLS_RANDOM_ENGINE_H_
 #define SRC_INTERNAL_DICE_ROLLS_RANDOM_ENGINE_H_
 
-#include <random>
+#include <cstdint>
 
 namespace ettes {
 namespace dice_rolls {
@@ -17,15 +17,15 @@ struct IRandomEngine {
   virtual ~IRandomEngine() = default;
 };
 
-class StdMt19937Engine : public IRandomEngine {
+class PcgEngine : public IRandomEngine {
  public:
-  StdMt19937Engine();
+  PcgEngine();
 
   int GetRand(int hi) override;
 
  private:
-  std::mt19937 rng_;
-  std::uniform_int_distribution<> dist_;
+  uint64_t state_;
+  uint64_t inc_;
 };
 
 }  // namespace dice_rolls

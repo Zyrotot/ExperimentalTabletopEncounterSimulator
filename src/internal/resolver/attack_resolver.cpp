@@ -54,7 +54,7 @@ void AttackResolver::ResolveAttackMove(const AttackMove& attack_move) {
 
   current_result.d20_roll =
       context_->roller->Roll(Term{.dice_groups = {{1, 20}}});
-  logger_->debug("D20 roll: {}", current_result.d20_roll);
+  logger_->Debug("D20 roll: {}", current_result.d20_roll);
 
   current_result.total_attack_roll =
       current_result.d20_roll + CalculateTotalAttackModifier(attack_move);
@@ -62,7 +62,7 @@ void AttackResolver::ResolveAttackMove(const AttackMove& attack_move) {
   combat::EmitCombatEvent(CombatEvent::AttackRoll, context_);
 
   int defender_ac = context_->target->GetEffectiveAC();
-  logger_->info("{} rolls {} vs AC {}", context_->source->GetName(),
+  logger_->Info("{} rolls {} vs AC {}", context_->source->GetName(),
                 current_result.total_attack_roll, defender_ac);
 
   if (current_result.total_attack_roll >= defender_ac) {
@@ -89,9 +89,9 @@ void AttackResolver::ResolveAttackMove(const AttackMove& attack_move) {
     for (const auto& dmg : current_result.damage_instances) {
       total_damage += dmg.amount;
     }
-    logger_->info("Hit! Total damage: {}", total_damage);
+    logger_->Info("Hit! Total damage: {}", total_damage);
   } else {
-    logger_->info("Miss!");
+    logger_->Info("Miss!");
     combat::EmitCombatEvent(CombatEvent::Miss, context_);
   }
 
@@ -122,7 +122,7 @@ void AttackResolver::GatherDamageFromSources(const AttackMove& attack_move,
       DamageInstance dmg = source.contribute(*context_);
       if (dmg.amount > 0) {
         result->damage_instances.push_back(dmg);
-        logger_->debug("{} contributes {} damage", source.name, dmg.amount);
+        logger_->Debug("{} contributes {} damage", source.name, dmg.amount);
       }
     }
   }
@@ -156,13 +156,13 @@ int AttackResolver::CheckCriticalHit(const AttackMove& attack_move,
     int fortification_roll =
         context_->roller->Roll(Term{.dice_groups = {{1, 100}}});
     if (fortification_roll <= fortification) {
-      logger_->info("Critical hit negated by fortification!");
+      logger_->Info("Critical hit negated by fortification!");
       return 1;
     }
 
     int multiplier =
         attack_move.weapon.crit_multiplier + attack_move.crit_multiplier_bonus;
-    logger_->info("Critical hit! Multiplier: {}", multiplier);
+    logger_->Info("Critical hit! Multiplier: {}", multiplier);
     return multiplier;
   }
   return 1;

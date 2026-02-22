@@ -20,16 +20,18 @@ namespace engine {
 
 class Encounter {
  public:
-  Encounter(std::vector<std::shared_ptr<entities::IEntity>> side_a,
-            std::vector<std::shared_ptr<entities::IEntity>> side_b);
+  Encounter(std::vector<std::unique_ptr<entities::IEntity>> side_a,
+            std::vector<std::unique_ptr<entities::IEntity>> side_b);
 
-  std::vector<std::shared_ptr<entities::IEntity>> GetLivingEnemiesOf(
+  ~Encounter();
+
+  std::vector<entities::IEntity*> GetLivingEnemiesOf(
       const entities::IEntity* entity) const;
 
-  std::shared_ptr<entities::IEntity> GetFirstLivingEnemyOf(
+  entities::IEntity* GetFirstLivingEnemyOf(
       const entities::IEntity* entity) const;
 
-  std::vector<std::shared_ptr<entities::IEntity>> GetLivingAlliesOf(
+  std::vector<entities::IEntity*> GetLivingAlliesOf(
       const entities::IEntity* entity) const;
 
   bool HasLivingEntitiesOnSideA() const;
@@ -37,18 +39,22 @@ class Encounter {
 
   bool IsOver() const;
 
-  const std::vector<std::shared_ptr<entities::IEntity>>& GetSideA() const;
-  const std::vector<std::shared_ptr<entities::IEntity>>& GetSideB() const;
+  void NotifyDeath(const entities::IEntity* entity);
+
+  const std::vector<std::unique_ptr<entities::IEntity>>& GetSideA() const;
+  const std::vector<std::unique_ptr<entities::IEntity>>& GetSideB() const;
 
  private:
   int FindSideOf(const entities::IEntity* entity) const;
 
-  std::vector<std::shared_ptr<entities::IEntity>> CollectLiving(
+  std::vector<entities::IEntity*> CollectLiving(
       int side, bool first_only = false) const;
 
-  std::vector<std::shared_ptr<entities::IEntity>> side_a_;
-  std::vector<std::shared_ptr<entities::IEntity>> side_b_;
+  std::vector<std::unique_ptr<entities::IEntity>> side_a_;
+  std::vector<std::unique_ptr<entities::IEntity>> side_b_;
   std::unordered_map<uint32_t, int> side_map_;
+  int alive_a_ = 0;
+  int alive_b_ = 0;
 };
 
 }  // namespace engine

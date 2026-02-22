@@ -31,6 +31,8 @@ class DefenseProfile {
   BaseStats* current_base_;
   BonusStats* current_bonus_;
   logging::Logger* logger_;
+  mutable Resistances cached_resistances_;
+  mutable bool resistances_dirty_ = true;
 };
 
 }  // namespace entities

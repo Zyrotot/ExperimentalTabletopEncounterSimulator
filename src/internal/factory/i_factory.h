@@ -18,8 +18,8 @@ class IFactory {
  public:
   virtual ~IFactory() = default;
 
-  virtual std::shared_ptr<entities::IEntity> CreatePlayer() const = 0;
-  virtual std::shared_ptr<entities::IEntity> CreateMonster() const = 0;
+  virtual std::unique_ptr<entities::IEntity> CreatePlayer() const = 0;
+  virtual std::unique_ptr<entities::IEntity> CreateMonster() const = 0;
 };
 
 }  // namespace factory

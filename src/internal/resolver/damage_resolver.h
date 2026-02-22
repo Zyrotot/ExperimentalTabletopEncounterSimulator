@@ -11,7 +11,7 @@
 #include "internal/entities/stats.h"
 #include "internal/logging/logger.h"
 
-namespace internal {
+namespace ettes {
 
 namespace resolver {
 
@@ -31,6 +31,6 @@ class DamageResolver {
 };
 
 }  // namespace resolver
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_RESOLVER_DAMAGE_RESOLVER_H_

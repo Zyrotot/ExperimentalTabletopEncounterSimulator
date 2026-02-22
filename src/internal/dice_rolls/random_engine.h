@@ -9,7 +9,7 @@
 
 #include <random>
 
-namespace internal {
+namespace ettes {
 namespace dice_rolls {
 
 struct IRandomEngine {
@@ -29,6 +29,6 @@ class StdMt19937Engine : public IRandomEngine {
 };
 
 }  // namespace dice_rolls
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_DICE_ROLLS_RANDOM_ENGINE_H_

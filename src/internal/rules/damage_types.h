@@ -9,7 +9,7 @@
 
 #include <cstdint>
 
-namespace internal {
+namespace ettes {
 namespace rules {
 
 enum class DamageType : uint16_t {
@@ -77,6 +77,6 @@ inline DamageCategory GetDamageCategory(DamageType type) {
 }
 
 }  // namespace rules
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_RULES_DAMAGE_TYPES_H_

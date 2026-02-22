@@ -6,7 +6,7 @@
 
 #include "internal/entities/ability_manager.h"
 
-namespace internal {
+namespace ettes {
 namespace entities {
 
 AbilityManager::AbilityManager(std::vector<abilities::Ability> abilities)
@@ -73,4 +73,4 @@ void AbilityManager::BuildActiveEffects() {
 }
 
 }  // namespace entities
-}  // namespace internal
+}  // namespace ettes

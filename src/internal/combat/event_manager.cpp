@@ -11,7 +11,7 @@
 #include "internal/entities/i_entity.h"
 #include "internal/logging/log_manager.h"
 
-namespace internal {
+namespace ettes {
 namespace combat {
 
 std::vector<DamageModification> EmitCombatEvent(
@@ -95,4 +95,4 @@ std::vector<DamageModification> EmitCombatEvent(
 }
 
 }  // namespace combat
-}  // namespace internal
+}  // namespace ettes

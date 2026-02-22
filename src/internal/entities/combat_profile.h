@@ -13,7 +13,7 @@
 #include "internal/items/weapon.h"
 #include "internal/logging/logger.h"
 
-namespace internal {
+namespace ettes {
 namespace entities {
 
 class CombatProfile {
@@ -33,6 +33,6 @@ class CombatProfile {
 };
 
 }  // namespace entities
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_ENTITIES_COMBAT_PROFILE_H_

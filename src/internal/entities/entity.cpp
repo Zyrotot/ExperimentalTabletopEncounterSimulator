@@ -10,7 +10,7 @@
 
 #include "internal/logging/log_manager.h"
 
-namespace internal {
+namespace ettes {
 namespace entities {
 
 std::atomic<uint32_t> Entity::next_id_{0};
@@ -21,7 +21,7 @@ Entity::Entity(const EntityConfig& config)
       starting_stats_(config.starting_stats),
       current_stats_(config.starting_stats),
       alignment_(config.alignment),
-      logger_(internal::logging::LogManager::GetLogger("entity")),
+      logger_(ettes::logging::LogManager::GetLogger("entity")),
       health_component_(&current_stats_.base_stats, &current_stats_.bonus_stats,
                         &starting_stats_.base_stats),
       combat_profile_(config.equipped_weapons, config.attack_sequences, logger_),
@@ -139,4 +139,4 @@ void Entity::ClearAllDR(bool from_bonus) {
 }
 
 }  // namespace entities
-}  // namespace internal
+}  // namespace ettes

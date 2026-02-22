@@ -11,7 +11,7 @@
 
 #include "internal/dice_rolls/term.h"
 
-namespace internal {
+namespace ettes {
 namespace dice_rolls {
 
 class IRandomEngine;
@@ -29,6 +29,6 @@ class Roller {
 };
 
 }  // namespace dice_rolls
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_DICE_ROLLS_ROLLER_H_

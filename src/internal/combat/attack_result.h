@@ -12,7 +12,7 @@
 
 #include "internal/rules/damage_types.h"
 
-namespace internal {
+namespace ettes {
 
 namespace entities {
 class IEntity;
@@ -41,6 +41,6 @@ struct QueuedAttack {
 };
 
 }  // namespace combat
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_COMBAT_ATTACK_RESULT_H_

@@ -16,7 +16,7 @@
 #include "internal/items/weapon.h"
 #include "internal/rules/alignment.h"
 
-namespace internal {
+namespace ettes {
 namespace entities {
 
 struct EntityConfig {
@@ -32,6 +32,6 @@ struct EntityConfig {
 };
 
 }  // namespace entities
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_ENTITIES_ENTITY_CONFIG_H_

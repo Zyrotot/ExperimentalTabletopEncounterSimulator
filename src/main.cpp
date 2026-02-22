@@ -9,12 +9,12 @@
 #include "internal/simulator/simulator.h"
 
 int main() {
-  auto roller = std::make_shared<internal::dice_rolls::Roller>();
+  auto roller = std::make_shared<ettes::dice_rolls::Roller>();
 
-  auto entity_factory = std::make_unique<internal::factory::Factory>(
-      "character.json", internal::factory::Monster::Reishid);
+  auto entity_factory = std::make_unique<ettes::factory::Factory>(
+      "character.json", ettes::factory::Monster::Custom);
 
-  internal::simulator::Simulator sim(std::move(entity_factory), roller);
+  ettes::simulator::Simulator sim(std::move(entity_factory), roller);
 
   auto results = sim.Run(1000);
   results.Print();

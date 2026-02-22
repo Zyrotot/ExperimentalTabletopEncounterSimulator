@@ -13,7 +13,7 @@
 #include "internal/dice_rolls/term.h"
 #include "internal/items/weapon.h"
 
-namespace internal {
+namespace ettes {
 namespace combat {
 
 struct AttackMove {
@@ -39,6 +39,6 @@ struct AttackSequence {
 };
 
 }  // namespace combat
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_COMBAT_ATTACK_H_

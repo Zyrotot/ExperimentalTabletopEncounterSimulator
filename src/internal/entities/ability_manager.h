@@ -14,7 +14,7 @@
 #include "internal/abilities/ability.h"
 #include "internal/combat/effect.h"
 
-namespace internal {
+namespace ettes {
 namespace entities {
 
 class AbilityManager {
@@ -38,6 +38,6 @@ class AbilityManager {
 };
 
 }  // namespace entities
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_ENTITIES_ABILITY_MANAGER_H_

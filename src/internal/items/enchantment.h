@@ -14,7 +14,7 @@
 #include "internal/combat/effect.h"
 #include "internal/rules/damage_types.h"
 
-namespace internal {
+namespace ettes {
 
 namespace dice_rolls {
 class Roller;
@@ -39,6 +39,6 @@ struct Enchantment {
 };
 
 }  // namespace items
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_ITEMS_ENCHANTMENT_H_

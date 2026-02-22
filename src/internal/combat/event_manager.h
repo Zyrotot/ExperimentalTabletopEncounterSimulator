@@ -12,7 +12,7 @@
 #include "internal/combat/combat_event_types.h"
 #include "internal/combat/damage_modification.h"
 
-namespace internal {
+namespace ettes {
 namespace combat {
 
 struct CombatEventContext;
@@ -21,6 +21,6 @@ std::vector<DamageModification> EmitCombatEvent(
     CombatEvent event, CombatEventContext* context);
 
 }  // namespace combat
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_COMBAT_EVENT_MANAGER_H_

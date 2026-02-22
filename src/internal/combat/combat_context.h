@@ -15,7 +15,7 @@
 #include "internal/combat/attack_result.h"
 #include "internal/combat/effect.h"
 
-namespace internal {
+namespace ettes {
 
 namespace entities {
 class IEntity;
@@ -43,6 +43,6 @@ struct CombatEventContext {
 };
 
 }  // namespace combat
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_COMBAT_COMBAT_CONTEXT_H_

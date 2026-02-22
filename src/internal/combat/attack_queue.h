@@ -9,7 +9,7 @@
 
 #include "internal/combat/attack_result.h"
 
-namespace internal {
+namespace ettes {
 namespace combat {
 
 class IAttackQueue {
@@ -19,6 +19,6 @@ class IAttackQueue {
 };
 
 }  // namespace combat
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_COMBAT_ATTACK_QUEUE_H_

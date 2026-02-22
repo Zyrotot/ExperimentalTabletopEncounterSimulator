@@ -8,7 +8,7 @@
 
 #include <regex>  // NOLINT
 
-namespace internal {
+namespace ettes {
 namespace dice_rolls {
 
 std::optional<Term> Term::Parse(const std::string& expression) {
@@ -59,4 +59,4 @@ void Term::AddModifier(int modifier) {
 }
 
 }  // namespace dice_rolls
-}  // namespace internal
+}  // namespace ettes

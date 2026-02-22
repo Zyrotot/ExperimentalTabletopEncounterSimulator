@@ -14,7 +14,7 @@
 #include "internal/logging/logger.h"
 #include "internal/rules/damage_types.h"
 
-namespace internal {
+namespace ettes {
 
 namespace resolver {
 
@@ -46,6 +46,6 @@ class AttackResolver {
 };
 
 }  // namespace resolver
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_RESOLVER_ATTACK_RESOLVER_H_

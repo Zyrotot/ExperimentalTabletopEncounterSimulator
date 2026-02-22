@@ -8,7 +8,7 @@
 
 #include <cassert>
 
-namespace internal {
+namespace ettes {
 namespace entities {
 
 CombatProfile::CombatProfile(std::vector<items::Weapon> weapons,
@@ -44,4 +44,4 @@ const std::vector<items::Weapon>& CombatProfile::GetEquippedWeapons() const {
 }
 
 }  // namespace entities
-}  // namespace internal
+}  // namespace ettes

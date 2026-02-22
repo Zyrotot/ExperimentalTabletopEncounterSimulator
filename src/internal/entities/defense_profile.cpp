@@ -6,7 +6,7 @@
 
 #include "internal/entities/defense_profile.h"
 
-namespace internal {
+namespace ettes {
 namespace entities {
 
 DefenseProfile::DefenseProfile(BaseStats* current_base,
@@ -73,4 +73,4 @@ void DefenseProfile::ClearAllDR(bool from_bonus) {
 }
 
 }  // namespace entities
-}  // namespace internal
+}  // namespace ettes

@@ -11,7 +11,7 @@
 
 #include "internal/logging/logger.h"
 
-namespace internal {
+namespace ettes {
 namespace logging {
 
 class LogManager {
@@ -23,6 +23,6 @@ class LogManager {
 };
 
 }  // namespace logging
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_LOGGING_LOG_MANAGER_H_

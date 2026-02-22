@@ -25,34 +25,34 @@
 #include <glaze/glaze.hpp>
 
 template <>
-struct glz::meta<internal::combat::Effect> {
-  using T = internal::combat::Effect;
+struct glz::meta<ettes::combat::Effect> {
+  using T = ettes::combat::Effect;
   static constexpr auto value =
       glz::object("name", &T::name, "source", &T::source, "trigger",
                   &T::trigger, "is_active", &T::is_active);
 };
 
 template <>
-struct glz::meta<internal::items::DamageSource> {
-  using T = internal::items::DamageSource;
+struct glz::meta<ettes::items::DamageSource> {
+  using T = ettes::items::DamageSource;
   static constexpr auto value = glz::object("name", &T::name);
 };
 
 template <>
-struct glz::meta<internal::items::Enchantment> {
-  using T = internal::items::Enchantment;
+struct glz::meta<ettes::items::Enchantment> {
+  using T = ettes::items::Enchantment;
   static constexpr auto value = glz::object("name", &T::name);
 };
 
 template <>
-struct glz::meta<internal::abilities::Ability> {
-  using T = internal::abilities::Ability;
+struct glz::meta<ettes::abilities::Ability> {
+  using T = ettes::abilities::Ability;
   static constexpr auto value =
       glz::object("name", &T::name, "stack_count", &T::stack_count, "is_active",
                   &T::is_active);
 };
 
-namespace internal {
+namespace ettes {
 namespace factory {
 
 using dice_rolls::Dice;
@@ -257,7 +257,7 @@ EntityConfig Factory::CreateExampleCharacter() const {
       .damage_modifier = rules::DamageModifier::None,
       .crit_range = 20,
       .crit_multiplier = 3,
-      .enchantments = {internal::items::CreateVampiricEnchantment()},
+      .enchantments = {ettes::items::CreateVampiricEnchantment()},
   };
 
   auto character_config = entities::EntityConfig{
@@ -332,7 +332,7 @@ EntityConfig Factory::CreateCustomEnemy() const {
       .damage_modifier = rules::DamageModifier::None,
       .crit_range = 20,
       .crit_multiplier = 3,
-      .enchantments = {internal::items::CreateFlamingExplosionEnchantment()},
+      .enchantments = {ettes::items::CreateFlamingExplosionEnchantment()},
   };
 
   auto character_config =
@@ -440,4 +440,4 @@ void Factory::SaveCharacterToJSON(
 }
 
 }  // namespace factory
-}  // namespace internal
+}  // namespace ettes

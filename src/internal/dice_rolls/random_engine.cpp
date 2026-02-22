@@ -6,7 +6,7 @@
 
 #include "internal/dice_rolls/random_engine.h"
 
-namespace internal {
+namespace ettes {
 namespace dice_rolls {
 
 StdMt19937Engine::StdMt19937Engine() : rng_(std::random_device {}()) {
@@ -18,4 +18,4 @@ int StdMt19937Engine::GetRand(int hi) {
 }
 
 }  // namespace dice_rolls
-}  // namespace internal
+}  // namespace ettes

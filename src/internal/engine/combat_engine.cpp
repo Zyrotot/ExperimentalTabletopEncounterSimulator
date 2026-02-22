@@ -12,7 +12,7 @@
 #include "internal/resolver/attack_resolver.h"
 #include "internal/resolver/damage_resolver.h"
 
-namespace internal {
+namespace ettes {
 namespace engine {
 
 CombatEngine::CombatEngine(std::shared_ptr<dice_rolls::Roller> roller)
@@ -75,4 +75,4 @@ void CombatEngine::ProcessAttack(
 }
 
 }  // namespace engine
-}  // namespace internal
+}  // namespace ettes

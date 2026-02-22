@@ -11,7 +11,7 @@
 #include "internal/entities/i_entity.h"  // IWYU pragma: keep
 #include "internal/rules/resistances.h"
 
-namespace internal {
+namespace ettes {
 namespace abilities {
 
 Ability CreateErosao() {
@@ -192,4 +192,4 @@ Ability CreateDuroDeMatar(int stacks) {
 }
 
 }  // namespace abilities
-}  // namespace internal
+}  // namespace ettes

@@ -15,7 +15,7 @@
 #include "internal/engine/encounter.h"
 #include "internal/logging/logger.h"
 
-namespace internal {
+namespace ettes {
 
 namespace engine {
 
@@ -43,6 +43,6 @@ class Director : public combat::IAttackQueue {
 };
 
 }  // namespace engine
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_ENGINE_DIRECTOR_H_

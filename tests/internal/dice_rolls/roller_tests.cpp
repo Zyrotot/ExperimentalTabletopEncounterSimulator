@@ -12,7 +12,7 @@
 
 using ::testing::Return;
 
-namespace internal {
+namespace ettes {
 namespace dice_rolls {
 
 class RollerTest : public ::testing::Test {
@@ -60,4 +60,4 @@ TEST_F(RollerTest, UsesCorrectSidesForEachDie) {
 }
 
 }  // namespace dice_rolls
-}  // namespace internal
+}  // namespace ettes

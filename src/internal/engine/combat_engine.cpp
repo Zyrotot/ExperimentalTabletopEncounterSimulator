@@ -16,8 +16,7 @@ namespace internal {
 namespace engine {
 
 CombatEngine::CombatEngine(std::shared_ptr<dice_rolls::Roller> roller)
-    : roller_(roller),
-      logger_(logging::LogManager::GetLogger("engine")) {
+    : roller_(roller), logger_(logging::LogManager::GetLogger("engine")) {
 }
 
 CombatEngine::~CombatEngine() {
@@ -54,20 +53,21 @@ void CombatEngine::ProcessAttack(
     std::shared_ptr<entities::IEntity> defender, int attack_sequence_index,
     combat::IAttackQueue* context_queue,
     std::vector<std::unique_ptr<combat::CombatEventContext>>* out_contexts) {
-  auto resolver = std::make_shared<resolver::AttackResolver>(
-      attacker, defender, attack_sequence_index, roller_);
-
   auto context = std::make_unique<combat::CombatEventContext>();
   context->source = attacker;
   context->target = defender;
   context->roller = roller_.get();
   context->attack_queue = context_queue;
 
-  auto damage_resolver = std::make_shared<resolver::DamageResolver>(context.get());
-
   const auto& sequence = attacker->GetAttackSequence(attack_sequence_index);
+
+  auto resolver =
+      std::make_shared<resolver::AttackResolver>(sequence, context.get());
+  auto damage_resolver =
+      std::make_shared<resolver::DamageResolver>(context.get());
+
   for (size_t i = 0; i < sequence.attacks.size(); ++i) {
-    resolver->ResolveSingleAttack(i, context.get());
+    resolver->ResolveSingleAttack(i);
     damage_resolver->ApplySingleAttack(context->results.size() - 1);
   }
 

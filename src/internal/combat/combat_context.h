@@ -13,6 +13,7 @@
 
 #include "internal/combat/attack_queue.h"
 #include "internal/combat/attack_result.h"
+#include "internal/combat/effect.h"
 
 namespace internal {
 
@@ -38,6 +39,7 @@ struct CombatEventContext {
   bool is_temp_hp = false;
 
   IAttackQueue* attack_queue = nullptr;
+  std::vector<const Effect*> transient_effects = {};
 };
 
 }  // namespace combat

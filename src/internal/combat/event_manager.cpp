@@ -73,6 +73,24 @@ std::vector<DamageModification> EmitCombatEvent(
     }
   }
 
+  for (const auto* effect : context->transient_effects) {
+    if (!effect->is_active) {
+      continue;
+    }
+
+    if (effect->trigger != event) {
+      continue;
+    }
+
+    if (effect->on_event) {
+      effect->on_event(*context);
+    }
+
+    if (effect->on_damage) {
+      modifications.push_back(effect->on_damage(*context));
+    }
+  }
+
   return modifications;
 }
 

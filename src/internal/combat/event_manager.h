@@ -15,7 +15,7 @@
 namespace internal {
 namespace combat {
 
-class CombatEventContext;
+struct CombatEventContext;
 
 std::vector<DamageModification> EmitCombatEvent(
     CombatEvent event, CombatEventContext* context);

@@ -25,12 +25,6 @@ DamageResolver::DamageResolver(combat::CombatEventContext* context)
 DamageResolver::~DamageResolver() {
 }
 
-void DamageResolver::ApplyDamage() {
-  for (size_t i = 0; i < context_->results.size(); ++i) {
-    ApplySingleAttack(i);
-  }
-}
-
 void DamageResolver::ApplySingleAttack(size_t result_index) {
   if (result_index >= context_->results.size()) {
     return;

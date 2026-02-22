@@ -13,15 +13,13 @@
 
 #include "internal/abilities/ability.h"
 #include "internal/combat/effect.h"
-#include "internal/items/weapon.h"
 
 namespace internal {
 namespace entities {
 
 class AbilityManager {
  public:
-  AbilityManager(std::vector<abilities::Ability> abilities,
-                 const std::vector<items::Weapon>* equipped_weapons);
+  explicit AbilityManager(std::vector<abilities::Ability> abilities);
 
   bool HasAbility(const std::string& ability_name) const;
   int GetAbilityStack(const std::string& ability_name) const;
@@ -37,7 +35,6 @@ class AbilityManager {
   std::vector<abilities::Ability> abilities_;
   std::unordered_map<std::string, abilities::Ability*> ability_index_;
   std::vector<const combat::Effect*> active_effects_;
-  const std::vector<items::Weapon>* equipped_weapons_;
 };
 
 }  // namespace entities

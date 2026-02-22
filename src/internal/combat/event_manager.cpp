@@ -48,7 +48,7 @@ std::vector<DamageModification> EmitCombatEvent(
         continue;
       }
 
-      logger->debug("Triggering {} effect from {} for {}", effect->name,
+      logger->Debug("Triggering {} effect from {} for {}", effect->name,
                     effect->source, relevant_entity->GetName());
 
       if (effect->on_event) {

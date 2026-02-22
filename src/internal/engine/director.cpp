@@ -44,13 +44,13 @@ void Director::RunEncounter() {
     }
   }
 
-  logger_->info("--- Encounter over ---");
+  logger_->Info("--- Encounter over ---");
   for (const auto& e : encounter_->GetSideA()) {
-    logger_->info("  [A] {} - {} HP", e->GetName(),
+    logger_->Info("  [A] {} - {} HP", e->GetName(),
                   e->GetCurrentStats().base_stats.hp);
   }
   for (const auto& e : encounter_->GetSideB()) {
-    logger_->info("  [B] {} - {} HP", e->GetName(),
+    logger_->Info("  [B] {} - {} HP", e->GetName(),
                   e->GetCurrentStats().base_stats.hp);
   }
 }
@@ -62,20 +62,20 @@ void Director::RunTurn(entities::IEntity* entity) {
 
   auto target = SelectTarget(entity);
   if (!target) {
-    logger_->info("{} has no living targets, skipping turn", entity->GetName());
+    logger_->Info("{} has no living targets, skipping turn", entity->GetName());
     return;
   }
 
   // TODO(zyrotot): Add positioning and range, removing the arbitrary adjacency
   // limit.
   if (attacks_this_round_[target] >= kMaxAdjacentAttackers) {
-    logger_->info("{} cannot attack {} - adjacency limit of {} reached",
+    logger_->Info("{} cannot attack {} - adjacency limit of {} reached",
                   entity->GetName(), target->GetName(), kMaxAdjacentAttackers);
     return;
   }
   attacks_this_round_[target]++;
 
-  logger_->info("--- {}'s turn ---", entity->GetName());
+  logger_->Info("--- {}'s turn ---", entity->GetName());
 
   combat::CombatEventContext context;
   context.source = entity;
@@ -94,13 +94,13 @@ void Director::QueueAttack(combat::QueuedAttack attack) {
   }
 
   if (!attack.target) {
-    logger_->info("No living target available for queued attack by {}, dropped",
+    logger_->Info("No living target available for queued attack by {}, dropped",
                   attack.attacker ? attack.attacker->GetName() : "unknown");
     return;
   }
 
   if (attacks_this_round_[attack.target] >= kMaxAdjacentAttackers) {
-    logger_->info(
+    logger_->Info(
         "Queued attack by {} on {} dropped - adjacency limit of {} reached",
         attack.attacker ? attack.attacker->GetName() : "unknown",
         attack.target->GetName(), kMaxAdjacentAttackers);

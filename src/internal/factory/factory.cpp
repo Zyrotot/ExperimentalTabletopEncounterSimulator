@@ -189,7 +189,7 @@ EntityConfig Factory::LoadCharacterFromJSON(const std::string& filename) const {
   {
     std::ifstream ifs(path, std::ios::binary);
     if (!ifs.is_open()) {
-      logger->error("Failed to open file: {}", path);
+      logger->Error("Failed to open file: {}", path);
       return EntityConfig{};
     }
     file_contents.assign(std::istreambuf_iterator<char>(ifs),
@@ -199,7 +199,7 @@ EntityConfig Factory::LoadCharacterFromJSON(const std::string& filename) const {
   EntityConfigRef parsed{};
   auto ec = glz::read_json(parsed, file_contents);
   if (ec) {
-    logger->error("Failed to parse JSON from {}: {}", path,
+    logger->Error("Failed to parse JSON from {}: {}", path,
                   glz::format_error(ec, file_contents));
     return EntityConfig{};
   }
@@ -434,7 +434,7 @@ void Factory::SaveCharacterToJSON(
   std::string buffer;
   auto error = glz::write_file_json(json_config, filename, buffer);
   if (error.ec != glz::error_code::none) {
-    logging::LogManager::GetLogger("factory")->error(
+    logging::LogManager::GetLogger("factory")->Error(
         "Failed to write JSON to {}", filename);
   }
 }

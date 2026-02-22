@@ -52,7 +52,7 @@ void DefenseProfile::AddDR(const rules::DamageReduction& dr, bool is_bonus) {
 
 void DefenseProfile::RemoveDR(int amount, bool from_bonus) {
   resistances_dirty_ = true;
-  logger_->debug("Removing {} DR from {}", amount,
+  logger_->Debug("Removing {} DR from {}", amount,
                  from_bonus ? "bonus DR" : "base DR");
   auto& dr_list = from_bonus
                       ? current_bonus_->bonus_resistances.damage_reductions

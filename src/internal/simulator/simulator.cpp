@@ -134,12 +134,12 @@ int Simulator::RunOnce(std::shared_ptr<dice_rolls::Roller> roller) const {
     if (RunWave(wave, roller)) {
       waves_cleared = wave;
       if (wave == MAX_WAVES) {
-        logger_->info("Wave cap ({}) reached — character wins!", MAX_WAVES);
+        logger_->Info("Wave cap ({}) reached — character wins!", MAX_WAVES);
         break;
       }
-      logger_->info("Wave {} cleared.", wave);
+      logger_->Info("Wave {} cleared.", wave);
     } else {
-      logger_->info("Lost on wave {}.", wave);
+      logger_->Info("Lost on wave {}.", wave);
       break;
     }
   }

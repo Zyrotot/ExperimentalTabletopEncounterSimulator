@@ -34,11 +34,11 @@ std::vector<std::unique_ptr<combat::CombatEventContext>> CombatEngine::Flush(
     attack_queue_.pop_front();
 
     if (!queued.attacker || !queued.target) {
-      logger_->warn("Skipping queued attack with null attacker or target");
+      logger_->Warn("Skipping queued attack with null attacker or target");
       continue;
     }
 
-    logger_->info("{} attacks {}", queued.attacker->GetName(),
+    logger_->Info("{} attacks {}", queued.attacker->GetName(),
                   queued.target->GetName());
     ProcessAttack(queued.attacker, queued.target, queued.attack_sequence_index,
                   context_queue, &out_contexts);

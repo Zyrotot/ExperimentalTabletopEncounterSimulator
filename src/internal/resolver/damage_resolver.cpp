@@ -60,14 +60,14 @@ void DamageResolver::ApplySingleAttack(size_t result_index) {
   combat::EmitCombatEvent(combat::CombatEvent::DealDamage, context_);
 
   if (total_damage > 0) {
-    logger_->info("Total damage applied: {}", total_damage);
+    logger_->Info("Total damage applied: {}", total_damage);
 
     bool was_alive = context_->target->IsAlive();
     context_->target->TakeDamage(total_damage);
     bool is_alive = context_->target->IsAlive();
 
     if (was_alive && !is_alive) {
-      logger_->info("{} killed {}!", context_->source->GetName(),
+      logger_->Info("{} killed {}!", context_->source->GetName(),
                     context_->target->GetName());
       if (context_->attack_queue) {
         context_->attack_queue->NotifyEntityDied(context_->target);
@@ -83,7 +83,7 @@ void DamageResolver::ApplyResistancesToDamage(
 
   if ((dmg_instance->types &
        static_cast<uint16_t>(resistances->immunity.immune_types)) != 0) {
-    logger->debug("Damage fully negated by immunity");
+    logger->Debug("Damage fully negated by immunity");
     dmg_instance->amount = 0;
     return;
   }
@@ -91,7 +91,7 @@ void DamageResolver::ApplyResistancesToDamage(
   for (auto& weakness : resistances->weaknesses) {
     if ((dmg_instance->types & static_cast<uint16_t>(weakness.weak_types)) !=
         0) {
-      logger->debug("Damage increased by weakness ({} -> {})",
+      logger->Debug("Damage increased by weakness ({} -> {})",
                     dmg_instance->amount,
                     dmg_instance->amount + weakness.amount);
       dmg_instance->amount += weakness.amount;
@@ -109,18 +109,18 @@ void DamageResolver::ApplyResistancesToDamage(
           ((dmg_instance->modifiers &
             static_cast<uint16_t>(dr.bypass_modifiers)) == 0)) {
         if (dmg_instance->amount > dr.amount) {
-          logger->debug("Damage reduction of {} applied", dr.amount);
+          logger->Debug("Damage reduction of {} applied", dr.amount);
           dmg_instance->amount -= dr.amount;
           dr.amount = 0;
         } else {
-          logger->debug(
+          logger->Debug(
               "Damage reduction of {} applied, but damage fully absorbed",
               dmg_instance->amount);
           dr.amount -= dmg_instance->amount;
           dmg_instance->amount = 0;
         }
       } else {
-        logger->debug("Damage reduction of {} bypassed by modifiers/types",
+        logger->Debug("Damage reduction of {} bypassed by modifiers/types",
                       dr.amount);
       }
     }
@@ -130,11 +130,11 @@ void DamageResolver::ApplyResistancesToDamage(
       if ((dmg_instance->types & static_cast<uint16_t>(er.resistance_type)) !=
           0) {
         if (dmg_instance->amount > er.amount) {
-          logger->debug("Energy resistance of {} applied", er.amount);
+          logger->Debug("Energy resistance of {} applied", er.amount);
           dmg_instance->amount -= er.amount;
           er.amount = 0;
         } else {
-          logger->debug(
+          logger->Debug(
               "Energy resistance of {} applied, but damage fully absorbed",
               dmg_instance->amount);
           er.amount -= dmg_instance->amount;

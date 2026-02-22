@@ -7,7 +7,6 @@
 #ifndef SRC_INTERNAL_ENGINE_DIRECTOR_H_
 #define SRC_INTERNAL_ENGINE_DIRECTOR_H_
 
-#include <memory>
 #include <unordered_map>
 
 #include "internal/combat/attack_queue.h"

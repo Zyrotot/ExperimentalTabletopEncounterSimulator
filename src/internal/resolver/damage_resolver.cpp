@@ -62,12 +62,16 @@ void DamageResolver::ApplySingleAttack(size_t result_index) {
   if (total_damage > 0) {
     logger_->info("Total damage applied: {}", total_damage);
 
+    bool was_alive = context_->target->IsAlive();
     context_->target->TakeDamage(total_damage);
     bool is_alive = context_->target->IsAlive();
 
-    if (!is_alive) {
+    if (was_alive && !is_alive) {
       logger_->info("{} killed {}!", context_->source->GetName(),
                     context_->target->GetName());
+      if (context_->attack_queue) {
+        context_->attack_queue->NotifyEntityDied(context_->target);
+      }
       combat::EmitCombatEvent(combat::CombatEvent::Kill, context_);
     }
   }

@@ -111,6 +111,10 @@ void Director::QueueAttack(combat::QueuedAttack attack) {
   engine_->QueueAttack(std::move(attack));
 }
 
+void Director::NotifyEntityDied(entities::IEntity* entity) {
+  encounter_->NotifyDeath(entity);
+}
+
 entities::IEntity* Director::SelectTarget(entities::IEntity* attacker) const {
   return encounter_->GetFirstLivingEnemyOf(attacker);
 }

@@ -16,6 +16,7 @@ class IAttackQueue {
  public:
   virtual ~IAttackQueue() = default;
   virtual void QueueAttack(QueuedAttack attack) = 0;
+  virtual void NotifyEntityDied(entities::IEntity* /*entity*/) = 0;
 };
 
 }  // namespace combat

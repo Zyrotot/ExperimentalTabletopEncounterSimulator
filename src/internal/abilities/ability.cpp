@@ -97,9 +97,7 @@ Ability CreateTrespassar() {
     if (context.source->GetAbilityStack(AbilityId::Trespassar) > 0) {
       context.source->DecrementAbilityStack(AbilityId::Trespassar);
       if (context.attack_queue) {
-        context.attack_queue->QueueAttack(
-            {context.source, context.target,
-             0});  // TODO(zyrotot): support multiple attack sequences
+        context.attack_queue->QueueAttack({context.source, nullptr, 0});
       }
     }
   };

@@ -37,6 +37,8 @@ class Encounter {
 
   bool IsOver() const;
 
+  void NotifyDeath(const entities::IEntity* entity);
+
   const std::vector<std::shared_ptr<entities::IEntity>>& GetSideA() const;
   const std::vector<std::shared_ptr<entities::IEntity>>& GetSideB() const;
 
@@ -49,6 +51,8 @@ class Encounter {
   std::vector<std::shared_ptr<entities::IEntity>> side_a_;
   std::vector<std::shared_ptr<entities::IEntity>> side_b_;
   std::unordered_map<uint32_t, int> side_map_;
+  int alive_a_ = 0;
+  int alive_b_ = 0;
 };
 
 }  // namespace engine

@@ -29,6 +29,7 @@ class Director : public combat::IAttackQueue {
   void RunTurn(entities::IEntity* entity);
 
   void QueueAttack(combat::QueuedAttack attack) override;
+  void NotifyEntityDied(entities::IEntity* entity) override;
 
  private:
   entities::IEntity* SelectTarget(entities::IEntity* attacker) const;

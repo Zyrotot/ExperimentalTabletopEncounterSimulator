@@ -17,11 +17,17 @@ Encounter::Encounter(std::vector<std::shared_ptr<entities::IEntity>> side_a,
   for (const auto& e : side_a_) {
     if (e) {
       side_map_[e->GetId()] = 0;
+      if (e->IsAlive()) {
+        alive_a_++;
+      }
     }
   }
   for (const auto& e : side_b_) {
     if (e) {
       side_map_[e->GetId()] = 1;
+      if (e->IsAlive()) {
+        alive_b_++;
+      }
     }
   }
 }
@@ -73,21 +79,24 @@ std::vector<std::shared_ptr<entities::IEntity>> Encounter::GetLivingAlliesOf(
 }
 
 bool Encounter::HasLivingEntitiesOnSideA() const {
-  for (const auto& e : side_a_) {
-    if (e && e->IsAlive()) return true;
-  }
-  return false;
+  return alive_a_ > 0;
 }
 
 bool Encounter::HasLivingEntitiesOnSideB() const {
-  for (const auto& e : side_b_) {
-    if (e && e->IsAlive()) return true;
-  }
-  return false;
+  return alive_b_ > 0;
 }
 
 bool Encounter::IsOver() const {
-  return !HasLivingEntitiesOnSideA() || !HasLivingEntitiesOnSideB();
+  return alive_a_ == 0 || alive_b_ == 0;
+}
+
+void Encounter::NotifyDeath(const entities::IEntity* entity) {
+  int side = FindSideOf(entity);
+  if (side == 0) {
+    alive_a_--;
+  } else if (side == 1) {
+    alive_b_--;
+  }
 }
 
 const std::vector<std::shared_ptr<entities::IEntity>>& Encounter::GetSideA()

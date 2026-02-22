@@ -11,7 +11,7 @@
 namespace ettes {
 namespace dice_rolls {
 
-Roller::Roller() : Roller(std::make_shared<StdMt19937Engine>()) {
+Roller::Roller() : Roller(std::make_shared<PcgEngine>()) {
 }
 
 Roller::Roller(std::shared_ptr<IRandomEngine> engine)

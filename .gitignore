@@ -1,2 +1,7 @@
-*.txt
+*.log
+*.info
+
 bin/
+build*/
+.cache/
+coverage-report/

@@ -13,7 +13,7 @@
 #include "internal/logging/log_manager.h"
 #include "internal/rules/resistances.h"
 
-namespace internal {
+namespace ettes {
 namespace resolver {
 
 using entities::Resistances;
@@ -147,4 +147,4 @@ void DamageResolver::ApplyResistancesToDamage(
 }
 
 }  // namespace resolver
-}  // namespace internal
+}  // namespace ettes

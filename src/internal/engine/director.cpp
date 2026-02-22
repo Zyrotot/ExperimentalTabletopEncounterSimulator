@@ -10,7 +10,7 @@
 #include "internal/entities/i_entity.h"
 #include "internal/logging/log_manager.h"
 
-namespace internal {
+namespace ettes {
 namespace engine {
 
 Director::Director(Encounter* encounter, CombatEngine* engine)
@@ -110,4 +110,4 @@ std::shared_ptr<entities::IEntity> Director::SelectTarget(
 }
 
 }  // namespace engine
-}  // namespace internal
+}  // namespace ettes

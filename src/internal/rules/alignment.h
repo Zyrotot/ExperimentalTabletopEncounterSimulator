@@ -7,7 +7,7 @@
 #ifndef SRC_INTERNAL_RULES_ALIGNMENT_H_
 #define SRC_INTERNAL_RULES_ALIGNMENT_H_
 
-namespace internal {
+namespace ettes {
 namespace rules {
 
 enum class Alignment {
@@ -33,6 +33,6 @@ enum class Alignment {
 };
 
 }  // namespace rules
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_RULES_ALIGNMENT_H_

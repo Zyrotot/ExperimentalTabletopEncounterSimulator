@@ -17,7 +17,7 @@
 #include "internal/rules/alignment.h"
 #include "internal/rules/damage_types.h"
 
-namespace internal {
+namespace ettes {
 namespace items {
 
 Enchantment CreateFlamingEnchantment() {
@@ -176,4 +176,4 @@ Enchantment CreateProfaneEnchantment() {
 }
 
 }  // namespace items
-}  // namespace internal
+}  // namespace ettes

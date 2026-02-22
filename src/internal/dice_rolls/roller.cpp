@@ -8,7 +8,7 @@
 
 #include "internal/dice_rolls/random_engine.h"
 
-namespace internal {
+namespace ettes {
 namespace dice_rolls {
 
 Roller::Roller() : Roller(std::make_shared<StdMt19937Engine>()) {
@@ -32,4 +32,4 @@ int Roller::Roll(const Term& term) {
 }
 
 }  // namespace dice_rolls
-}  // namespace internal
+}  // namespace ettes

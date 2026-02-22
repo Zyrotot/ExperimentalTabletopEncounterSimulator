@@ -13,7 +13,7 @@
 #include "internal/combat/combat_event_types.h"
 #include "internal/combat/damage_modification.h"
 
-namespace internal {
+namespace ettes {
 namespace combat {
 
 struct CombatEventContext;
@@ -28,6 +28,6 @@ struct Effect {
 };
 
 }  // namespace combat
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_COMBAT_EFFECT_H_

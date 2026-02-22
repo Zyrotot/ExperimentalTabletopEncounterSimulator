@@ -12,7 +12,7 @@
 #include <mutex>  // NOLINT
 #include "spdlog/common.h"
 
-namespace internal {
+namespace ettes {
 namespace logging {
 
 Logger* LogManager::GetLogger(const std::string& name) {
@@ -31,4 +31,4 @@ Logger* LogManager::GetLogger(const std::string& name) {
 }
 
 }  // namespace logging
-}  // namespace internal
+}  // namespace ettes

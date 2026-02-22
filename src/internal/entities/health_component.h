@@ -9,7 +9,7 @@
 
 #include "internal/entities/stats.h"
 
-namespace internal {
+namespace ettes {
 namespace entities {
 
 class HealthComponent {
@@ -29,6 +29,6 @@ class HealthComponent {
 };
 
 }  // namespace entities
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_ENTITIES_HEALTH_COMPONENT_H_

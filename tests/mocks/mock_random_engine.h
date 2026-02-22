@@ -11,7 +11,7 @@
 
 #include "src/internal/dice_rolls/random_engine.h"
 
-namespace internal {
+namespace ettes {
 namespace dice_rolls {
 
 class MockRandomEngine : public IRandomEngine {
@@ -21,6 +21,6 @@ class MockRandomEngine : public IRandomEngine {
 };
 
 }  // namespace dice_rolls
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // TESTS_MOCKS_MOCK_RANDOM_ENGINE_H_

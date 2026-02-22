@@ -7,7 +7,7 @@
 #ifndef SRC_INTERNAL_COMBAT_COMBAT_EVENT_TYPES_H_
 #define SRC_INTERNAL_COMBAT_COMBAT_EVENT_TYPES_H_
 
-namespace internal {
+namespace ettes {
 namespace combat {
 
 enum class CombatEvent {
@@ -23,6 +23,6 @@ enum class CombatEvent {
 };
 
 }  // namespace combat
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_COMBAT_COMBAT_EVENT_TYPES_H_

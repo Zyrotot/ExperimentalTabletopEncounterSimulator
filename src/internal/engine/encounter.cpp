@@ -8,7 +8,7 @@
 
 #include "internal/entities/i_entity.h"
 
-namespace internal {
+namespace ettes {
 namespace engine {
 
 Encounter::Encounter(std::vector<std::shared_ptr<entities::IEntity>> side_a,
@@ -97,4 +97,4 @@ const std::vector<std::shared_ptr<entities::IEntity>>& Encounter::GetSideB()
 }
 
 }  // namespace engine
-}  // namespace internal
+}  // namespace ettes

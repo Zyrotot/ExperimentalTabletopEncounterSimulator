@@ -13,7 +13,7 @@
 #include "internal/entities/entity_config.h"
 #include "internal/factory/i_factory.h"
 
-namespace internal {
+namespace ettes {
 namespace factory {
 
 enum Monster {
@@ -55,6 +55,6 @@ class Factory : public IFactory {
 };
 
 }  // namespace factory
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_FACTORY_FACTORY_H_

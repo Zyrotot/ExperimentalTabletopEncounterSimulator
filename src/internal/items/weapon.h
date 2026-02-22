@@ -14,7 +14,7 @@
 #include "internal/items/enchantment.h"
 #include "internal/rules/damage_types.h"
 
-namespace internal {
+namespace ettes {
 namespace items {
 
 struct Weapon {
@@ -33,6 +33,6 @@ struct Weapon {
 };
 
 }  // namespace items
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_ITEMS_WEAPON_H_

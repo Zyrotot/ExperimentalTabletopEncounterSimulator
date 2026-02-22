@@ -9,7 +9,7 @@
 
 #include "internal/rules/damage_types.h"
 
-namespace internal {
+namespace ettes {
 namespace rules {
 
 struct DamageReduction {
@@ -34,6 +34,6 @@ struct Weakness {
 };
 
 }  // namespace rules
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_RULES_RESISTANCES_H_

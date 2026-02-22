@@ -12,7 +12,7 @@
 
 #include "internal/combat/effect.h"
 
-namespace internal {
+namespace ettes {
 
 namespace entities {
 class Entity;
@@ -35,6 +35,6 @@ Ability CreateDuroDeFerir(int stacks);
 Ability CreateDuroDeMatar(int stacks);
 
 }  // namespace abilities
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_ABILITIES_ABILITY_H_

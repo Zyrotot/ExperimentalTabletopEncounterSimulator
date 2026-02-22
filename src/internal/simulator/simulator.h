@@ -14,7 +14,7 @@
 #include "internal/factory/i_factory.h"
 #include "internal/logging/logger.h"
 
-namespace internal {
+namespace ettes {
 
 namespace dice_rolls {
 class Roller;
@@ -55,6 +55,6 @@ class Simulator {
 };
 
 }  // namespace simulator
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_SIMULATOR_SIMULATOR_H_

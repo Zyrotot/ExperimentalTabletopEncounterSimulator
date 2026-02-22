@@ -16,7 +16,7 @@
 #include "internal/combat/combat_context.h"
 #include "internal/logging/logger.h"
 
-namespace internal {
+namespace ettes {
 
 namespace entities {
 class IEntity;
@@ -51,6 +51,6 @@ class CombatEngine {
 };
 
 }  // namespace engine
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_ENGINE_COMBAT_ENGINE_H_

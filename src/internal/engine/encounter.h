@@ -11,7 +11,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace internal {
+namespace ettes {
 namespace entities {
 class IEntity;
 }  // namespace entities
@@ -52,6 +52,6 @@ class Encounter {
 };
 
 }  // namespace engine
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_ENGINE_ENCOUNTER_H_

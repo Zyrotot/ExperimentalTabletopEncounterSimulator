@@ -16,7 +16,7 @@
 #include "internal/rules/alignment.h"
 #include "internal/rules/resistances.h"
 
-namespace internal {
+namespace ettes {
 namespace entities {
 
 class IEntity {
@@ -55,6 +55,6 @@ class IEntity {
 };
 
 }  // namespace entities
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_ENTITIES_I_ENTITY_H_

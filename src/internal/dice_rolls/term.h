@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-namespace internal {
+namespace ettes {
 namespace dice_rolls {
 
 struct Dice {
@@ -32,6 +32,6 @@ class Term {
 Term operator+(const Term& lhs, const Term& rhs);
 
 }  // namespace dice_rolls
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_DICE_ROLLS_TERM_H_

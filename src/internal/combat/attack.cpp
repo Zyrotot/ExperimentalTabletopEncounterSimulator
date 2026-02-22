@@ -6,7 +6,7 @@
 
 #include "internal/combat/attack.h"
 
-namespace internal {
+namespace ettes {
 namespace combat {
 
 using dice_rolls::Term;
@@ -23,4 +23,4 @@ Term AttackMove::GetAttackDamage() const {
 }
 
 }  // namespace combat
-}  // namespace internal
+}  // namespace ettes

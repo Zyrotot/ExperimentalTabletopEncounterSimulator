@@ -8,7 +8,7 @@
 
 #include "internal/dice_rolls/term.h"
 
-namespace internal {
+namespace ettes {
 namespace dice_rolls {
 
 TEST(ParseTermTest, SingleDieGroupNoBonus) {
@@ -66,4 +66,4 @@ TEST(ParseTermTest, NoDiceGroupsReturnsNullopt) {
 }
 
 }  // namespace dice_rolls
-}  // namespace internal
+}  // namespace ettes

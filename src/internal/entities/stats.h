@@ -11,7 +11,7 @@
 
 #include "internal/rules/resistances.h"
 
-namespace internal {
+namespace ettes {
 namespace entities {
 
 struct AttackBonuses {
@@ -76,6 +76,6 @@ struct Stats {
 };
 
 }  // namespace entities
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_ENTITIES_STATS_H_

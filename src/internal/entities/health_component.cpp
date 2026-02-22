@@ -6,7 +6,7 @@
 
 #include "internal/entities/health_component.h"
 
-namespace internal {
+namespace ettes {
 namespace entities {
 
 HealthComponent::HealthComponent(BaseStats* current_base,
@@ -63,4 +63,4 @@ bool HealthComponent::IsAlive() const {
 }
 
 }  // namespace entities
-}  // namespace internal
+}  // namespace ettes

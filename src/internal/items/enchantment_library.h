@@ -7,7 +7,7 @@
 #ifndef SRC_INTERNAL_ITEMS_ENCHANTMENT_LIBRARY_H_
 #define SRC_INTERNAL_ITEMS_ENCHANTMENT_LIBRARY_H_
 
-namespace internal {
+namespace ettes {
 namespace items {
 
 class Enchantment;
@@ -20,6 +20,6 @@ Enchantment CreateDrainingEnchantment();
 Enchantment CreateProfaneEnchantment();
 
 }  // namespace items
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_ITEMS_ENCHANTMENT_LIBRARY_H_

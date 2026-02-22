@@ -11,7 +11,7 @@
 
 #include "internal/entities/i_entity.h"
 
-namespace internal {
+namespace ettes {
 namespace factory {
 
 class IFactory {
@@ -23,6 +23,6 @@ class IFactory {
 };
 
 }  // namespace factory
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_FACTORY_I_FACTORY_H_

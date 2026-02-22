@@ -11,7 +11,7 @@
 #include "internal/logging/logger.h"
 #include "internal/rules/resistances.h"
 
-namespace internal {
+namespace ettes {
 namespace entities {
 
 class DefenseProfile {
@@ -34,6 +34,6 @@ class DefenseProfile {
 };
 
 }  // namespace entities
-}  // namespace internal
+}  // namespace ettes
 
 #endif  // SRC_INTERNAL_ENTITIES_DEFENSE_PROFILE_H_

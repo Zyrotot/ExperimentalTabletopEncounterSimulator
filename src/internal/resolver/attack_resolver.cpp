@@ -11,7 +11,7 @@
 #include "internal/entities/i_entity.h"  // IWYU pragma: keep
 #include "internal/logging/log_manager.h"
 
-namespace internal {
+namespace ettes {
 namespace resolver {
 
 using combat::AttackMove;
@@ -170,4 +170,4 @@ int AttackResolver::CheckCriticalHit(const AttackMove& attack_move,
 }
 
 }  // namespace resolver
-}  // namespace internal
+}  // namespace ettes

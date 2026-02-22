@@ -24,7 +24,7 @@
 
 constexpr int MAX_WAVES = 75;
 
-namespace internal {
+namespace ettes {
 namespace simulator {
 
 void SimulationResults::Print() const {
@@ -179,4 +179,4 @@ int Simulator::RunOnce(std::shared_ptr<dice_rolls::Roller> roller) const {
 }
 
 }  // namespace simulator
-}  // namespace internal
+}  // namespace ettes

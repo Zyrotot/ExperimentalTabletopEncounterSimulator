@@ -8,7 +8,6 @@
 
 #include <atomic>
 
-#include "internal/items/weapon.h"
 #include "internal/logging/log_manager.h"
 
 namespace internal {
@@ -16,23 +15,21 @@ namespace entities {
 
 std::atomic<uint32_t> Entity::next_id_{0};
 
-using combat::AttackSequence;
-using items::Weapon;
-
 Entity::Entity(const EntityConfig& config)
     : id_(next_id_.fetch_add(1)),
       name_(config.name),
       starting_stats_(config.starting_stats),
       current_stats_(config.starting_stats),
-      equipped_weapons_(config.equipped_weapons),
-      attack_sequences_(config.attack_sequences),
-      abilities_(config.abilities),
       alignment_(config.alignment),
-      logger_(internal::logging::LogManager::GetLogger("entity")) {
-  BuildActiveEffects();
-  for (auto& ability : abilities_) {
-    ability_index_[ability.name] = &ability;
-  }
+      logger_(internal::logging::LogManager::GetLogger("entity")),
+      health_component_(&current_stats_.base_stats, &current_stats_.bonus_stats,
+                        &starting_stats_.base_stats),
+      combat_profile_(config.equipped_weapons, config.attack_sequences, logger_),
+      ability_manager_(config.abilities,
+                       &combat_profile_.GetEquippedWeapons()),
+      defense_profile_(&current_stats_.base_stats, &current_stats_.bonus_stats,
+                       logger_) {
+  ability_manager_.BuildActiveEffects();
 }
 
 Entity::~Entity() {
@@ -54,19 +51,16 @@ const Stats& Entity::GetStartingStats() const {
   return starting_stats_;
 }
 
-const std::vector<AttackSequence>& Entity::GetAttackSequences() const {
-  return attack_sequences_;
+const std::vector<combat::AttackSequence>& Entity::GetAttackSequences() const {
+  return combat_profile_.GetAttackSequences();
 }
 
-const AttackSequence& Entity::GetAttackSequence(int index) const {
-  if (index < 0 || static_cast<size_t>(index) >= attack_sequences_.size()) {
-    return attack_sequences_[0];
-  }
-  return attack_sequences_[static_cast<size_t>(index)];
+const combat::AttackSequence& Entity::GetAttackSequence(int index) const {
+  return combat_profile_.GetAttackSequence(index);
 }
 
-const std::vector<Weapon>& Entity::GetEquippedWeapons() const {
-  return equipped_weapons_;
+const std::vector<items::Weapon>& Entity::GetEquippedWeapons() const {
+  return combat_profile_.GetEquippedWeapons();
 }
 
 const rules::Alignment& Entity::GetAlignment() const {
@@ -74,171 +68,75 @@ const rules::Alignment& Entity::GetAlignment() const {
 }
 
 const std::vector<abilities::Ability>& Entity::GetAbilities() const {
-  return abilities_;
+  return ability_manager_.GetAbilities();
 }
 
 bool Entity::HasAbility(const std::string& ability_name) const {
-  return ability_index_.count(ability_name) > 0;
+  return ability_manager_.HasAbility(ability_name);
 }
 
 int Entity::GetAbilityStack(const std::string& ability_name) const {
-  auto it = ability_index_.find(ability_name);
-  if (it == ability_index_.end()) {
-    return 0;
-  }
-  return it->second->stack_count;
+  return ability_manager_.GetAbilityStack(ability_name);
 }
 
 void Entity::IncrementAbilityStack(const std::string& ability_name) {
-  auto it = ability_index_.find(ability_name);
-  if (it != ability_index_.end()) {
-    it->second->stack_count++;
-  }
+  ability_manager_.IncrementAbilityStack(ability_name);
 }
 
 void Entity::DecrementAbilityStack(const std::string& ability_name) {
-  auto it = ability_index_.find(ability_name);
-  if (it != ability_index_.end() && it->second->stack_count > 0) {
-    it->second->stack_count--;
-  }
+  ability_manager_.DecrementAbilityStack(ability_name);
 }
 
 void Entity::SetAbilityStack(const std::string& ability_name, int value) {
-  auto it = ability_index_.find(ability_name);
-  if (it != ability_index_.end()) {
-    it->second->stack_count = value;
-  }
+  ability_manager_.SetAbilityStack(ability_name, value);
 }
 
 int Entity::GetEffectiveAC() const {
-  return current_stats_.base_stats.armour_class +
-         current_stats_.bonus_stats.ac_bonus;
+  return defense_profile_.GetEffectiveAC();
 }
 
 int Entity::GetFortification() const {
-  return current_stats_.base_stats.fortification;
+  return defense_profile_.GetFortification();
 }
 
 Resistances Entity::GetResistances() const {
-  return current_stats_.base_stats.resistances +
-         current_stats_.bonus_stats.bonus_resistances;
+  return defense_profile_.GetResistances();
 }
 
 void Entity::TakeDamage(int damage) {
-  if (damage <= 0) {
-    return;
-  }
-
-  if (current_stats_.bonus_stats.temporary_hp > 0) {
-    if (damage <= current_stats_.bonus_stats.temporary_hp) {
-      current_stats_.bonus_stats.temporary_hp -= damage;
-      return;
-    }
-    damage -= current_stats_.bonus_stats.temporary_hp;
-    current_stats_.bonus_stats.temporary_hp = 0;
-  }
-
-  current_stats_.base_stats.hp -= damage;
-  if (current_stats_.base_stats.hp < 0) {
-    current_stats_.base_stats.hp = 0;
-  }
+  health_component_.TakeDamage(damage);
 }
 
 void Entity::Heal(int amount) {
-  if (amount <= 0) {
-    return;
-  }
-
-  current_stats_.base_stats.hp += amount;
-
-  if (current_stats_.base_stats.hp > starting_stats_.base_stats.hp) {
-    current_stats_.base_stats.hp = starting_stats_.base_stats.hp;
-  }
+  health_component_.Heal(amount);
 }
 
 void Entity::AddTempHP(int amount) {
-  if (amount <= 0) {
-    return;
-  }
-
-  if (current_stats_.bonus_stats.temporary_hp < amount) {
-    current_stats_.bonus_stats.temporary_hp = amount;
-  }
+  health_component_.AddTempHP(amount);
 }
 
 const std::vector<const combat::Effect*>& Entity::GetActiveEffects() const {
-  return active_effects_;
+  return ability_manager_.GetActiveEffects();
 }
 
 void Entity::BuildActiveEffects() {
-  active_effects_.clear();
-
-  for (const auto& ability : abilities_) {
-    if (!ability.is_active)
-      continue;
-
-    for (const auto& effect : ability.effects) {
-      active_effects_.push_back(&effect);
-    }
-  }
-
-  for (const auto& weapon : equipped_weapons_) {
-    for (const auto& enchantment : weapon.enchantments) {
-      for (const auto& effect : enchantment.effects) {
-        active_effects_.push_back(&effect);
-      }
-    }
-  }
+  ability_manager_.BuildActiveEffects();
 }
 
 bool Entity::IsAlive() const {
-  return current_stats_.base_stats.hp > 0;
+  return health_component_.IsAlive();
 }
 
 void Entity::AddDR(const rules::DamageReduction& dr, bool is_bonus) {
-  auto& dr_list =
-      is_bonus
-          ? current_stats_.bonus_stats.bonus_resistances.damage_reductions
-          : current_stats_.base_stats.resistances.damage_reductions;
-
-  for (auto& existing : dr_list) {
-    if (existing.bypass_types == dr.bypass_types &&
-        existing.bypass_modifiers == dr.bypass_modifiers) {
-      existing.amount += dr.amount;
-      return;
-    }
-  }
-
-  dr_list.push_back(dr);
+  defense_profile_.AddDR(dr, is_bonus);
 }
 
 void Entity::RemoveDR(int amount, bool from_bonus) {
-  logger_->debug("Removing {} DR from {}", amount,
-                 from_bonus ? "bonus DR" : "base DR");
-  auto& dr_list =
-      from_bonus
-          ? current_stats_.bonus_stats.bonus_resistances.damage_reductions
-          : current_stats_.base_stats.resistances.damage_reductions;
-
-  for (auto it = dr_list.rbegin(); it != dr_list.rend() && amount > 0;) {
-    if (it->amount <= amount) {
-      amount -= it->amount;
-      it = std::vector<rules::DamageReduction>::reverse_iterator(
-          dr_list.erase(std::next(it).base()));
-    } else {
-      it->amount -= amount;
-      amount = 0;
-      ++it;
-    }
-  }
+  defense_profile_.RemoveDR(amount, from_bonus);
 }
 
 void Entity::ClearAllDR(bool from_bonus) {
-  if (from_bonus) {
-    current_stats_.bonus_stats.bonus_resistances.damage_reductions.clear();
-  } else {
-    current_stats_.base_stats.resistances.damage_reductions.clear();
-  }
+  defense_profile_.ClearAllDR(from_bonus);
 }
 
 }  // namespace entities

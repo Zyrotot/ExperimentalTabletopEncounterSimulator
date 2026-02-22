@@ -10,13 +10,16 @@
 #include <atomic>
 #include <cstdint>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #include "internal/abilities/ability.h"
 #include "internal/combat/attack.h"
 #include "internal/combat/effect.h"
+#include "internal/entities/ability_manager.h"
+#include "internal/entities/combat_profile.h"
+#include "internal/entities/defense_profile.h"
 #include "internal/entities/entity_config.h"
+#include "internal/entities/health_component.h"
 #include "internal/entities/i_entity.h"
 #include "internal/entities/stats.h"
 #include "internal/logging/logger.h"
@@ -72,16 +75,14 @@ class Entity : public IEntity {
   Stats starting_stats_;
   Stats current_stats_;
 
-  std::vector<items::Weapon> equipped_weapons_;
-  std::vector<combat::AttackSequence> attack_sequences_;
-  std::vector<abilities::Ability> abilities_;
-
   rules::Alignment alignment_;
 
-  std::vector<const combat::Effect*> active_effects_;
-  std::unordered_map<std::string, abilities::Ability*> ability_index_;
-
   logging::Logger* logger_;
+
+  HealthComponent health_component_;
+  CombatProfile combat_profile_;
+  AbilityManager ability_manager_;
+  DefenseProfile defense_profile_;
 
   static std::atomic<uint32_t> next_id_;
 };

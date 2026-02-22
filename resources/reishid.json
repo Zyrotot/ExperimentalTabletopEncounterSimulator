@@ -1,0 +1,134 @@
+{
+    "name": "Reishid",
+    "starting_stats": {
+        "base_stats": {
+            "hp": 143,
+            "armour_class": 30,
+            "fortification": 100,
+            "attack_bonuses": {
+                "attack_bonus": 22,
+                "damage_bonus": 10
+            },
+            "resistances": {
+                "damage_reductions": [
+                    {
+                        "bypass_types": 0,
+                        "bypass_modifiers": 1,
+                        "amount": 10
+                    }
+                ],
+                "energy_resistances": [],
+                "immunity": {
+                    "immune_types": 0,
+                    "immune_categories": 2
+                },
+                "weaknesses": []
+            }
+        },
+        "bonus_stats": {
+            "temporary_hp": 0,
+            "ac_bonus": 0,
+            "bonus_resistances": {
+                "damage_reductions": [],
+                "energy_resistances": [],
+                "immunity": {
+                    "immune_types": 0,
+                    "immune_categories": 0
+                },
+                "weaknesses": []
+            }
+        }
+    },
+    "equipped_weapons": [
+        {
+            "name": "adaga",
+            "attack_bonus": 4,
+            "damage": {
+                "dice_groups": [
+                    {
+                        "count": 1,
+                        "sides": 4
+                    }
+                ],
+                "bonus": 4
+            },
+            "damage_type": 2,
+            "damage_modifier": 1,
+            "crit_range": 19,
+            "crit_multiplier": 2,
+            "enchantments": [
+                {
+                    "name": "Profane"
+                }
+            ]
+        },
+        {
+            "name": "mordida",
+            "attack_bonus": 0,
+            "damage": {
+                "dice_groups": [
+                    {
+                        "count": 1,
+                        "sides": 4
+                    }
+                ],
+                "bonus": 4
+            },
+            "damage_type": 2,
+            "damage_modifier": 0,
+            "crit_range": 20,
+            "crit_multiplier": 2,
+            "enchantments": []
+        },
+        {
+            "name": "garra",
+            "attack_bonus": 0,
+            "damage": {
+                "dice_groups": [
+                    {
+                        "count": 1,
+                        "sides": 4
+                    }
+                ],
+                "bonus": 0
+            },
+            "damage_type": 1,
+            "damage_modifier": 0,
+            "crit_range": 20,
+            "crit_multiplier": 2,
+            "enchantments": []
+        }
+    ],
+    "attack_sequences": [
+        {
+            "name": "Multiple Attacks",
+            "attacks": [
+                {
+                    "weapon_ref": "adaga",
+                    "attack_modifier": 0,
+                    "damage_modifier": 0,
+                    "crit_range_bonus": 0,
+                    "crit_multiplier_bonus": 0
+                },
+                {
+                    "weapon_ref": "mordida",
+                    "attack_modifier": 0,
+                    "damage_modifier": 0,
+                    "crit_range_bonus": 0,
+                    "crit_multiplier_bonus": 0
+                },
+                {
+                    "weapon_ref": "garra",
+                    "attack_modifier": 0,
+                    "damage_modifier": 0,
+                    "crit_range_bonus": 0,
+                    "crit_multiplier_bonus": 0
+                }
+            ],
+            "attack_modifier": 0,
+            "damage_modifier": 0
+        }
+    ],
+    "abilities": [],
+    "alignment": 36
+}

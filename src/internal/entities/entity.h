@@ -44,15 +44,17 @@ class Entity : public IEntity {
   const rules::Alignment& GetAlignment() const override;
 
   const std::vector<abilities::Ability>& GetAbilities() const;
-  bool HasAbility(const std::string& ability_name) const override;
-  int GetAbilityStack(const std::string& ability_name) const override;
+  bool HasAbility(abilities::AbilityId id) const override;
+  int GetAbilityStack(abilities::AbilityId id) const override;
 
   const std::vector<const combat::Effect*>& GetActiveEffects() const override;
+  const std::vector<const combat::Effect*>& GetEffectsForEvent(
+      combat::CombatEvent event) const override;
   void BuildActiveEffects() override;
 
-  void IncrementAbilityStack(const std::string& ability_name) override;
-  void DecrementAbilityStack(const std::string& ability_name) override;
-  void SetAbilityStack(const std::string& ability_name, int value) override;
+  void IncrementAbilityStack(abilities::AbilityId id) override;
+  void DecrementAbilityStack(abilities::AbilityId id) override;
+  void SetAbilityStack(abilities::AbilityId id, int value) override;
 
   int GetEffectiveAC() const override;
   int GetFortification() const override;

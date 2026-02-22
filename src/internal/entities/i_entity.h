@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 
+#include "internal/abilities/ability_id.h"
 #include "internal/combat/attack.h"
 #include "internal/combat/effect.h"
 #include "internal/entities/stats.h"
@@ -40,17 +41,21 @@ class IEntity {
   virtual void AddTempHP(int amount) = 0;
   virtual bool IsAlive() const = 0;
 
-  virtual bool HasAbility(const std::string& ability_name) const = 0;
-  virtual int GetAbilityStack(const std::string& ability_name) const = 0;
-  virtual void IncrementAbilityStack(const std::string& ability_name) = 0;
-  virtual void DecrementAbilityStack(const std::string& ability_name) = 0;
-  virtual void SetAbilityStack(const std::string& ability_name, int value) = 0;
+  virtual bool HasAbility(abilities::AbilityId id) const = 0;
+  virtual int GetAbilityStack(abilities::AbilityId id) const = 0;
+  virtual void IncrementAbilityStack(abilities::AbilityId id) = 0;
+  virtual void DecrementAbilityStack(abilities::AbilityId id) = 0;
+  virtual void SetAbilityStack(abilities::AbilityId id, int value) = 0;
 
-  virtual void AddDR(const rules::DamageReduction& dr, bool is_bonus = true) = 0;
+  virtual void AddDR(const rules::DamageReduction& dr,
+                     bool is_bonus = true) = 0;
   virtual void RemoveDR(int amount, bool from_bonus = true) = 0;
   virtual void ClearAllDR(bool from_bonus = true) = 0;
 
-  virtual const std::vector<const combat::Effect*>& GetActiveEffects() const = 0;
+  virtual const std::vector<const combat::Effect*>& GetActiveEffects()
+      const = 0;
+  virtual const std::vector<const combat::Effect*>& GetEffectsForEvent(
+      combat::CombatEvent event) const = 0;
   virtual void BuildActiveEffects() = 0;
 };
 

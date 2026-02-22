@@ -26,10 +26,16 @@ int DefenseProfile::GetFortification() const {
 }
 
 Resistances DefenseProfile::GetResistances() const {
-  return current_base_->resistances + current_bonus_->bonus_resistances;
+  if (resistances_dirty_) {
+    cached_resistances_ =
+        current_base_->resistances + current_bonus_->bonus_resistances;
+    resistances_dirty_ = false;
+  }
+  return cached_resistances_;
 }
 
 void DefenseProfile::AddDR(const rules::DamageReduction& dr, bool is_bonus) {
+  resistances_dirty_ = true;
   auto& dr_list = is_bonus ? current_bonus_->bonus_resistances.damage_reductions
                            : current_base_->resistances.damage_reductions;
 
@@ -45,6 +51,7 @@ void DefenseProfile::AddDR(const rules::DamageReduction& dr, bool is_bonus) {
 }
 
 void DefenseProfile::RemoveDR(int amount, bool from_bonus) {
+  resistances_dirty_ = true;
   logger_->debug("Removing {} DR from {}", amount,
                  from_bonus ? "bonus DR" : "base DR");
   auto& dr_list = from_bonus
@@ -65,6 +72,7 @@ void DefenseProfile::RemoveDR(int amount, bool from_bonus) {
 }
 
 void DefenseProfile::ClearAllDR(bool from_bonus) {
+  resistances_dirty_ = true;
   if (from_bonus) {
     current_bonus_->bonus_resistances.damage_reductions.clear();
   } else {

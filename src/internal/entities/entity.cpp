@@ -69,24 +69,24 @@ const std::vector<abilities::Ability>& Entity::GetAbilities() const {
   return ability_manager_.GetAbilities();
 }
 
-bool Entity::HasAbility(const std::string& ability_name) const {
-  return ability_manager_.HasAbility(ability_name);
+bool Entity::HasAbility(abilities::AbilityId id) const {
+  return ability_manager_.HasAbility(id);
 }
 
-int Entity::GetAbilityStack(const std::string& ability_name) const {
-  return ability_manager_.GetAbilityStack(ability_name);
+int Entity::GetAbilityStack(abilities::AbilityId id) const {
+  return ability_manager_.GetAbilityStack(id);
 }
 
-void Entity::IncrementAbilityStack(const std::string& ability_name) {
-  ability_manager_.IncrementAbilityStack(ability_name);
+void Entity::IncrementAbilityStack(abilities::AbilityId id) {
+  ability_manager_.IncrementAbilityStack(id);
 }
 
-void Entity::DecrementAbilityStack(const std::string& ability_name) {
-  ability_manager_.DecrementAbilityStack(ability_name);
+void Entity::DecrementAbilityStack(abilities::AbilityId id) {
+  ability_manager_.DecrementAbilityStack(id);
 }
 
-void Entity::SetAbilityStack(const std::string& ability_name, int value) {
-  ability_manager_.SetAbilityStack(ability_name, value);
+void Entity::SetAbilityStack(abilities::AbilityId id, int value) {
+  ability_manager_.SetAbilityStack(id, value);
 }
 
 int Entity::GetEffectiveAC() const {
@@ -115,6 +115,11 @@ void Entity::AddTempHP(int amount) {
 
 const std::vector<const combat::Effect*>& Entity::GetActiveEffects() const {
   return ability_manager_.GetActiveEffects();
+}
+
+const std::vector<const combat::Effect*>& Entity::GetEffectsForEvent(
+    combat::CombatEvent event) const {
+  return ability_manager_.GetEffectsForEvent(event);
 }
 
 void Entity::BuildActiveEffects() {

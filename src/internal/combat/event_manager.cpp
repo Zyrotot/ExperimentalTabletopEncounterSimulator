@@ -43,8 +43,8 @@ std::vector<DamageModification> EmitCombatEvent(
   }
 
   if (relevant_entity) {
-    for (const auto* effect : relevant_entity->GetActiveEffects()) {
-      if (!effect->is_active || effect->trigger != event) {
+    for (const auto* effect : relevant_entity->GetEffectsForEvent(event)) {
+      if (!effect->is_active) {
         continue;
       }
 

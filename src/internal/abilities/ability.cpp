@@ -17,6 +17,7 @@ namespace abilities {
 Ability CreateErosao() {
   Ability ability;
   ability.name = "Erosion";
+  ability.id = AbilityId::Erosao;
   ability.is_active = true;
 
   combat::Effect effect;
@@ -42,6 +43,7 @@ Ability CreateErosao() {
 Ability CreateRigidezRaivosa() {
   Ability ability;
   ability.name = "Rigidez Raivosa";
+  ability.id = AbilityId::RigidezRaivosa;
   ability.is_active = true;
   ability.stack_count = 0;
 
@@ -57,7 +59,7 @@ Ability CreateRigidezRaivosa() {
     dr.amount = 1;
     dr.bypass_types = rules::DamageType::None;
     context.target->AddDR(dr, true);
-    context.target->IncrementAbilityStack("Rigidez Raivosa");
+    context.target->IncrementAbilityStack(AbilityId::RigidezRaivosa);
   };
 
   combat::Effect heal_effect;
@@ -69,7 +71,7 @@ Ability CreateRigidezRaivosa() {
       return;
 
     context.target->ClearAllDR(true);
-    context.target->SetAbilityStack("Rigidez Raivosa", 0);
+    context.target->SetAbilityStack(AbilityId::RigidezRaivosa, 0);
   };
 
   ability.effects.push_back(take_damage_effect);
@@ -80,6 +82,7 @@ Ability CreateRigidezRaivosa() {
 Ability CreateTrespassar() {
   Ability ability;
   ability.name = "Trespassar";
+  ability.id = AbilityId::Trespassar;
   ability.is_active = true;
   ability.stack_count = 1;
 
@@ -91,8 +94,8 @@ Ability CreateTrespassar() {
     if (!context.source) {
       return;
     }
-    if (context.source->GetAbilityStack("Trespassar") > 0) {
-      context.source->DecrementAbilityStack("Trespassar");
+    if (context.source->GetAbilityStack(AbilityId::Trespassar) > 0) {
+      context.source->DecrementAbilityStack(AbilityId::Trespassar);
       if (context.attack_queue) {
         context.attack_queue->QueueAttack(
             {context.source, context.target,
@@ -111,7 +114,7 @@ Ability CreateTrespassar() {
     if (!context.source) {
       return;
     }
-    context.source->SetAbilityStack("Trespassar", 1);
+    context.source->SetAbilityStack(AbilityId::Trespassar, 1);
   };
 
   ability.effects.push_back(recharge_effect);
@@ -122,6 +125,7 @@ Ability CreateTrespassar() {
 Ability CreateDuroDeFerir(int stacks) {
   Ability ability;
   ability.name = "Duro de Ferir";
+  ability.id = AbilityId::DuroDeFerir;
   ability.is_active = true;
   ability.stack_count = stacks;
 
@@ -135,8 +139,8 @@ Ability CreateDuroDeFerir(int stacks) {
       return {};
     }
 
-    if (context.target->GetAbilityStack("Duro de Ferir") > 0) {
-      context.target->DecrementAbilityStack("Duro de Ferir");
+    if (context.target->GetAbilityStack(AbilityId::DuroDeFerir) > 0) {
+      context.target->DecrementAbilityStack(AbilityId::DuroDeFerir);
       return {.negate_all = true};
     }
     return {};
@@ -149,6 +153,7 @@ Ability CreateDuroDeFerir(int stacks) {
 Ability CreateDuroDeMatar(int stacks) {
   Ability ability;
   ability.name = "Duro de Matar";
+  ability.id = AbilityId::DuroDeMatar;
   ability.is_active = true;
   ability.stack_count = stacks;
 
@@ -168,7 +173,7 @@ Ability CreateDuroDeMatar(int stacks) {
 
     const auto& current_result = context.results[context.current_index];
 
-    if (context.target->GetAbilityStack("Duro de Matar") > 0) {
+    if (context.target->GetAbilityStack(AbilityId::DuroDeMatar) > 0) {
       int total_damage = 0;
 
       for (const auto& dmg : current_result.damage_instances) {
@@ -180,7 +185,7 @@ Ability CreateDuroDeMatar(int stacks) {
           context.target->GetCurrentStats().bonus_stats.temporary_hp;
 
       if (total_damage >= current_hp) {
-        context.target->DecrementAbilityStack("Duro de Matar");
+        context.target->DecrementAbilityStack(AbilityId::DuroDeMatar);
         return {.negate_all = true};
       }
     }

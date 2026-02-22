@@ -7,6 +7,7 @@
 #ifndef SRC_INTERNAL_ENTITIES_ABILITY_MANAGER_H_
 #define SRC_INTERNAL_ENTITIES_ABILITY_MANAGER_H_
 
+#include <array>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -21,20 +22,25 @@ class AbilityManager {
  public:
   explicit AbilityManager(std::vector<abilities::Ability> abilities);
 
-  bool HasAbility(const std::string& ability_name) const;
-  int GetAbilityStack(const std::string& ability_name) const;
-  void IncrementAbilityStack(const std::string& ability_name);
-  void DecrementAbilityStack(const std::string& ability_name);
-  void SetAbilityStack(const std::string& ability_name, int value);
+  bool HasAbility(abilities::AbilityId id) const;
+  int GetAbilityStack(abilities::AbilityId id) const;
+  void IncrementAbilityStack(abilities::AbilityId id);
+  void DecrementAbilityStack(abilities::AbilityId id);
+  void SetAbilityStack(abilities::AbilityId id, int value);
 
   const std::vector<abilities::Ability>& GetAbilities() const;
   const std::vector<const combat::Effect*>& GetActiveEffects() const;
+  const std::vector<const combat::Effect*>& GetEffectsForEvent(
+      combat::CombatEvent event) const;
   void BuildActiveEffects();
 
  private:
+  static constexpr std::size_t kNumEvents = 9;
   std::vector<abilities::Ability> abilities_;
   std::unordered_map<std::string, abilities::Ability*> ability_index_;
+  std::unordered_map<abilities::AbilityId, abilities::Ability*> ability_id_index_;
   std::vector<const combat::Effect*> active_effects_;
+  std::array<std::vector<const combat::Effect*>, kNumEvents> bucketed_effects_;
 };
 
 }  // namespace entities

@@ -24,7 +24,7 @@ struct Term {
   std::vector<Dice> dice_groups = {};
   int bonus = 0;
 
-  void AddModifier(const int& modifier);
+  void AddModifier(int modifier);
 };
 
 inline Term operator+(const Term& lhs, const Term& rhs) {
@@ -36,7 +36,7 @@ inline Term operator+(const Term& lhs, const Term& rhs) {
   return result;
 }
 
-inline void Term::AddModifier(const int& modifier) {
+inline void Term::AddModifier(int modifier) {
   bonus += modifier;
 }
 

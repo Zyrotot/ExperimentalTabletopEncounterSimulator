@@ -8,7 +8,6 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <memory>
 
 #include "internal/combat/combat_context.h"
 #include "internal/dice_rolls/roller.h"

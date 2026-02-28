@@ -120,6 +120,22 @@ const std::unordered_map<std::string, std::function<abilities::Ability(int)>>
 
 }  // namespace
 
+Monster MonsterFromString(const std::string& name) {
+  if (name == "uktril") {
+    return Monster::Uktril;
+  }
+  if (name == "geraktril") {
+    return Monster::Geraktril;
+  }
+  if (name == "reishid") {
+    return Monster::Reishid;
+  }
+  if (name == "custom") {
+    return Monster::Custom;
+  }
+  return Monster::Reishid;
+}
+
 Factory::Factory(std::string player_filename, Monster monster_type)
     : player_filename_(std::move(player_filename)),
       monster_type_(monster_type),

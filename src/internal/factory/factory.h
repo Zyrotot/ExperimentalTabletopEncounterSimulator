@@ -23,6 +23,8 @@ enum Monster {
   Custom = 4,
 };
 
+Monster MonsterFromString(const std::string& name);
+
 class Factory : public IFactory {
  public:
   Factory(std::string player_filename, Monster monster_type);

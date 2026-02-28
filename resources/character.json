@@ -47,7 +47,7 @@
                 "bonus": 0
             },
             "damage_type": 1,
-            "damage_modifier": 0,
+            "damage_modifier": 1,
             "crit_range": 20,
             "crit_multiplier": 3,
             "enchantments": [

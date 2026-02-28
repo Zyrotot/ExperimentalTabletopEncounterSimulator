@@ -146,5 +146,33 @@ TEST_F(DefenseProfileTest, AddDRInvalidatesCacheSuccessfully) {
   EXPECT_EQ(after.damage_reductions.size(), 1u);
 }
 
+TEST_F(DefenseProfileTest, RemoveDRFromBase) {
+  rules::DamageReduction dr{rules::DamageType::None,
+                            rules::DamageModifier::None, 10};
+  sut_->AddDR(dr, false);
+  sut_->RemoveDR(6, false);
+  EXPECT_EQ(current_base_.resistances.damage_reductions.size(), 1u);
+  EXPECT_EQ(current_base_.resistances.damage_reductions[0].amount, 4);
+}
+
+TEST_F(DefenseProfileTest, RemoveDRAcrossMultipleEntries) {
+  rules::DamageReduction dr1{rules::DamageType::None,
+                             rules::DamageModifier::None, 3};
+  rules::DamageReduction dr2{rules::DamageType::Slash,
+                             rules::DamageModifier::None, 4};
+  sut_->AddDR(dr1, true);
+  sut_->AddDR(dr2, true);
+  sut_->RemoveDR(7, true);
+  EXPECT_TRUE(current_bonus_.bonus_resistances.damage_reductions.empty());
+}
+
+TEST_F(DefenseProfileTest, RemoveDRExceedsAvailable) {
+  rules::DamageReduction dr{rules::DamageType::None,
+                            rules::DamageModifier::None, 3};
+  sut_->AddDR(dr, true);
+  sut_->RemoveDR(100, true);
+  EXPECT_TRUE(current_bonus_.bonus_resistances.damage_reductions.empty());
+}
+
 }  // namespace entities
 }  // namespace ettes

@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "src/internal/combat/combat_context.h"
 #include "src/internal/entities/entity.h"
 #include "src/internal/items/enchantment_library.h"
 #include "src/internal/rules/alignment.h"
@@ -209,6 +210,61 @@ TEST_F(EnchantmentIntegrationTest, ProfaneNoBonusVsNonGoodTarget) {
   harness_->engine->Flush(nullptr);
 
   EXPECT_EQ(target.GetCurrentStats().base_stats.hp, 87);
+}
+
+TEST(EnchantmentEdgeCaseTest, FlamingExplosionEmptyResultsReturnsEmpty) {
+  auto ench = items::CreateFlamingExplosionEnchantment();
+  combat::CombatEventContext ctx;
+
+  auto result = ench.damage_sources[0].contribute(ctx);
+
+  EXPECT_EQ(result.amount, 0);
+}
+
+TEST(EnchantmentEdgeCaseTest, VampiricOutOfBoundsIndexDoesNothing) {
+  auto ench = items::CreateVampiricEnchantment();
+  combat::CombatEventContext ctx;
+  ctx.current_index = 5;
+
+  ench.effects[0].on_event(ctx);
+}
+
+TEST(EnchantmentEdgeCaseTest, VampiricNullSourceSkipsHeal) {
+  auto ench = items::CreateVampiricEnchantment();
+  combat::CombatEventContext ctx;
+  ctx.source = nullptr;
+  ctx.current_index = 0;
+  ctx.results.push_back(
+      {.attack = nullptr,
+       .damage_instances = {{.amount = 10, .types = 0, .modifiers = 0}}});
+
+  ench.effects[0].on_event(ctx);
+}
+
+TEST(EnchantmentEdgeCaseTest, DrainingNullSourceDoesNotCrash) {
+  auto ench = items::CreateDrainingEnchantment();
+  combat::CombatEventContext ctx;
+  ctx.source = nullptr;
+
+  ench.effects[0].on_event(ctx);
+}
+
+TEST(EnchantmentEdgeCaseTest, ProfaneNullTargetReturnsEmpty) {
+  auto ench = items::CreateProfaneEnchantment();
+  combat::CombatEventContext ctx;
+  ctx.target = nullptr;
+
+  auto result = ench.damage_sources[0].contribute(ctx);
+
+  EXPECT_EQ(result.amount, 0);
+}
+
+TEST(EnchantmentEdgeCaseTest, DissonantNullRollerDoesNotCrash) {
+  auto ench = items::CreateDissonantEnchantment();
+  combat::CombatEventContext ctx;
+  ctx.roller = nullptr;
+
+  ench.effects[0].on_event(ctx);
 }
 
 }  // namespace testing

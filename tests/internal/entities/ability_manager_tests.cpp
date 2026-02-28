@@ -149,5 +149,36 @@ TEST_F(AbilityManagerTest, GetAbilitiesReturnsAll) {
   EXPECT_EQ(mgr.GetAbilities().size(), 2u);
 }
 
+TEST_F(AbilityManagerTest, IncrementMissingAbilityDoesNothing) {
+  AbilityManager mgr({});
+  mgr.IncrementAbilityStack(abilities::AbilityId::Erosao);
+  EXPECT_EQ(mgr.GetAbilityStack(abilities::AbilityId::Erosao), 0);
+}
+
+TEST_F(AbilityManagerTest, DecrementMissingAbilityDoesNothing) {
+  AbilityManager mgr({});
+  mgr.DecrementAbilityStack(abilities::AbilityId::Erosao);
+  EXPECT_EQ(mgr.GetAbilityStack(abilities::AbilityId::Erosao), 0);
+}
+
+TEST_F(AbilityManagerTest, SetStackMissingAbilityDoesNothing) {
+  AbilityManager mgr({});
+  mgr.SetAbilityStack(abilities::AbilityId::Erosao, 10);
+  EXPECT_EQ(mgr.GetAbilityStack(abilities::AbilityId::Erosao), 0);
+}
+
+TEST_F(AbilityManagerTest, GetEffectsForOutOfBoundsEventReturnsEmpty) {
+  AbilityManager mgr({});
+  auto event = static_cast<combat::CombatEvent>(99);
+  EXPECT_TRUE(mgr.GetEffectsForEvent(event).empty());
+}
+
+TEST_F(AbilityManagerTest, AbilityWithNoneIdNotInIndex) {
+  AbilityManager mgr(
+      {MakeAbility("NoneAbility", abilities::AbilityId::None)});
+  EXPECT_FALSE(mgr.HasAbility(abilities::AbilityId::None));
+  EXPECT_EQ(mgr.GetAbilities().size(), 1u);
+}
+
 }  // namespace entities
 }  // namespace ettes

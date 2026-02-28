@@ -29,6 +29,8 @@ struct Weapon {
   int crit_range = 0;
   int crit_multiplier = 0;
 
+  double range_meters = 1.5;
+
   std::vector<Enchantment> enchantments = {};
 };
 

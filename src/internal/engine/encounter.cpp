@@ -34,7 +34,7 @@ Encounter::Encounter(std::vector<std::unique_ptr<entities::IEntity>> side_a,
 
 Encounter::~Encounter() = default;
 
-int Encounter::FindSideOf(const entities::IEntity* entity) const {
+int Encounter::GetSideOf(const entities::IEntity* entity) const {
   if (!entity) {
     return -1;
   }
@@ -59,13 +59,13 @@ std::vector<entities::IEntity*> Encounter::CollectLiving(
 
 std::vector<entities::IEntity*> Encounter::GetLivingEnemiesOf(
     const entities::IEntity* entity) const {
-  int side = FindSideOf(entity);
+  int side = GetSideOf(entity);
   return CollectLiving(side == 0 ? 1 : 0);
 }
 
 entities::IEntity* Encounter::GetFirstLivingEnemyOf(
     const entities::IEntity* entity) const {
-  const auto& source = (FindSideOf(entity) == 0) ? side_b_ : side_a_;
+  const auto& source = (GetSideOf(entity) == 0) ? side_b_ : side_a_;
   for (const auto& e : source) {
     if (e && e->IsAlive()) {
       return e.get();
@@ -76,7 +76,7 @@ entities::IEntity* Encounter::GetFirstLivingEnemyOf(
 
 std::vector<entities::IEntity*> Encounter::GetLivingAlliesOf(
     const entities::IEntity* entity) const {
-  int side = FindSideOf(entity);
+  int side = GetSideOf(entity);
   return CollectLiving(side);
 }
 
@@ -93,7 +93,7 @@ bool Encounter::IsOver() const {
 }
 
 void Encounter::NotifyDeath(const entities::IEntity* entity) {
-  int side = FindSideOf(entity);
+  int side = GetSideOf(entity);
   if (side == 0) {
     alive_a_--;
   } else if (side == 1) {

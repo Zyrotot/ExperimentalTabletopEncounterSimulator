@@ -59,6 +59,9 @@ class Entity : public IEntity {
   int GetEffectiveAC() const override;
   int GetFortification() const override;
 
+  positioning::EntitySize GetEntitySize() const override;
+  double GetSpeedMeters() const override;
+
   Resistances GetResistances() const override;
 
   void TakeDamage(int damage) override;

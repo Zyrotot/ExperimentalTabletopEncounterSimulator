@@ -46,8 +46,9 @@ class Encounter {
 
   std::vector<std::unique_ptr<entities::IEntity>> ReleaseSideA();
 
+  int GetSideOf(const entities::IEntity* entity) const;
+
  private:
-  int FindSideOf(const entities::IEntity* entity) const;
 
   std::vector<entities::IEntity*> CollectLiving(
       int side, bool first_only = false) const;

@@ -97,6 +97,14 @@ int Entity::GetFortification() const {
   return defense_profile_.GetFortification();
 }
 
+positioning::EntitySize Entity::GetEntitySize() const {
+  return current_stats_.base_stats.entity_size;
+}
+
+double Entity::GetSpeedMeters() const {
+  return current_stats_.base_stats.speed_meters;
+}
+
 Resistances Entity::GetResistances() const {
   return defense_profile_.GetResistances();
 }

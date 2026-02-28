@@ -13,11 +13,15 @@
 #include <vector>
 
 #include "src/internal/entities/i_entity.h"
+#include "src/internal/positioning/entity_size.h"
 
 class MockEntity : public ettes::entities::IEntity {
  public:
   MOCK_METHOD(uint32_t, GetId, (), (const, override));
   MOCK_METHOD(const std::string&, GetName, (), (const, override));
+  MOCK_METHOD(ettes::positioning::EntitySize, GetEntitySize, (),
+              (const, override));
+  MOCK_METHOD(double, GetSpeedMeters, (), (const, override));
   MOCK_METHOD(const ettes::entities::Stats&, GetCurrentStats, (),
               (const, override));
   MOCK_METHOD(const ettes::combat::AttackSequence&, GetAttackSequence, (int),

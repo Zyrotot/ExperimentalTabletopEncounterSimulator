@@ -9,6 +9,7 @@
 
 #include <vector>
 
+#include "internal/positioning/entity_size.h"
 #include "internal/rules/resistances.h"
 
 namespace ettes {
@@ -57,6 +58,8 @@ struct BaseStats {
   int hp = 0;
   int armour_class = 0;
   int fortification = 0;
+  double speed_meters = 9.0;
+  positioning::EntitySize entity_size = positioning::EntitySize::Medium;
 
   AttackBonuses attack_bonuses = {};
 

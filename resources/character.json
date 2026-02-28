@@ -17,7 +17,8 @@
                     "immune_categories": 0
                 },
                 "weaknesses": []
-            }
+            },
+            "entity_size": 2
         },
         "bonus_stats": {
             "temporary_hp": 0,

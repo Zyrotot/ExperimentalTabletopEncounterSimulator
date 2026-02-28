@@ -7,12 +7,15 @@
 #ifndef SRC_INTERNAL_ENGINE_DIRECTOR_H_
 #define SRC_INTERNAL_ENGINE_DIRECTOR_H_
 
-#include <unordered_map>
+#include <memory>
 
 #include "internal/combat/attack_queue.h"
 #include "internal/engine/combat_engine.h"
 #include "internal/engine/encounter.h"
 #include "internal/logging/logger.h"
+#include "internal/positioning/grid_pos.h"
+#include "internal/positioning/movement_resolver.h"
+#include "internal/positioning/position_map.h"
 
 namespace ettes {
 
@@ -20,25 +23,34 @@ namespace engine {
 
 class Director : public combat::IAttackQueue {
  public:
-  Director(Encounter* encounter, CombatEngine* engine);
+  Director(Encounter* encounter, CombatEngine* engine,
+           positioning::DiagonalMode diagonal_mode =
+               positioning::DiagonalMode::Alternating);
   ~Director() override;
 
   void RunEncounter();
 
-  void RunTurn(entities::IEntity* entity);
+  void RunTurn(entities::IEntity* entity, int attack_sequence_index = 0);
 
   void QueueAttack(combat::QueuedAttack attack) override;
   void NotifyEntityDied(entities::IEntity* entity) override;
 
- private:
-  entities::IEntity* SelectTarget(entities::IEntity* attacker) const;
+  const positioning::PositionMap* GetPositionMap() const;
 
-  static constexpr int kMaxAdjacentAttackers = 8;
+ private:
+  void InitPositionMap();
+  void LogGrid() const;
+
+  entities::IEntity* SelectTarget(entities::IEntity* attacker) const;
+  double GetMaxAttackRange(const entities::IEntity* entity, int attack_index) const;
 
   Encounter* encounter_;
   CombatEngine* engine_;
   logging::Logger* logger_;
-  std::unordered_map<const entities::IEntity*, int> attacks_this_round_;
+
+  positioning::DiagonalMode diagonal_mode_;
+  std::unique_ptr<positioning::PositionMap> position_map_;
+  std::unique_ptr<positioning::MovementResolver> movement_resolver_;
 };
 
 }  // namespace engine

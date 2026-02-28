@@ -22,6 +22,14 @@ class Logger {
   explicit Logger(spdlog::logger* impl);
 
   template <typename... Args>
+  void Trace([[maybe_unused]] spdlog::format_string_t<Args...> fmt,
+             [[maybe_unused]] Args&&... args) const {
+#ifndef NDEBUG
+    impl_->trace(fmt, std::forward<Args>(args)...);
+#endif
+  }
+
+  template <typename... Args>
   void Debug([[maybe_unused]] spdlog::format_string_t<Args...> fmt,
              [[maybe_unused]] Args&&... args) const {
 #ifndef NDEBUG

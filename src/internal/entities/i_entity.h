@@ -13,6 +13,7 @@
 #include "internal/entities/i_ability_holder.h"
 #include "internal/entities/i_combatant.h"
 #include "internal/entities/i_damageable.h"
+#include "internal/positioning/entity_size.h"
 
 namespace ettes {
 namespace entities {
@@ -23,6 +24,8 @@ class IEntity : public ICombatant, public IDamageable, public IAbilityHolder {
 
   virtual uint32_t GetId() const = 0;
   virtual const std::string& GetName() const = 0;
+  virtual positioning::EntitySize GetEntitySize() const = 0;
+  virtual double GetSpeedMeters() const = 0;
 };
 
 }  // namespace entities

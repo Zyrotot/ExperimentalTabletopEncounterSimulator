@@ -40,6 +40,8 @@ struct CombatEventContext {
   IAttackQueue* attack_queue = nullptr;
   std::vector<const Effect*> transient_effects = {};
   mutable std::vector<rules::DamageInstance> self_damage_instances = {};
+
+  double distance_meters = 0.0;
 };
 
 }  // namespace combat

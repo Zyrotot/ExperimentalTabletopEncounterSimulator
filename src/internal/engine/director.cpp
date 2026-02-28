@@ -77,6 +77,13 @@ void Director::RunTurn(entities::IEntity* entity) {
 
   logger_->Info("--- {}'s turn ---", entity->GetName());
 
+  logger_->Debug("Target current HP: {} and temp HP: {}",
+                 target->GetCurrentStats().base_stats.hp,
+                 target->GetCurrentStats().bonus_stats.temporary_hp);
+  logger_->Debug("Source current HP: {} and temp HP: {}",
+                 entity->GetCurrentStats().base_stats.hp,
+                 entity->GetCurrentStats().bonus_stats.temporary_hp);
+
   combat::CombatEventContext context;
   context.source = entity;
   combat::EmitCombatEvent(combat::CombatEvent::TurnStart, &context);

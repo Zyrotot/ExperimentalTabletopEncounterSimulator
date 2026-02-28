@@ -11,6 +11,7 @@
 #include <memory>
 #include <vector>
 
+#include "internal/config/config.h"
 #include "internal/factory/i_factory.h"
 #include "internal/logging/logger.h"
 
@@ -23,6 +24,7 @@ class Roller;
 namespace simulator {
 
 struct SimulationResults {
+  config::SimulationMode mode = config::SimulationMode::WaveScaling;
   int num_simulations = 0;
 
   std::vector<int> max_waves_cleared;
@@ -39,7 +41,9 @@ struct SimulationResults {
 class Simulator {
  public:
   Simulator(std::unique_ptr<factory::IFactory> entity_factory,
-            std::shared_ptr<dice_rolls::Roller> roller);
+            std::shared_ptr<dice_rolls::Roller> roller,
+            config::SimulationMode mode = config::SimulationMode::WaveScaling,
+            int max_waves = 75);
 
   SimulationResults Run(int num_simulations,
                         unsigned int num_threads = 0) const;
@@ -48,9 +52,12 @@ class Simulator {
   bool RunWave(int wave, std::shared_ptr<dice_rolls::Roller> roller) const;
 
   int RunOnce(std::shared_ptr<dice_rolls::Roller> roller) const;
+  int RunOnceEndurance(std::shared_ptr<dice_rolls::Roller> roller) const;
 
   std::unique_ptr<factory::IFactory> entity_factory_;
   std::shared_ptr<dice_rolls::Roller> roller_;
+  config::SimulationMode mode_;
+  int max_waves_;
   logging::Logger* logger_;
 };
 

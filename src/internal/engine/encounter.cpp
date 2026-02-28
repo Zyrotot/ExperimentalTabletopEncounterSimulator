@@ -111,5 +111,9 @@ const std::vector<std::unique_ptr<entities::IEntity>>& Encounter::GetSideB()
   return side_b_;
 }
 
+std::vector<std::unique_ptr<entities::IEntity>> Encounter::ReleaseSideA() {
+  return std::move(side_a_);
+}
+
 }  // namespace engine
 }  // namespace ettes

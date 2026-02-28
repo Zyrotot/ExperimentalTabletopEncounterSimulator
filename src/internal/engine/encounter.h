@@ -44,6 +44,8 @@ class Encounter {
   const std::vector<std::unique_ptr<entities::IEntity>>& GetSideA() const;
   const std::vector<std::unique_ptr<entities::IEntity>>& GetSideB() const;
 
+  std::vector<std::unique_ptr<entities::IEntity>> ReleaseSideA();
+
  private:
   int FindSideOf(const entities::IEntity* entity) const;
 

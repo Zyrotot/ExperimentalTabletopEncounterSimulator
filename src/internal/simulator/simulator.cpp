@@ -7,10 +7,11 @@
 #include "internal/simulator/simulator.h"
 
 #include <algorithm>
-#include <future>   // NOLINT
+#include <future>  // NOLINT
 #include <iomanip>
 #include <iostream>
 #include <numeric>
+#include <string>
 #include <thread>  // NOLINT
 
 #include "internal/dice_rolls/roller.h"
@@ -21,27 +22,36 @@
 #include "internal/factory/i_factory.h"
 #include "internal/logging/log_manager.h"
 
-constexpr int MAX_WAVES = 75;
+constexpr int kDefaultMaxWaves = 75;
 
 namespace ettes {
 namespace simulator {
 
 void SimulationResults::Print() const {
+  const bool endurance = (mode == config::SimulationMode::Endurance);
+  const std::string unit = endurance ? "enemies" : "waves";
+
   std::cout
       << "\n============================================================\n";
-  std::cout << "  Simulation Results\n";
+  std::cout << "  Simulation Results";
+  if (endurance) {
+    std::cout << "  [Endurance]";
+  } else {
+    std::cout << "  [Wave Scaling]";
+  }
+  std::cout << "\n";
   std::cout << "============================================================\n";
   std::cout << "  Runs          : " << num_simulations << "\n";
   std::cout << std::fixed << std::setprecision(2);
-  std::cout << "  Avg waves     : " << average << "\n";
-  std::cout << "  Min waves     : " << min_wave << "\n";
-  std::cout << "  Max waves     : " << max_wave << "\n";
-  std::cout << "\n  Wave distribution (waves cleared -> number of runs):\n";
+  std::cout << "  Avg " << unit << std::string(10 - unit.size(), ' ') << ": " << average << "\n";
+  std::cout << "  Min " << unit << std::string(10 - unit.size(), ' ') << ": " << min_wave << "\n";
+  std::cout << "  Max " << unit << std::string(10 - unit.size(), ' ') << ": " << max_wave << "\n";
+  std::cout << "\n  Distribution (" << unit << " -> number of runs):\n";
   std::cout << "  ----------------------------------------------------------\n";
   for (const auto& [wave, count] : wave_distribution) {
     double pct = 100.0 * static_cast<double>(count) /
                  static_cast<double>(num_simulations);
-    std::cout << "    Wave " << std::setw(3) << wave << " : " << std::setw(5)
+    std::cout << "    " << std::setw(7) << wave << "  : " << std::setw(5)
               << count << " runs  (" << std::setw(6) << std::setprecision(2)
               << pct << "%)\n";
   }
@@ -50,9 +60,13 @@ void SimulationResults::Print() const {
 }
 
 Simulator::Simulator(std::unique_ptr<factory::IFactory> entity_factory,
-                     std::shared_ptr<dice_rolls::Roller> roller)
+                     std::shared_ptr<dice_rolls::Roller> roller,
+                     config::SimulationMode mode,
+                     int max_waves)
     : entity_factory_(std::move(entity_factory)),
       roller_(std::move(roller)),
+      mode_(mode),
+      max_waves_(max_waves > 0 ? max_waves : kDefaultMaxWaves),
       logger_(logging::LogManager::GetLogger("simulator")) {
 }
 
@@ -81,13 +95,18 @@ SimulationResults Simulator::Run(int num_simulations,
           results.reserve(static_cast<std::size_t>(count));
 
           for (int sim = 0; sim < count; ++sim) {
-            results.push_back(RunOnce(local_roller));
+            if (mode_ == config::SimulationMode::Endurance) {
+              results.push_back(RunOnceEndurance(local_roller));
+            } else {
+              results.push_back(RunOnce(local_roller));
+            }
           }
           return results;
         }));
   }
 
   SimulationResults results;
+  results.mode = mode_;
   results.num_simulations = num_simulations;
   results.max_waves_cleared.reserve(static_cast<std::size_t>(num_simulations));
 
@@ -133,11 +152,11 @@ bool Simulator::RunWave(int wave,
 int Simulator::RunOnce(std::shared_ptr<dice_rolls::Roller> roller) const {
   int waves_cleared = 0;
 
-  for (int wave = 1; wave <= MAX_WAVES; ++wave) {
+  for (int wave = 1; wave <= max_waves_; ++wave) {
     if (RunWave(wave, roller)) {
       waves_cleared = wave;
-      if (wave == MAX_WAVES) {
-        logger_->Info("Wave cap ({}) reached — character wins!", MAX_WAVES);
+      if (wave == max_waves_) {
+        logger_->Info("Wave cap ({}) reached — character wins!", max_waves_);
         break;
       }
       logger_->Info("Wave {} cleared.", wave);
@@ -148,6 +167,43 @@ int Simulator::RunOnce(std::shared_ptr<dice_rolls::Roller> roller) const {
   }
 
   return waves_cleared;
+}
+
+int Simulator::RunOnceEndurance(
+    std::shared_ptr<dice_rolls::Roller> roller) const {
+  int enemies_defeated = 0;
+
+  std::vector<std::unique_ptr<entities::IEntity>> player_side;
+  player_side.push_back(entity_factory_->CreatePlayer());
+
+  for (int i = 1; i <= max_waves_; ++i) {
+    std::vector<std::unique_ptr<entities::IEntity>> enemy_side;
+    enemy_side.push_back(entity_factory_->CreateMonster());
+
+    engine::CombatEngine combat_engine(roller);
+    engine::Encounter encounter(std::move(player_side), std::move(enemy_side));
+    engine::Director director(&encounter, &combat_engine);
+
+    director.RunEncounter();
+
+    if (!encounter.HasLivingEntitiesOnSideA()) {
+      logger_->Info("Endurance: defeated {} enemies before falling.",
+                    enemies_defeated);
+      break;
+    }
+
+    enemies_defeated++;
+    player_side = encounter.ReleaseSideA();
+
+    if (enemies_defeated >= max_waves_) {
+      logger_->Info("Endurance: cap ({}) reached!", max_waves_);
+      break;
+    }
+
+    logger_->Debug("Endurance: enemy {} defeated.", enemies_defeated);
+  }
+
+  return enemies_defeated;
 }
 
 }  // namespace simulator

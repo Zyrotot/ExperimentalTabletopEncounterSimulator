@@ -11,12 +11,39 @@
 
 #include <memory>
 #include <mutex>  // NOLINT
+#include <string>
 #include <unordered_map>
-
-#include "spdlog/common.h"
 
 namespace ettes {
 namespace logging {
+
+spdlog::level::level_enum LogManager::default_level_ = spdlog::level::info;
+
+void LogManager::SetDefaultLevel(const std::string& level) {
+  default_level_ = ParseLevel(level);
+}
+
+spdlog::level::level_enum LogManager::ParseLevel(const std::string& level) {
+  if (level == "trace") {
+    return spdlog::level::trace;
+  }
+  if (level == "debug") {
+    return spdlog::level::debug;
+  }
+  if (level == "info") {
+    return spdlog::level::info;
+  }
+  if (level == "warn") {
+    return spdlog::level::warn;
+  }
+  if (level == "error") {
+    return spdlog::level::err;
+  }
+  if (level == "critical") {
+    return spdlog::level::critical;
+  }
+  return spdlog::level::info;
+}
 
 Logger* LogManager::GetLogger(const std::string& name) {
   static std::mutex creation_mutex;
@@ -32,6 +59,7 @@ Logger* LogManager::GetLogger(const std::string& name) {
   if (!spd) {
     spd = spdlog::stdout_color_mt(name);
     spd->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] [%n] %v");
+    spd->set_level(default_level_);
   }
 
   auto [it, ok] = wrappers.emplace(name, std::make_unique<Logger>(spd.get()));

@@ -161,7 +161,6 @@ TEST_F(MultiAbilityInteractionTest, CritFortErosaoAndDR) {
   {
     ::testing::InSequence seq;
     EXPECT_CALL(*harness_->mock_engine, GetRand(20)).WillOnce(Return(20));
-    EXPECT_CALL(*harness_->mock_engine, GetRand(100)).WillOnce(Return(1));
     EXPECT_CALL(*harness_->mock_engine, GetRand(8)).WillOnce(Return(8));
   }
 

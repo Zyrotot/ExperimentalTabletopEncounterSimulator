@@ -52,41 +52,42 @@ void AttackResolver::ResolveAttackMove(const AttackMove& attack_move) {
                               .crit_multiplier = 1,
                               .damage_instances = {}};
 
-  current_result.d20_roll =
-      context_->roller->Roll(Term{.dice_groups = {{1, 20}}});
-  logger_->Debug("D20 roll: {}", current_result.d20_roll);
+  context_->results.push_back(current_result);
+  AttackResult& result = context_->results.back();
 
-  current_result.total_attack_roll =
-      current_result.d20_roll + CalculateTotalAttackModifier(attack_move);
+  result.d20_roll = context_->roller->Roll(Term{.dice_groups = {{1, 20}}});
+  logger_->Debug("D20 roll: {}", result.d20_roll);
+
+  result.total_attack_roll =
+      result.d20_roll + CalculateTotalAttackModifier(attack_move);
 
   combat::EmitCombatEvent(CombatEvent::AttackRoll, context_);
 
   int defender_ac = context_->target->GetEffectiveAC();
   logger_->Info("{} rolls {} vs AC {}", context_->source->GetName(),
-                current_result.total_attack_roll, defender_ac);
+                result.total_attack_roll, defender_ac);
 
-  if (current_result.total_attack_roll >= defender_ac) {
-    current_result.is_hit = true;
+  if (result.total_attack_roll >= defender_ac) {
+    result.is_hit = true;
 
-    current_result.crit_multiplier =
-        CheckCriticalHit(attack_move, current_result.d20_roll,
-                         context_->target->GetFortification());
-    current_result.is_crit = current_result.crit_multiplier > 1;
+    result.crit_multiplier = CheckCriticalHit(
+        attack_move, result.d20_roll, context_->target->GetFortification());
+    result.is_crit = result.crit_multiplier > 1;
 
-    if (current_result.is_crit) {
+    if (result.is_crit) {
       combat::EmitCombatEvent(CombatEvent::CriticalHit, context_);
     }
 
     combat::EmitCombatEvent(CombatEvent::Hit, context_);
 
     DamageInstance base_dmg =
-        CalculateBaseDamage(attack_move, current_result.crit_multiplier);
-    current_result.damage_instances.push_back(base_dmg);
+        CalculateBaseDamage(attack_move, result.crit_multiplier);
+    result.damage_instances.push_back(base_dmg);
 
-    GatherDamageFromSources(attack_move, &current_result);
+    GatherDamageFromSources(attack_move, &result);
 
     int total_damage = 0;
-    for (const auto& dmg : current_result.damage_instances) {
+    for (const auto& dmg : result.damage_instances) {
       total_damage += dmg.amount;
     }
     logger_->Info("Hit! Total damage: {}", total_damage);
@@ -94,8 +95,6 @@ void AttackResolver::ResolveAttackMove(const AttackMove& attack_move) {
     logger_->Info("Miss!");
     combat::EmitCombatEvent(CombatEvent::Miss, context_);
   }
-
-  context_->results.push_back(current_result);
 }
 
 DamageInstance AttackResolver::CalculateBaseDamage(
@@ -153,11 +152,13 @@ int AttackResolver::CheckCriticalHit(const AttackMove& attack_move,
   int crit_threshold =
       attack_move.weapon.crit_range - attack_move.crit_range_bonus;
   if (attack_roll >= crit_threshold) {
-    int fortification_roll =
-        context_->roller->Roll(Term{.dice_groups = {{1, 100}}});
-    if (fortification_roll <= fortification) {
-      logger_->Info("Critical hit negated by fortification!");
-      return 1;
+    if (fortification > 0) {
+      int fortification_roll =
+          context_->roller->Roll(Term{.dice_groups = {{1, 100}}});
+      if (fortification_roll <= fortification) {
+        logger_->Info("Critical hit negated by fortification!");
+        return 1;
+      }
     }
 
     int multiplier =

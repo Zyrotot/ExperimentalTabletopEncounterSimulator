@@ -32,10 +32,8 @@ class EventManagerTest : public ::testing::Test {
   std::unique_ptr<MockEntity> target_;
 };
 
-TEST_F(EventManagerTest, NullContextReturnsEmptyModifications) {
-  auto result = EmitCombatEvent(CombatEvent::Hit, nullptr);
-
-  EXPECT_TRUE(result.empty());
+TEST_F(EventManagerTest, NullContextDoesNotCrash) {
+  EmitCombatEvent(CombatEvent::Hit, nullptr);
 }
 
 TEST_F(EventManagerTest, EmitsEventToSourceOnHit) {
@@ -82,13 +80,17 @@ TEST_F(EventManagerTest, EmitsEventToTargetOnTakeDamage) {
   EXPECT_TRUE(was_called);
 }
 
-TEST_F(EventManagerTest, OnDamageReturnsDamageModification) {
+TEST_F(EventManagerTest, OnEventCanNegateDamageDirectly) {
   Effect eff;
   eff.name = "negate";
   eff.trigger = CombatEvent::TakeDamage;
   eff.is_active = true;
-  eff.on_damage = [](const CombatEventContext&) {
-    return DamageModification{.negate_all = true};
+  eff.on_event = [](const CombatEventContext& ctx) {
+    if (ctx.current_index < ctx.results.size()) {
+      for (auto& dmg : ctx.results[ctx.current_index].damage_instances) {
+        dmg.amount = 0;
+      }
+    }
   };
 
   std::vector<const Effect*> effects = {&eff};
@@ -99,11 +101,14 @@ TEST_F(EventManagerTest, OnDamageReturnsDamageModification) {
   CombatEventContext context;
   context.source = source_.get();
   context.target = target_.get();
+  context.current_index = 0;
+  context.results.push_back(
+      {.attack = nullptr,
+       .damage_instances = {{.amount = 10, .types = 0, .modifiers = 0}}});
 
-  auto mods = EmitCombatEvent(CombatEvent::TakeDamage, &context);
+  EmitCombatEvent(CombatEvent::TakeDamage, &context);
 
-  ASSERT_EQ(mods.size(), 1u);
-  EXPECT_TRUE(mods[0].negate_all);
+  EXPECT_EQ(context.results[0].damage_instances[0].amount, 0);
 }
 
 TEST_F(EventManagerTest, InactiveEffectsAreSkipped) {

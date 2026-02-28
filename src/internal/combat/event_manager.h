@@ -7,17 +7,14 @@
 #ifndef SRC_INTERNAL_COMBAT_EVENT_MANAGER_H_
 #define SRC_INTERNAL_COMBAT_EVENT_MANAGER_H_
 
-#include <vector>
-
 #include "internal/combat/combat_event_types.h"
-#include "internal/combat/damage_modification.h"
 
 namespace ettes {
 namespace combat {
 
 struct CombatEventContext;
 
-std::vector<DamageModification> EmitCombatEvent(
+void EmitCombatEvent(
     CombatEvent event, CombatEventContext* context);
 
 }  // namespace combat

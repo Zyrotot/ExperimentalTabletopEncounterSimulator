@@ -7,7 +7,6 @@
 #include "internal/abilities/ability.h"
 
 #include "internal/combat/combat_context.h"
-#include "internal/combat/damage_modification.h"
 #include "internal/entities/i_entity.h"  // IWYU pragma: keep
 #include "internal/rules/resistances.h"
 
@@ -25,8 +24,9 @@ Ability CreateErosao() {
   effect.source = "Ability: Erosion";
   effect.trigger = combat::CombatEvent::Hit;
   effect.on_event = [](const combat::CombatEventContext& context) {
-    if (!context.target)
+    if (!context.target) {
       return;
+    }
     auto& bonus_dr = context.target->GetCurrentStats()
                          .bonus_stats.bonus_resistances.damage_reductions;
     if (!bonus_dr.empty()) {
@@ -52,8 +52,23 @@ Ability CreateRigidezRaivosa() {
   take_damage_effect.source = "Ability: Rigidez Raivosa";
   take_damage_effect.trigger = combat::CombatEvent::TakeDamage;
   take_damage_effect.on_event = [](const combat::CombatEventContext& context) {
-    if (!context.target)
+    if (!context.target || context.current_index >= context.results.size()) {
       return;
+    }
+
+    const auto current_result = context.results[context.current_index];
+
+    int total_damage = 0;
+    for (const auto& dmg : current_result.damage_instances) {
+      if (dmg.amount > 0) {
+        total_damage += dmg.amount;
+        break;
+      }
+    }
+
+    if (total_damage == 0) {
+      return;
+    }
 
     rules::DamageReduction dr;
     dr.amount = 1;
@@ -67,8 +82,9 @@ Ability CreateRigidezRaivosa() {
   heal_effect.source = "Ability: Rigidez Raivosa";
   heal_effect.trigger = combat::CombatEvent::Heal;
   heal_effect.on_event = [](const combat::CombatEventContext& context) {
-    if (!context.target || context.is_temp_hp)
+    if (!context.target || context.is_temp_hp) {
       return;
+    }
 
     context.target->ClearAllDR(true);
     context.target->SetAbilityStack(AbilityId::RigidezRaivosa, 0);
@@ -131,17 +147,20 @@ Ability CreateDuroDeFerir(int stacks) {
   effect.name = "Duro de Ferir";
   effect.source = "Ability: Duro de Ferir";
   effect.trigger = combat::CombatEvent::TakeDamage;
-  effect.on_damage = [](const combat::CombatEventContext& context)
-      -> combat::DamageModification {
+  effect.on_event = [](const combat::CombatEventContext& context) {
     if (!context.target) {
-      return {};
+      return;
     }
 
     if (context.target->GetAbilityStack(AbilityId::DuroDeFerir) > 0) {
       context.target->DecrementAbilityStack(AbilityId::DuroDeFerir);
-      return {.negate_all = true};
+      if (context.current_index < context.results.size()) {
+        for (auto& dmg :
+             context.results[context.current_index].damage_instances) {
+          dmg.amount = 0;
+        }
+      }
     }
-    return {};
   };
 
   ability.effects.push_back(effect);
@@ -159,14 +178,13 @@ Ability CreateDuroDeMatar(int stacks) {
   effect.name = "Duro de Matar";
   effect.source = "Ability: Duro de Matar";
   effect.trigger = combat::CombatEvent::TakeDamage;
-  effect.on_damage = [](const combat::CombatEventContext& context)
-      -> combat::DamageModification {
+  effect.on_event = [](const combat::CombatEventContext& context) {
     if (!context.target) {
-      return {};
+      return;
     }
 
     if (context.current_index >= context.results.size()) {
-      return {};
+      return;
     }
 
     const auto& current_result = context.results[context.current_index];
@@ -184,10 +202,12 @@ Ability CreateDuroDeMatar(int stacks) {
 
       if (total_damage >= current_hp) {
         context.target->DecrementAbilityStack(AbilityId::DuroDeMatar);
-        return {.negate_all = true};
+        for (auto& dmg :
+             context.results[context.current_index].damage_instances) {
+          dmg.amount = 0;
+        }
       }
     }
-    return {};
   };
 
   ability.effects.push_back(effect);

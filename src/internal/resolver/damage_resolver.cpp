@@ -6,7 +6,6 @@
 
 #include "internal/resolver/damage_resolver.h"
 
-#include "internal/combat/damage_modification.h"
 #include "internal/combat/event_manager.h"
 #include "internal/entities/i_entity.h"  // IWYU pragma: keep
 #include "internal/entities/stats.h"
@@ -41,16 +40,7 @@ void DamageResolver::ApplySingleAttack(size_t result_index) {
     ApplyResistancesToDamage(&dmg_instance, &remaining_resistances, logger_);
   }
 
-  auto modifications =
-      combat::EmitCombatEvent(combat::CombatEvent::TakeDamage, context_);
-
-  for (const auto& mod : modifications) {
-    if (mod.negate_all) {
-      for (auto& dmg : result.damage_instances) {
-        dmg.amount = 0;
-      }
-    }
-  }
+  combat::EmitCombatEvent(combat::CombatEvent::TakeDamage, context_);
 
   int total_damage = 0;
   for (const auto& dmg_instance : result.damage_instances) {

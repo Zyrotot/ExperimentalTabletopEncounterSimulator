@@ -11,7 +11,6 @@
 #include <string>
 
 #include "internal/combat/combat_event_types.h"
-#include "internal/combat/damage_modification.h"
 
 namespace ettes {
 namespace combat {
@@ -23,7 +22,6 @@ struct Effect {
   std::string source;
   CombatEvent trigger;
   std::function<void(const CombatEventContext&)> on_event;
-  std::function<DamageModification(const CombatEventContext&)> on_damage;
   bool is_active = true;
 };
 

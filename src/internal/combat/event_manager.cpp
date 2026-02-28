@@ -7,20 +7,17 @@
 #include "internal/combat/event_manager.h"
 
 #include "internal/combat/combat_context.h"
-#include "internal/combat/damage_modification.h"
 #include "internal/entities/i_entity.h"
 #include "internal/logging/log_manager.h"
 
 namespace ettes {
 namespace combat {
 
-std::vector<DamageModification> EmitCombatEvent(
+void EmitCombatEvent(
     CombatEvent event, CombatEventContext* context) {
   if (!context) {
-    return {};
+    return;
   }
-
-  std::vector<DamageModification> modifications;
 
   static logging::Logger* logger =
       logging::LogManager::GetLogger("events");
@@ -48,15 +45,10 @@ std::vector<DamageModification> EmitCombatEvent(
         continue;
       }
 
-      logger->Debug("Triggering {} effect from {} for {}", effect->name,
-                    effect->source, relevant_entity->GetName());
-
       if (effect->on_event) {
+        logger->Debug("Triggering {} effect from {} for {}", effect->name,
+                      effect->source, relevant_entity->GetName());
         effect->on_event(*context);
-      }
-
-      if (effect->on_damage) {
-        modifications.push_back(effect->on_damage(*context));
       }
     }
   }
@@ -73,13 +65,7 @@ std::vector<DamageModification> EmitCombatEvent(
     if (effect->on_event) {
       effect->on_event(*context);
     }
-
-    if (effect->on_damage) {
-      modifications.push_back(effect->on_damage(*context));
-    }
   }
-
-  return modifications;
 }
 
 }  // namespace combat

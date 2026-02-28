@@ -128,7 +128,7 @@ void DamageResolver::ApplyResistancesToDamage(
         continue;
       }
       if (((dmg_instance->types & static_cast<uint16_t>(dr.bypass_types)) ==
-           0) ||
+           0) &&
           ((dmg_instance->modifiers &
             static_cast<uint16_t>(dr.bypass_modifiers)) == 0)) {
         if (dmg_instance->amount > dr.amount) {

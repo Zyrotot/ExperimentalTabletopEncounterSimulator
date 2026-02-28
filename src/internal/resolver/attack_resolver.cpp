@@ -152,7 +152,10 @@ int AttackResolver::CheckCriticalHit(const AttackMove& attack_move,
   int crit_threshold =
       attack_move.weapon.crit_range - attack_move.crit_range_bonus;
   if (attack_roll >= crit_threshold) {
-    if (fortification > 0) {
+    if (fortification == 100) {
+      logger_->Info("Critical hit negated by fortification!");
+      return 1;
+    } else if (fortification > 0) {
       int fortification_roll =
           context_->roller->Roll(Term{.dice_groups = {{1, 100}}});
       if (fortification_roll <= fortification) {

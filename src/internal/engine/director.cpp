@@ -50,8 +50,8 @@ void Director::InitPositionMap() {
   int width = positioning::RecommendedGridWidth(side_a_ptrs, side_b_ptrs);
   int height = positioning::RecommendedGridHeight(side_a_ptrs, side_b_ptrs);
 
-  position_map_ = std::make_unique<positioning::PositionMap>(
-      width, height, diagonal_mode_);
+  position_map_ =
+      std::make_unique<positioning::PositionMap>(width, height, diagonal_mode_);
   movement_resolver_ =
       std::make_unique<positioning::MovementResolver>(position_map_.get());
 
@@ -65,7 +65,20 @@ const positioning::PositionMap* Director::GetPositionMap() const {
 }
 
 void Director::RunEncounter() {
+  auto collect_ids = [](const auto& side) {
+    std::vector<uint32_t> ids;
+    for (const auto& e : side) {
+      if (e && e->IsAlive()) {
+        ids.push_back(e->GetId());
+      }
+    }
+    return ids;
+  };
+
   while (!encounter_->IsOver()) {
+    std::vector<uint32_t> side_a_ids = collect_ids(encounter_->GetSideA());
+    std::vector<uint32_t> side_b_ids = collect_ids(encounter_->GetSideB());
+
     for (const auto& entity : encounter_->GetSideA()) {
       if (encounter_->IsOver()) {
         break;
@@ -73,7 +86,7 @@ void Director::RunEncounter() {
       if (!entity || !entity->IsAlive()) {
         continue;
       }
-      RunTurn(entity.get());
+      ExecuteTurn(entity.get(), 0, side_a_ids);
     }
     for (const auto& entity : encounter_->GetSideB()) {
       if (encounter_->IsOver()) {
@@ -82,7 +95,7 @@ void Director::RunEncounter() {
       if (!entity || !entity->IsAlive()) {
         continue;
       }
-      RunTurn(entity.get());
+      ExecuteTurn(entity.get(), 0, side_b_ids);
     }
   }
 
@@ -98,6 +111,11 @@ void Director::RunEncounter() {
 }
 
 void Director::RunTurn(entities::IEntity* entity, int attack_sequence_index) {
+  ExecuteTurn(entity, attack_sequence_index, {});
+}
+
+void Director::ExecuteTurn(entities::IEntity* entity, int attack_sequence_index,
+                           const std::vector<uint32_t>& ally_ids) {
   if (!entity || !entity->IsAlive()) {
     return;
   }
@@ -119,16 +137,16 @@ void Director::RunTurn(entities::IEntity* entity, int attack_sequence_index) {
 
     positioning::GridPos destination =
         movement_resolver_->FindClosestReachableCell(entity, target,
-                                                     speed_cells);
+                                                     speed_cells, ally_ids);
 
     positioning::GridPos current = position_map_->GetAnchor(entity);
     if (destination != current) {
-      auto path =
-          movement_resolver_->PlanMove(entity, destination, speed_cells);
+      auto path = movement_resolver_->PlanMove(entity, destination, speed_cells,
+                                               ally_ids);
       if (!path.empty()) {
         movement_resolver_->ApplyMove(entity, path.back());
-        logger_->Debug("{} moves to ({}, {})", entity->GetName(),
-                       path.back().x, path.back().y);
+        logger_->Debug("{} moves to ({}, {})", entity->GetName(), path.back().x,
+                       path.back().y);
         LogGrid();
       }
     }
@@ -168,8 +186,7 @@ void Director::QueueAttack(combat::QueuedAttack attack) {
       auto enemies = encounter_->GetLivingEnemiesOf(attack.attacker);
       entities::IEntity* best = nullptr;
       for (auto* enemy : enemies) {
-        if (position_map_->GetDistanceMeters(attack.attacker, enemy) <=
-            range) {
+        if (position_map_->GetDistanceMeters(attack.attacker, enemy) <= range) {
           best = enemy;
           break;
         }
@@ -189,10 +206,9 @@ void Director::QueueAttack(combat::QueuedAttack attack) {
 
   if (position_map_->GetDistanceMeters(attack.attacker, attack.target) >
       range) {
-    logger_->Info(
-        "Queued attack by {} on {} dropped - out of range",
-        attack.attacker ? attack.attacker->GetName() : "unknown",
-        attack.target->GetName());
+    logger_->Info("Queued attack by {} on {} dropped - out of range",
+                  attack.attacker ? attack.attacker->GetName() : "unknown",
+                  attack.target->GetName());
     return;
   }
 
@@ -224,7 +240,8 @@ entities::IEntity* Director::SelectTarget(entities::IEntity* attacker) const {
   return best;
 }
 
-double Director::GetMaxAttackRange(const entities::IEntity* entity, int attack_index) const {
+double Director::GetMaxAttackRange(const entities::IEntity* entity,
+                                   int attack_index) const {
   const auto& sequence = entity->GetAttackSequence(attack_index);
   double max_range = std::numeric_limits<double>::max();
   for (const auto& attack : sequence.attacks) {
@@ -246,8 +263,7 @@ void Director::LogGrid() const {
       continue;
     }
     positioning::GridPos anchor = position_map_->GetAnchor(e.get());
-    int foot =
-        positioning::FootprintCells(position_map_->GetSize(e.get()));
+    int foot = positioning::FootprintCells(position_map_->GetSize(e.get()));
     for (int dx = 0; dx < foot; ++dx) {
       for (int dy = 0; dy < foot; ++dy) {
         size_t cx = static_cast<size_t>(anchor.x + dx);
@@ -264,8 +280,7 @@ void Director::LogGrid() const {
       continue;
     }
     positioning::GridPos anchor = position_map_->GetAnchor(e.get());
-    int foot =
-        positioning::FootprintCells(position_map_->GetSize(e.get()));
+    int foot = positioning::FootprintCells(position_map_->GetSize(e.get()));
     for (int dx = 0; dx < foot; ++dx) {
       for (int dy = 0; dy < foot; ++dy) {
         size_t cx = static_cast<size_t>(anchor.x + dx);

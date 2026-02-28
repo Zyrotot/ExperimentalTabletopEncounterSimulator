@@ -61,6 +61,9 @@ class PositionMap {
   bool IsCellOccupied(GridPos pos) const;
   bool IsAreaFree(GridPos anchor, EntitySize size,
                   const entities::IEntity* ignore = nullptr) const;
+  const entities::IEntity* GetEntityBlockingArea(
+      GridPos anchor, EntitySize size,
+      const entities::IEntity* ignore = nullptr) const;
 
  private:
   int MinFootprintDistance(const Placement& a, const Placement& b) const;

@@ -8,6 +8,7 @@
 #define SRC_INTERNAL_ENGINE_DIRECTOR_H_
 
 #include <memory>
+#include <vector>
 
 #include "internal/combat/attack_queue.h"
 #include "internal/engine/combat_engine.h"
@@ -42,7 +43,10 @@ class Director : public combat::IAttackQueue {
   void LogGrid() const;
 
   entities::IEntity* SelectTarget(entities::IEntity* attacker) const;
-  double GetMaxAttackRange(const entities::IEntity* entity, int attack_index) const;
+  double GetMaxAttackRange(const entities::IEntity* entity,
+                           int attack_index) const;
+  void ExecuteTurn(entities::IEntity* entity, int attack_sequence_index,
+                   const std::vector<uint32_t>& ally_ids);
 
   Encounter* encounter_;
   CombatEngine* engine_;

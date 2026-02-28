@@ -84,7 +84,7 @@ EntitySize PositionMap::GetSize(const entities::IEntity* entity) const {
 }
 
 int PositionMap::MinFootprintDistance(const Placement& a,
-                                     const Placement& b) const {
+                                      const Placement& b) const {
   int a_foot = FootprintCells(a.size);
   int b_foot = FootprintCells(b.size);
 
@@ -173,13 +173,43 @@ std::vector<const entities::IEntity*> PositionMap::GetAdjacentEntities(
   return GetEntitiesInRange(entity, kCellSizeMeters);
 }
 
+const entities::IEntity* PositionMap::GetEntityBlockingArea(
+    GridPos anchor, EntitySize size, const entities::IEntity* ignore) const {
+  int foot = FootprintCells(size);
+  uint32_t ignore_id = ignore ? ignore->GetId() : 0;
+  bool has_ignore = (ignore != nullptr);
+
+  for (int dx = 0; dx < foot; ++dx) {
+    for (int dy = 0; dy < foot; ++dy) {
+      GridPos cell{anchor.x + dx, anchor.y + dy};
+      if (cell.x < 0 || cell.x >= width_ || cell.y < 0 || cell.y >= height_) {
+        return nullptr;
+      }
+      for (const auto& [id, placement] : placements_) {
+        if (has_ignore && id == ignore_id) {
+          continue;
+        }
+        int pfoot = FootprintCells(placement.size);
+        if (cell.x >= placement.anchor.x &&
+            cell.x < placement.anchor.x + pfoot &&
+            cell.y >= placement.anchor.y &&
+            cell.y < placement.anchor.y + pfoot) {
+          auto eit = id_to_entity_.find(id);
+          if (eit != id_to_entity_.end()) {
+            return eit->second;
+          }
+        }
+      }
+    }
+  }
+  return nullptr;
+}
+
 bool PositionMap::IsCellOccupied(GridPos pos) const {
   for (const auto& [id, placement] : placements_) {
     int foot = FootprintCells(placement.size);
-    if (pos.x >= placement.anchor.x &&
-        pos.x < placement.anchor.x + foot &&
-        pos.y >= placement.anchor.y &&
-        pos.y < placement.anchor.y + foot) {
+    if (pos.x >= placement.anchor.x && pos.x < placement.anchor.x + foot &&
+        pos.y >= placement.anchor.y && pos.y < placement.anchor.y + foot) {
       return true;
     }
   }
@@ -195,8 +225,7 @@ bool PositionMap::IsAreaFree(GridPos anchor, EntitySize size,
   for (int dx = 0; dx < foot; ++dx) {
     for (int dy = 0; dy < foot; ++dy) {
       GridPos cell{anchor.x + dx, anchor.y + dy};
-      if (cell.x < 0 || cell.x >= width_ || cell.y < 0 ||
-          cell.y >= height_) {
+      if (cell.x < 0 || cell.x >= width_ || cell.y < 0 || cell.y >= height_) {
         return false;
       }
       for (const auto& [id, placement] : placements_) {

@@ -1,9 +1,9 @@
 {
   "simulation_mode": "wave_scaling",
   "num_simulations": 1000,
-  "max_waves": 75,
+  "max_waves": 50,
   "player_file": "character.json",
   "monster": "reishid",
-  "log_level": "info",
+  "log_level": "error",
   "num_threads": 0
 }

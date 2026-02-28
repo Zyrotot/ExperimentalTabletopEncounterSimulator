@@ -177,5 +177,158 @@ TEST_F(EventManagerTest, TransientEffectsWithWrongTriggerAreSkipped) {
   EXPECT_FALSE(was_called);
 }
 
+TEST_F(EventManagerTest, EmitsEventToSourceOnDealDamage) {
+  bool was_called = false;
+  Effect eff;
+  eff.name = "on_deal";
+  eff.trigger = CombatEvent::DealDamage;
+  eff.is_active = true;
+  eff.on_event = [&](const CombatEventContext&) { was_called = true; };
+  std::vector<const Effect*> effects = {&eff};
+  ON_CALL(*source_, GetEffectsForEvent(CombatEvent::DealDamage))
+      .WillByDefault(ReturnRef(effects));
+  CombatEventContext context;
+  context.source = source_.get();
+  context.target = target_.get();
+  EmitCombatEvent(CombatEvent::DealDamage, &context);
+  EXPECT_TRUE(was_called);
+}
+
+TEST_F(EventManagerTest, EmitsEventToSourceOnKill) {
+  bool was_called = false;
+  Effect eff;
+  eff.name = "on_kill";
+  eff.trigger = CombatEvent::Kill;
+  eff.is_active = true;
+  eff.on_event = [&](const CombatEventContext&) { was_called = true; };
+  std::vector<const Effect*> effects = {&eff};
+  ON_CALL(*source_, GetEffectsForEvent(CombatEvent::Kill))
+      .WillByDefault(ReturnRef(effects));
+  CombatEventContext context;
+  context.source = source_.get();
+  context.target = target_.get();
+  EmitCombatEvent(CombatEvent::Kill, &context);
+  EXPECT_TRUE(was_called);
+}
+
+TEST_F(EventManagerTest, EmitsEventToSourceOnTurnStart) {
+  bool was_called = false;
+  Effect eff;
+  eff.name = "on_turn_start";
+  eff.trigger = CombatEvent::TurnStart;
+  eff.is_active = true;
+  eff.on_event = [&](const CombatEventContext&) { was_called = true; };
+  std::vector<const Effect*> effects = {&eff};
+  ON_CALL(*source_, GetEffectsForEvent(CombatEvent::TurnStart))
+      .WillByDefault(ReturnRef(effects));
+  CombatEventContext context;
+  context.source = source_.get();
+  context.target = target_.get();
+  EmitCombatEvent(CombatEvent::TurnStart, &context);
+  EXPECT_TRUE(was_called);
+}
+
+TEST_F(EventManagerTest, EmitsEventToTargetOnHeal) {
+  bool was_called = false;
+  Effect eff;
+  eff.name = "on_heal";
+  eff.trigger = CombatEvent::Heal;
+  eff.is_active = true;
+  eff.on_event = [&](const CombatEventContext&) { was_called = true; };
+  std::vector<const Effect*> effects = {&eff};
+  ON_CALL(*target_, GetEffectsForEvent(CombatEvent::Heal))
+      .WillByDefault(ReturnRef(effects));
+  CombatEventContext context;
+  context.source = source_.get();
+  context.target = target_.get();
+  EmitCombatEvent(CombatEvent::Heal, &context);
+  EXPECT_TRUE(was_called);
+}
+
+TEST_F(EventManagerTest, DefaultEventDoesNotRouteToEntity) {
+  bool was_called = false;
+  Effect eff;
+  eff.name = "should_not_fire";
+  eff.trigger = CombatEvent::AttackRoll;
+  eff.is_active = true;
+  eff.on_event = [&](const CombatEventContext&) { was_called = true; };
+  std::vector<const Effect*> effects = {&eff};
+  ON_CALL(*source_, GetEffectsForEvent(CombatEvent::AttackRoll))
+      .WillByDefault(ReturnRef(effects));
+  ON_CALL(*target_, GetEffectsForEvent(CombatEvent::AttackRoll))
+      .WillByDefault(ReturnRef(effects));
+  CombatEventContext context;
+  context.source = source_.get();
+  context.target = target_.get();
+  EmitCombatEvent(CombatEvent::AttackRoll, &context);
+  EXPECT_FALSE(was_called);
+}
+
+TEST_F(EventManagerTest, MissEventDoesNotRouteToEntity) {
+  bool was_called = false;
+  Effect eff;
+  eff.name = "should_not_fire";
+  eff.trigger = CombatEvent::Miss;
+  eff.is_active = true;
+  eff.on_event = [&](const CombatEventContext&) { was_called = true; };
+  std::vector<const Effect*> effects = {&eff};
+  ON_CALL(*source_, GetEffectsForEvent(CombatEvent::Miss))
+      .WillByDefault(ReturnRef(effects));
+  CombatEventContext context;
+  context.source = source_.get();
+  context.target = target_.get();
+  EmitCombatEvent(CombatEvent::Miss, &context);
+  EXPECT_FALSE(was_called);
+}
+
+TEST_F(EventManagerTest, NullOnEventEntityEffectDoesNotCrash) {
+  Effect eff;
+  eff.name = "null_callback";
+  eff.trigger = CombatEvent::Hit;
+  eff.is_active = true;
+  eff.on_event = nullptr;
+  std::vector<const Effect*> effects = {&eff};
+  ON_CALL(*source_, GetEffectsForEvent(CombatEvent::Hit))
+      .WillByDefault(ReturnRef(effects));
+  CombatEventContext context;
+  context.source = source_.get();
+  context.target = target_.get();
+  EmitCombatEvent(CombatEvent::Hit, &context);
+}
+
+TEST_F(EventManagerTest, InactiveTransientEffectSkipped) {
+  bool was_called = false;
+  Effect transient;
+  transient.name = "inactive_transient";
+  transient.trigger = CombatEvent::Hit;
+  transient.is_active = false;
+  transient.on_event = [&](const CombatEventContext&) { was_called = true; };
+  std::vector<const Effect*> empty_effects;
+  ON_CALL(*source_, GetEffectsForEvent(CombatEvent::Hit))
+      .WillByDefault(ReturnRef(empty_effects));
+  CombatEventContext context;
+  context.source = source_.get();
+  context.target = target_.get();
+  context.transient_effects = {&transient};
+  EmitCombatEvent(CombatEvent::Hit, &context);
+  EXPECT_FALSE(was_called);
+}
+
+TEST_F(EventManagerTest, NullOnEventTransientDoesNotCrash) {
+  Effect transient;
+  transient.name = "null_transient";
+  transient.trigger = CombatEvent::Hit;
+  transient.is_active = true;
+  transient.on_event = nullptr;
+  std::vector<const Effect*> empty_effects;
+  ON_CALL(*source_, GetEffectsForEvent(CombatEvent::Hit))
+      .WillByDefault(ReturnRef(empty_effects));
+  CombatEventContext context;
+  context.source = source_.get();
+  context.target = target_.get();
+  context.transient_effects = {&transient};
+  EmitCombatEvent(CombatEvent::Hit, &context);
+}
+
 }  // namespace combat
 }  // namespace ettes

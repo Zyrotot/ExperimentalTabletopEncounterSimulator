@@ -65,5 +65,27 @@ TEST(ParseTermTest, NoDiceGroupsReturnsNullopt) {
   EXPECT_FALSE(result.has_value());
 }
 
+TEST(ParseTermTest, MultipleDiceGroupsNoBonus) {
+  auto result = Term::Parse("1d8+1d6");
+
+  ASSERT_TRUE(result.has_value());
+  ASSERT_EQ(result->dice_groups.size(), 2u);
+  EXPECT_EQ(result->dice_groups[0].count, 1);
+  EXPECT_EQ(result->dice_groups[0].sides, 8);
+  EXPECT_EQ(result->dice_groups[1].count, 1);
+  EXPECT_EQ(result->dice_groups[1].sides, 6);
+  EXPECT_EQ(result->bonus, 0);
+}
+
+TEST(ParseTermTest, SingleDieGroupLargeNumbers) {
+  auto result = Term::Parse("10d12+15");
+
+  ASSERT_TRUE(result.has_value());
+  ASSERT_EQ(result->dice_groups.size(), 1u);
+  EXPECT_EQ(result->dice_groups[0].count, 10);
+  EXPECT_EQ(result->dice_groups[0].sides, 12);
+  EXPECT_EQ(result->bonus, 15);
+}
+
 }  // namespace dice_rolls
 }  // namespace ettes

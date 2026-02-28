@@ -30,7 +30,7 @@ struct AttackResult {
   bool is_hit = false;
   bool is_crit = false;
   int crit_multiplier = 1;
-  std::vector<rules::DamageInstance> damage_instances;
+  mutable std::vector<rules::DamageInstance> damage_instances;
 };
 
 struct QueuedAttack {
